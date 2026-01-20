@@ -1,0 +1,156 @@
+:host {
+  font-family: 'Inter', sans-serif; /* Hoặc font hệ thống */
+}
+
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+/* PHẦN BÊN TRÁI: FORM */
+.login-form-section {
+  flex: 0 0 45%; /* Chiếm 45% chiều rộng */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #000;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 32px;
+  font-size: 1rem;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #333;
+  font-weight: 500;
+}
+
+.checkbox-container input {
+  margin-right: 8px;
+}
+
+.forgot-password {
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* BUTTONS */
+.btn-signin {
+  width: 100%;
+  padding: 14px;
+  background-color: #f0444e; /* Màu đỏ như trong ảnh */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: background 0.3s;
+}
+
+.btn-signin:hover {
+  background-color: #d93d45;
+}
+
+.btn-google {
+  width: 100%;
+  padding: 12px;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.btn-google img {
+  width: 20px;
+}
+
+.signup-text {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.signup-text a {
+  color: #f0444e;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* PHẦN BÊN PHẢI: IMAGE */
+.login-image-section {
+  flex: 0 0 55%; /* Chiếm 55% chiều rộng */
+  background-color: #f3f4f6; /* Màu nền xám nhạt */
+  background-image: url('/assets/images/login-bg.png'); /* Đường dẫn ảnh của bạn */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Responsive cho di động */
+@media (max-width: 768px) {
+  .login-image-section {
+    display: none;
+  }
+  .login-form-section {
+    flex: 0 0 100%;
+  }
+}
