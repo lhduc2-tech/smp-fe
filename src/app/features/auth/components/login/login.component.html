@@ -6,8 +6,8 @@
 
       <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
         <div class="input-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" formControlName="email" placeholder="Enter your email">
+          <label for="username">Username</label>
+          <input type="username" id="username" formControlName="username" placeholder="Enter your username">
         </div>
 
         <div class="input-group">
@@ -24,7 +24,8 @@
           <a href="#" class="forgot-password">Forgot password</a>
         </div>
 
-        <button type="submit" class="btn-signin">Sign in</button>
+        <button type="submit" class="btn-primary btn-signin">Sign in </button>
+
       </form>
 
       <button class="btn-google">
