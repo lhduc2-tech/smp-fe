@@ -25,7 +25,7 @@ type IconType = 'edit' | 'delete' | 'add' | 'search' | 'view';
     }
 
     .icon-edit {
-      color: #0066ff;
+      color: #6366F1;
     }
 
     .icon-delete {
@@ -41,7 +41,7 @@ type IconType = 'edit' | 'delete' | 'add' | 'search' | 'view';
     }
 
     .icon-view {
-      color: #0066ff;
+      color: #6366F1;
     }
   `]
 })

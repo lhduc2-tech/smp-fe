@@ -68,11 +68,11 @@ interface MenuItem {
   styles: [`
     .sidebar {
       width: 250px;
-      background-color: #1a1f3a;
+      background-color: #1e1b4b;
       color: #fff;
       overflow-y: auto;
       transition: width 0.3s ease;
-      border-right: 1px solid #2d3154;
+      border-right: 1px solid #312e81;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -96,7 +96,7 @@ interface MenuItem {
     }
 
     .logo-text {
-      background: linear-gradient(135deg, #0066ff, #00d4ff);
+      background: linear-gradient(135deg, #6366F1, #4F46E5);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -135,14 +135,14 @@ interface MenuItem {
     }
 
     .menu-item:hover {
-      background-color: #252d47;
+      background-color: #312e81;
       color: #fff;
     }
 
     .menu-item.active {
-      background-color: #0066ff;
+      background-color: #6366F1;
       color: #fff;
-      border-left-color: #00d4ff;
+      border-left-color: #a5b4fc;
     }
 
     .menu-parent {
@@ -186,14 +186,14 @@ interface MenuItem {
     }
 
     .submenu-item:hover {
-      background-color: #252d47;
+      background-color: #312e81;
       color: #fff;
     }
 
     .submenu-item.active {
-      background-color: #0066ff;
+      background-color: #6366F1;
       color: #fff;
-      border-left-color: #00d4ff;
+      border-left-color: #a5b4fc;
     }
 
     .icon {

@@ -70,7 +70,7 @@ import { CommonModule } from '@angular/common';
     }
 
     .toggle-sidebar-btn:hover {
-      color: #0066ff;
+      color: #6366F1;
     }
 
     .menu-icon {
@@ -90,9 +90,9 @@ import { CommonModule } from '@angular/common';
 
     .search-box:focus {
       outline: none;
-      border-color: #0066ff;
+      border-color: #6366F1;
       background-color: #fff;
-      box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
     .topbar-right {

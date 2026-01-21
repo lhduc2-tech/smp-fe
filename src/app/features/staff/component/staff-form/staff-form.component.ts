@@ -136,8 +136,8 @@ import { Staff } from '../../models/staff.model';
 
     input:focus, select:focus {
       outline: none;
-      border-color: #0066ff;
-      box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+      border-color: #6366F1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
     .form-actions {
@@ -149,7 +149,7 @@ import { Staff } from '../../models/staff.model';
     }
 
     .btn-submit {
-      background-color: #0066ff;
+      background-color: #6366F1;
       color: white;
       padding: 10px 30px;
       border: none;
@@ -160,7 +160,7 @@ import { Staff } from '../../models/staff.model';
     }
 
     .btn-submit:hover {
-      background-color: #0052cc;
+      background-color: #4F46E5;
     }
 
     .btn-cancel {

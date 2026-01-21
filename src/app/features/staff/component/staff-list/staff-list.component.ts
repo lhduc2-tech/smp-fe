@@ -87,7 +87,7 @@ import { IconComponent } from '../../../../shared/components/icon.component';
     }
 
     .btn-add {
-      background-color: #0066ff;
+      background-color: #6366F1;
       color: white;
       padding: 10px 20px;
       border-radius: 6px;
@@ -97,7 +97,7 @@ import { IconComponent } from '../../../../shared/components/icon.component';
     }
 
     .btn-add:hover {
-      background-color: #0052cc;
+      background-color: #4F46E5;
     }
 
     .search-bar {
@@ -115,8 +115,8 @@ import { IconComponent } from '../../../../shared/components/icon.component';
 
     .search-bar input:focus {
       outline: none;
-      border-color: #0066ff;
-      box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+      border-color: #6366F1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
     .staff-table {
