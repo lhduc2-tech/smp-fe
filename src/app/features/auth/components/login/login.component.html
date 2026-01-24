@@ -1,18 +1,34 @@
 <div class="login-container">
   <div class="login-form-section">
     <div class="form-wrapper">
+
       <h1 class="title">WELCOME BACK</h1>
       <p class="subtitle">Welcome back! Please enter your details.</p>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+      <!-- LOGIN FORM -->
+      <form
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        class="auth-form"
+      >
         <div class="input-group">
           <label for="username">Username</label>
-          <input type="username" id="username" formControlName="username" placeholder="Enter your username">
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Enter your username"
+          >
         </div>
 
         <div class="input-group">
           <label for="password">Password</label>
-          <input type="password" id="password" formControlName="password" placeholder="**********">
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="**********"
+          >
         </div>
 
         <div class="options-row">
@@ -21,24 +37,40 @@
             <span class="checkmark"></span>
             Remember me
           </label>
+
           <a href="#" class="forgot-password">Forgot password</a>
         </div>
 
-        <button type="submit" class="btn-primary btn-signin">Sign in </button>
-
+        <button
+          type="submit"
+          class="btn-primary btn-signin"
+          [disabled]="loading"
+        >
+          Sign in
+        </button>
       </form>
 
-      <button class="btn-google">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+      <!-- GOOGLE LOGIN -->
+      <button
+        type="button"
+        class="btn-google"
+        (click)="loginWithGoogle()"
+      >
+        <img
+          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+          alt="Google logo"
+        >
         Sign in with Google
       </button>
 
+      <!-- REGISTER LINK -->
       <p class="signup-text">
-        Don’t have an account? <a href="#">Sign up for free!</a>
+        Don’t have an account?
+        <a routerLink="/register">Sign up for free!</a>
       </p>
+
     </div>
   </div>
 
-  <div class="login-image-section">
-    </div>
+  <div class="login-image-section"></div>
 </div>

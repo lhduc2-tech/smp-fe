@@ -9,6 +9,12 @@ export const routes: Routes = [
       import('./features/auth/components/login/login.component')
         .then(m => m.LoginComponent)
   },
+    {
+    path: 'register',
+    loadComponent: () =>
+      import('./features/auth/components/register/register.component')
+        .then(m => m.RegisterComponent)
+  },
   {
     path: '',
     canActivate: [authGuard],

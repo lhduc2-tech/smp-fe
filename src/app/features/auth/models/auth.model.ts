@@ -12,3 +12,16 @@ export interface LoginResponse {
   expires_in: number;
   user_id: string;
 }
+
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+}
+
+export interface RegisterResponse {
+  id: string;
+  username: string;
+  email: string;
+}

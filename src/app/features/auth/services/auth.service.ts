@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { LoginRequest, LoginResponse } from '../models/auth.model';
-
+import { RegisterRequest, RegisterResponse } from '../models/auth.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -32,6 +32,27 @@ export class AuthService {
       );
   }
 
+  register(request: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(
+      `${this.API_URL}/register`,
+      request
+    );
+  }
+  loginWithGoogle(idToken: string): Observable<LoginResponse> {
+  return this.http
+    .post<LoginResponse>(`${this.API_URL}/google`, {
+      idToken: idToken
+    })
+    .pipe(
+      tap((res: LoginResponse) => {
+        localStorage.setItem('access_token', res.access_token);
+        localStorage.setItem('username', res.username);
+        localStorage.setItem('user_id', res.user_id);
+        localStorage.setItem('roles', JSON.stringify(res.roles));
+        localStorage.setItem('permissions', JSON.stringify(res.permissions));
+      })
+    );
+}
   logout(): void {
     localStorage.clear();
   }

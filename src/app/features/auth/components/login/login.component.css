@@ -97,7 +97,19 @@
   margin-bottom: 16px;
   transition: background 0.3s;
 }
-
+.btn-signup {
+  width: 100%;
+  padding: 14px;
+  background-color: #09b749; 
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: background 0.3s;
+}
 .btn-signin:hover {
   background-color: #d93d45;
 }
@@ -130,9 +142,15 @@
 }
 
 .signup-text a {
-  color: #f0444e;
-  text-decoration: none;
+  color: #e53935;              /* đỏ như hình bạn gửi */
   font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.signup-text a:hover {
+  text-decoration: none;
+  opacity: 0.85;
 }
 
 /* PHẦN BÊN PHẢI: IMAGE */
