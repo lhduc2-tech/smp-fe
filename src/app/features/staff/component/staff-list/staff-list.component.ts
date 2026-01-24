@@ -32,24 +32,16 @@ import { IconComponent } from '../../../../shared/components/icon.component';
               <th>Tên nhân viên</th>
               <th>Email</th>
               <th>Số điện thoại</th>
-              <th>Chức vụ</th>
-              <th>Trạng thái</th>
-              <th>Ngày vào</th>
+              <th>Ngày tạo</th>
               <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let staff of filteredStaff">
-              <td>{{ staff.name }}</td>
+              <td>{{ staff.fullName }}</td>
               <td>{{ staff.email }}</td>
-              <td>{{ staff.phone }}</td>
-              <td>{{ staff.position }}</td>
-              <td>
-                <span class="status" [class.active]="staff.status === 'active'">
-                  {{ staff.status === 'active' ? 'Hoạt động' : 'Không hoạt động' }}
-                </span>
-              </td>
-              <td>{{ staff.joinDate | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ staff.phoneNumber }}</td>
+              <td>{{ staff.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
               <td class="actions">
                 <a [routerLink]="staff.id" class="action-icon" title="Sửa">
                   <app-icon type="edit"></app-icon>
@@ -224,6 +216,7 @@ export class StaffListComponent implements OnInit {
   staffList: Staff[] = [];
   filteredStaff: Staff[] = [];
   searchTerm = '';
+  isLoading = false;
 
   constructor(private staffService: StaffService) {}
 
@@ -232,9 +225,17 @@ export class StaffListComponent implements OnInit {
   }
 
   loadStaff(): void {
-    this.staffService.getStaffList().subscribe(staff => {
-      this.staffList = staff;
-      this.filterStaff();
+    this.isLoading = true;
+    this.staffService.getStaffList().subscribe({
+      next: (staff) => {
+        this.staffList = staff;
+        this.filterStaff();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Lỗi khi tải danh sách nhân viên:', error);
+        this.isLoading = false;
+      }
     });
   }
 
@@ -244,17 +245,25 @@ export class StaffListComponent implements OnInit {
     } else {
       const term = this.searchTerm.toLowerCase();
       this.filteredStaff = this.staffList.filter(staff =>
-        staff.name.toLowerCase().includes(term) ||
+        staff.fullName.toLowerCase().includes(term) ||
         staff.email.toLowerCase().includes(term) ||
-        staff.phone.includes(term)
+        staff.phoneNumber.includes(term)
       );
     }
   }
 
   deleteStaff(id: string): void {
     if (confirm('Bạn chắc chắn muốn xóa nhân viên này?')) {
-      this.staffService.deleteStaff(id);
-      this.loadStaff();
+      this.staffService.deleteStaff(id).subscribe({
+        next: () => {
+          console.log('Xóa nhân viên thành công');
+          this.loadStaff();
+        },
+        error: (error) => {
+          console.error('Lỗi khi xóa nhân viên:', error);
+          alert('Không thể xóa nhân viên. Vui lòng thử lại!');
+        }
+      });
     }
   }
 }

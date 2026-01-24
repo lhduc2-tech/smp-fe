@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StaffService } from '../../services/staff.service';
 import { Staff } from '../../models/staff.model';
@@ -8,20 +8,19 @@ import { Staff } from '../../models/staff.model';
 @Component({
   selector: 'app-staff-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="staff-form-container">
       <div class="header">
         <h1>{{ isEdit ? 'Chỉnh sửa nhân viên' : 'Thêm nhân viên mới' }}</h1>
       </div>
 
-      <form (ngSubmit)="submitForm()" class="form">
+      <form (ngSubmit)="submitForm()" class="form" [formGroup]="staffForm">
         <div class="form-group">
           <label>Tên nhân viên *</label>
           <input 
             type="text" 
-            [(ngModel)]="staff.name"
-            name="name"
+            formControlName="fullName"
             placeholder="Nhập tên nhân viên"
             required>
         </div>
@@ -31,8 +30,7 @@ import { Staff } from '../../models/staff.model';
             <label>Email *</label>
             <input 
               type="email" 
-              [(ngModel)]="staff.email"
-              name="email"
+              formControlName="email"
               placeholder="Nhập email"
               required>
           </div>
@@ -41,44 +39,16 @@ import { Staff } from '../../models/staff.model';
             <label>Số điện thoại *</label>
             <input 
               type="tel" 
-              [(ngModel)]="staff.phone"
-              name="phone"
+              formControlName="phoneNumber"
               placeholder="Nhập số điện thoại"
               required>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Chức vụ *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="staff.position"
-            name="position"
-            placeholder="Nhập chức vụ"
-            required>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Ngày vào làm *</label>
-            <input 
-              type="date" 
-              [(ngModel)]="staff.joinDate"
-              name="joinDate"
-              required>
-          </div>
-
-          <div class="form-group">
-            <label>Trạng thái *</label>
-            <select [(ngModel)]="staff.status" name="status" required>
-              <option value="active">Hoạt động</option>
-              <option value="inactive">Không hoạt động</option>
-            </select>
-          </div>
-        </div>
-
         <div class="form-actions">
-          <button type="submit" class="btn-submit">{{ isEdit ? 'Cập nhật' : 'Thêm mới' }}</button>
+          <button type="submit" class="btn-submit" [disabled]="isLoading">
+            {{ isLoading ? 'Đang xử lý...' : (isEdit ? 'Cập nhật' : 'Thêm mới') }}
+          </button>
           <a routerLink="/settings/staff" class="btn-cancel">Hủy</a>
         </div>
       </form>
@@ -194,24 +164,23 @@ import { Staff } from '../../models/staff.model';
   `]
 })
 export class StaffFormComponent implements OnInit {
-  staff: Staff = {
-    id: '',
-    name: '',
-    email: '',
-    phone: '',
-    position: '',
-    status: 'active',
-    joinDate: new Date().toISOString().split('T')[0]
-  };
-
+  staffForm: FormGroup;
   isEdit = false;
   staffId: string = '';
+  isLoading = false;
 
   constructor(
+    private formBuilder: FormBuilder,
     private staffService: StaffService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    this.staffForm = this.formBuilder.group({
+      fullName: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.required]]
+    });
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -224,19 +193,101 @@ export class StaffFormComponent implements OnInit {
   }
 
   loadStaff(): void {
-    this.staffService.getStaffById(this.staffId).subscribe(staff => {
-      if (staff) {
-        this.staff = staff;
+    this.staffService.getStaffById(this.staffId).subscribe({
+      next: (staff) => {
+        this.staffForm.patchValue({
+          fullName: staff.fullName,
+          email: staff.email,
+          phoneNumber: staff.phoneNumber
+        });
+      },
+      error: (error) => {
+        console.error('Lỗi khi tải thông tin nhân viên:', error);
+        const errorMessage = this.getErrorMessage(error);
+        alert(`Không thể tải thông tin nhân viên:\n${errorMessage}`);
+        this.router.navigate(['/settings/staff']);
       }
     });
   }
 
   submitForm(): void {
-    if (this.isEdit) {
-      this.staffService.updateStaff(this.staff);
-    } else {
-      this.staffService.addStaff(this.staff);
+    if (!this.staffForm.valid) {
+      alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+      return;
     }
-    this.router.navigate(['/settings/staff']);
+
+    this.isLoading = true;
+    const formData = this.staffForm.value;
+
+    if (this.isEdit) {
+      const staffData: Staff = {
+        id: this.staffId,
+        fullName: formData.fullName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber
+      };
+
+      this.staffService.updateStaff(staffData).subscribe({
+        next: () => {
+          console.log('Cập nhật nhân viên thành công');
+          this.router.navigate(['/settings/staff']);
+        },
+        error: (error) => {
+          console.error('Lỗi khi cập nhật nhân viên:', error);
+          const errorMessage = this.getErrorMessage(error);
+          alert(`Cập nhật nhân viên thất bại:\n${errorMessage}`);
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.staffService.addStaff(formData).subscribe({
+        next: () => {
+          console.log('Thêm nhân viên thành công');
+          this.router.navigate(['/settings/staff']);
+        },
+        error: (error) => {
+          console.error('Lỗi khi thêm nhân viên:', error);
+          const errorMessage = this.getErrorMessage(error);
+          alert(`Thêm nhân viên thất bại:\n${errorMessage}`);
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  private getErrorMessage(error: any): string {
+    // Kiểm tra lỗi từ backend
+    if (error?.error?.message) {
+      return error.error.message;
+    }
+    
+    // Kiểm tra lỗi validation từ backend
+    if (error?.error?.errors) {
+      const errors = error.error.errors;
+      if (Array.isArray(errors)) {
+        return errors.join('\n');
+      }
+      return Object.values(errors).join('\n');
+    }
+    
+    // Kiểm tra HTTP error status
+    if (error?.status) {
+      const statusMessages: { [key: number]: string } = {
+        400: 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.',
+        409: 'Email hoặc số điện thoại đã tồn tại trong hệ thống.',
+        401: 'Bạn không có quyền thực hiện hành động này.',
+        403: 'Bạn không có quyền truy cập.',
+        404: 'Không tìm thấy dữ liệu.',
+        500: 'Lỗi server. Vui lòng thử lại sau.'
+      };
+      return statusMessages[error.status] || `Lỗi (${error.status}): ${error.statusText || 'Không xác định'}`;
+    }
+    
+    // Lỗi network
+    if (error?.status === 0) {
+      return 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+    }
+    
+    return 'Đã xảy ra lỗi. Vui lòng thử lại sau!';
   }
 }
