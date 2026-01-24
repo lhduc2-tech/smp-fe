@@ -53,10 +53,17 @@ export class AuthService {
       })
     );
 }
-  logout(): void {
-    localStorage.clear();
-  }
+logout(): void {
+  // gọi API nếu muốn
+  // this.http.post(`${this.API_URL}/logout`, {}).subscribe();
 
+  // xóa token
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('username');
+  localStorage.removeItem('user_id');
+  localStorage.removeItem('roles');
+  localStorage.removeItem('permissions');
+}
   get token(): string | null {
     return localStorage.getItem('access_token');
   }

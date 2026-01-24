@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
   selector: 'app-user-list',
@@ -7,7 +9,14 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="page">
-      <h2>User List</h2>
+      <div class="header">
+        <h2>User List</h2>
+
+        <button class="logout-btn" (click)="logout()">
+          Logout
+        </button>
+      </div>
+
       <p>Trang danh sách user (placeholder)</p>
     </div>
   `,
@@ -15,6 +24,31 @@ import { CommonModule } from '@angular/common';
     .page {
       padding: 24px;
     }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logout-btn {
+      padding: 6px 14px;
+      border: none;
+      cursor: pointer;
+      background: #c62828;
+      color: #fff;
+    }
   `]
 })
-export class UserListComponent {}
+export class UserListComponent {
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  logout() {
+  this.authService.logout();
+  this.router.navigate(['/login']);
+}
+}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -8,10 +8,6 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import {
-  SocialAuthService,
-  GoogleLoginProvider
-} from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'app-login',
@@ -24,7 +20,7 @@ import {
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
   form: FormGroup;
   loading = false;
@@ -32,14 +28,19 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
-    private socialAuth: SocialAuthService
+    private router: Router
   ) {
     this.form = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
       rememberMe: [false]
     });
+  }
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/users']);
+    }
   }
 
   // ===== LOGIN BẰNG USERNAME / PASSWORD =====
@@ -54,39 +55,11 @@ export class LoginComponent {
     const { username, password } = this.form.value;
 
     this.authService.login({ username, password }).subscribe({
-      next: () => {
-        this.router.navigate(['/users']);
-      },
-      error: (err) => {
+      next: () => this.router.navigate(['/users']),
+      error: (err: unknown) => {
         console.error('Login failed', err);
         this.loading = false;
       }
     });
   }
-
-  // ===== LOGIN BẰNG GOOGLE =====
-  loginWithGoogle(): void {
-  this.socialAuth.signIn(GoogleLoginProvider.PROVIDER_ID)
-    .then(user => {
-
-      // ✅ GUARD CLAUSE – BẮT BUỘC
-      const idToken = user.idToken;
-      if (!idToken) {
-        console.error('Google ID token is missing');
-        return;
-      }
-
-      this.authService.loginWithGoogle(idToken).subscribe({
-        next: () => {
-          this.router.navigate(['/users']);
-        },
-        error: (err: unknown) => {
-          console.error('Google login failed', err);
-        }
-      });
-    })
-    .catch((err: unknown) => {
-      console.error('Google sign-in error', err);
-    });
-}
 }
