@@ -1,0 +1,59 @@
+<div class="login-container">
+  <div class="login-form-section">
+    <div class="form-wrapper">
+
+      <h1 class="title">WELCOME BACK</h1>
+      <p class="subtitle">Welcome back! Please enter your details.</p>
+
+      <!-- LOGIN FORM -->
+      <form
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        class="auth-form"
+      >
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Enter your username"
+          >
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="**********"
+          >
+        </div>
+        <button
+          type="submit"
+          class="btn-primary btn-signin"
+          [disabled]="loading"
+        >
+          Sign in
+        </button>
+      </form>
+
+      <!-- GOOGLE LOGIN -->
+        <!-- GOOGLE LOGIN -->
+        <div class="google-login-wrapper">
+          <div id="google-login-btn"></div>
+        </div>
+
+
+      <!-- REGISTER LINK -->
+      <p class="signup-text">
+        Don’t have an account?
+        <a routerLink="/register">Sign up for free!</a>
+      </p>
+
+    </div>
+  </div>
+
+  <div class="login-image-section"></div>
+</div>

@@ -1,0 +1,50 @@
+<div class="login-container">
+  <div class="login-form-section">
+    <div class="form-wrapper">
+
+      <h1 class="title">CREATE ACCOUNT</h1>
+      <p class="subtitle">Please fill in your information</p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+
+        <div class="input-group">
+          <label>Username</label>
+          <input formControlName="username" placeholder="Enter username">
+        </div>
+
+        <div class="input-group">
+          <label>Email</label>
+          <input formControlName="email" placeholder="example@email.com">
+        </div>
+
+        <div class="input-group">
+          <label>Phone number</label>
+          <input formControlName="phoneNumber" placeholder="0912345679">
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" placeholder="********">
+        </div>
+
+        <div class="input-group">
+          <label>Confirm password</label>
+          <input type="password" formControlName="confirmPassword">
+        </div>
+
+        <button type="submit" class="btn-primary btn-signup">
+          Create account
+        </button>
+
+      </form>
+
+      <p class="signup-text">
+        Already have an account?
+        <a routerLink="/login">Sign in</a>
+      </p>
+
+    </div>
+  </div>
+
+  <div class="login-image-section"></div>
+</div>

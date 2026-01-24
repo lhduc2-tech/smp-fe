@@ -1,5 +1,7 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Output, EventEmitter, Input, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-topbar',
@@ -14,7 +16,7 @@ import { CommonModule } from '@angular/common';
         <input 
           type="text" 
           class="search-box" 
-          placeholder="Tìm kiếm (Ctrl + K)"
+          placeholder="Tìm kiếm..."
         />
       </div>
 
@@ -23,16 +25,25 @@ import { CommonModule } from '@angular/common';
           <span class="icon">🔔</span>
           <span class="badge">3</span>
         </div>
-        <div class="user-profile">
+
+        <!-- USER PROFILE (GIỮ NGUYÊN UI) -->
+        <div class="user-profile" (click)="toggleDropdown($event)">
           <img 
             src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tduc" 
             alt="User Avatar" 
             class="avatar"
           />
           <span class="username">Tduc</span>
-          <button class="dropdown-toggle">
+          <button class="dropdown-toggle" type="button">
             <span>▼</span>
           </button>
+
+          <!-- DROPDOWN -->
+          <div class="dropdown-menu" *ngIf="dropdownOpen">
+            <button class="dropdown-item logout" (click)="logout()">
+              Đăng xuất
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -63,18 +74,6 @@ import { CommonModule } from '@angular/common';
       font-size: 20px;
       color: #333;
       padding: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.3s ease;
-    }
-
-    .toggle-sidebar-btn:hover {
-      color: #6366F1;
-    }
-
-    .menu-icon {
-      display: inline-block;
     }
 
     .search-box {
@@ -85,14 +84,6 @@ import { CommonModule } from '@angular/common';
       border-radius: 6px;
       font-size: 14px;
       background-color: #f5f5f5;
-      transition: all 0.3s ease;
-    }
-
-    .search-box:focus {
-      outline: none;
-      border-color: #6366F1;
-      background-color: #fff;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
     .topbar-right {
@@ -105,11 +96,6 @@ import { CommonModule } from '@angular/common';
       position: relative;
       font-size: 20px;
       cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-
-    .notification-icon:hover {
-      transform: scale(1.1);
     }
 
     .badge {
@@ -128,13 +114,14 @@ import { CommonModule } from '@angular/common';
       font-weight: bold;
     }
 
+    /* ===== USER PROFILE – GIỮ NGUYÊN ===== */
     .user-profile {
+      position: relative; /* QUAN TRỌNG cho dropdown */
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 5px 10px;
       border-radius: 6px;
-      transition: background-color 0.3s ease;
       cursor: pointer;
     }
 
@@ -162,31 +149,43 @@ import { CommonModule } from '@angular/common';
       cursor: pointer;
       color: #999;
       font-size: 12px;
-      padding: 2px 5px;
-      transition: color 0.3s ease;
     }
 
-    .dropdown-toggle:hover {
-      color: #0066ff;
+    /* ===== DROPDOWN ===== */
+    .dropdown-menu {
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      min-width: 140px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      z-index: 1000;
+    }
+
+    .dropdown-item {
+      width: 100%;
+      padding: 10px 14px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .dropdown-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .dropdown-item.logout {
+      color: #e53935;
+      font-weight: 500;
     }
 
     @media (max-width: 768px) {
-      .topbar {
-        padding: 0 15px;
-      }
-
-      .search-box {
-        max-width: none;
-        flex: 1;
-        min-width: 150px;
-      }
-
       .username {
         display: none;
-      }
-
-      .topbar-right {
-        gap: 15px;
       }
     }
   `]
@@ -194,4 +193,34 @@ import { CommonModule } from '@angular/common';
 export class TopbarComponent {
   @Output() toggleSidebar = new EventEmitter<void>();
   @Input() sidebarOpen = true;
+
+  dropdownOpen = false;
+
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
+
+  toggleDropdown(event: Event) {
+    event.stopPropagation();
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  logout() {
+    this.http.post('/api/private/auth/logout', {}).subscribe({
+      next: () => this.handleLogout(),
+      error: () => this.handleLogout()
+    });
+  }
+
+  private handleLogout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    this.router.navigate(['/login']);
+  }
+
+  @HostListener('document:click')
+  closeDropdown() {
+    this.dropdownOpen = false;
+  }
 }
