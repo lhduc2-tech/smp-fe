@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -7,7 +7,9 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+
 import { AuthService } from '../../services/auth.service';
+import { GoogleAuthService } from '../../services/google-auth.service';
 
 @Component({
   selector: 'app-login',
@@ -18,9 +20,9 @@ import { AuthService } from '../../services/auth.service';
     RouterLink
   ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'] // ✅ KHÔI PHỤC CSS
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements AfterViewInit {
 
   form: FormGroup;
   loading = false;
@@ -28,36 +30,44 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private googleAuth: GoogleAuthService,
     private router: Router
   ) {
     this.form = this.fb.group({
       username: ['', Validators.required],
-      password: ['', Validators.required],
-      rememberMe: [false]
+      password: ['', Validators.required]
     });
   }
 
-  ngOnInit(): void {
+  async ngAfterViewInit(): Promise<void> {
+    // Nếu đã login → redirect
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/users']);
-    }
-  }
-
-  // ===== LOGIN BẰNG USERNAME / PASSWORD =====
-  submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
       return;
     }
 
-    this.loading = true;
+    // ✅ ĐỢI GOOGLE SDK LOAD + INIT
+    await this.googleAuth.initialize((idToken: string) => {
+      this.authService.loginWithGoogle(idToken).subscribe({
+        next: () => this.router.navigate(['/users']),
+        error: err => console.error('Google login failed', err)
+      });
+    });
 
+    // ✅ SAU KHI SDK SẴN SÀNG → RENDER BUTTON
+    this.googleAuth.renderButton('google-login-btn');
+  }
+
+  submit(): void {
+    if (this.form.invalid) return;
+
+    this.loading = true;
     const { username, password } = this.form.value;
 
     this.authService.login({ username, password }).subscribe({
       next: () => this.router.navigate(['/users']),
-      error: (err: unknown) => {
-        console.error('Login failed', err);
+      error: err => {
+        console.error(err);
         this.loading = false;
       }
     });

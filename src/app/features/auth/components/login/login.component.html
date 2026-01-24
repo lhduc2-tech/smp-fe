@@ -30,17 +30,6 @@
             placeholder="**********"
           >
         </div>
-
-        <div class="options-row">
-          <label class="checkbox-container">
-            <input type="checkbox" formControlName="rememberMe">
-            <span class="checkmark"></span>
-            Remember me
-          </label>
-
-          <a href="#" class="forgot-password">Forgot password</a>
-        </div>
-
         <button
           type="submit"
           class="btn-primary btn-signin"
@@ -51,16 +40,11 @@
       </form>
 
       <!-- GOOGLE LOGIN -->
-      <button
-        type="button"
-        class="btn-google"
-      >
-        <img
-          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-          alt="Google logo"
-        >
-        Sign in with Google
-      </button>
+        <!-- GOOGLE LOGIN -->
+        <div class="google-login-wrapper">
+          <div id="google-login-btn"></div>
+        </div>
+
 
       <!-- REGISTER LINK -->
       <p class="signup-text">

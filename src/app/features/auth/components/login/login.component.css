@@ -172,3 +172,31 @@
     flex: 0 0 100%;
   }
 }
+.google-login-wrapper {
+  width: 100%;
+  margin-bottom: 32px;
+
+  display: flex;
+  justify-content: center;
+}
+
+/* Wrapper để Google iframe KHỚP nút Sign in */
+.google-login-wrapper > div {
+  width: 100%;
+  max-width: 400px; /* giống form-wrapper */
+  display: flex;
+  justify-content: center;
+}
+
+/* Google iframe */
+.google-login-wrapper iframe {
+  width: 100% !important;
+  height: 52px !important;          /* = btn-signin (14px padding) */
+  border-radius: 12px !important;   /* đồng bộ bo góc */
+}
+
+/* Fix iframe bị inline */
+.google-login-wrapper iframe {
+  display: block;
+}
+
