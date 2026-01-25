@@ -12,13 +12,18 @@ import {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    // Router
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
 
-    // ✅ BẮT BUỘC – nếu thiếu sẽ crash
+    // HttpClient + Auth Interceptor
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    ),
+
+    // Social login module
     importProvidersFrom(SocialLoginModule),
 
-    // ✅ Config phải dùng string token
+    // Social auth config (string token là đúng)
     {
       provide: 'SocialAuthServiceConfig',
       useValue: {
