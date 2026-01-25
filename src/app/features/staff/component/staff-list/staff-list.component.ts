@@ -54,7 +54,7 @@ export class StaffListComponent implements OnInit {
       // Hoặc tùy backend logic, có thể truyền vào email/phone
     }
 
-    this.staffService.searchStaffList(request)
+    this.staffService.getStaffPage(request)
       .pipe(
         retry({
           count: 5,

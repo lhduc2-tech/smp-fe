@@ -18,9 +18,9 @@ export class StaffService {
   constructor() { }
 
   /**
-   * Lấy danh sách nhân viên với tìm kiếm và phân trang
-   */
-  searchStaffList(request?: SearchStaffRequest): Observable<PageResponse<Staff>> {
+ * Lấy danh sách nhân viên phân trang (hỗ trợ cả tìm kiếm)
+ */
+  getStaffPage(request?: SearchStaffRequest): Observable<PageResponse<Staff>> {
     const searchRequest = request || {
       page: 0,
       size: 10,
@@ -40,7 +40,7 @@ export class StaffService {
    * Lấy danh sách tất cả nhân viên
    */
   getStaffList(): Observable<Staff[]> {
-    return this.searchStaffList().pipe(
+    return this.getStaffPage().pipe(
       map(response => response.content)
     );
   }

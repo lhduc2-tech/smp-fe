@@ -29,23 +29,66 @@ h1 {
   background-color: #4F46E5;
 }
 
+.search-wrap {
+  margin-bottom: 24px;
+}
+
 .search-bar {
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  max-width: 450px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 2px 2px 2px 15px;
+  transition: all 0.3s ease;
+}
+
+.search-bar:focus-within {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .search-bar input {
-  width: 100%;
-  max-width: 400px;
-  padding: 10px 15px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 0;
   font-size: 14px;
+  color: #333;
+  outline: none;
 }
 
-.search-bar input:focus {
-  outline: none;
-  border-color: #6366F1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+.search-btn {
+  background-color: #6366F1;
+  color: white;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-left: 10px;
+}
+
+.search-btn:hover {
+  background-color: #4F46E5;
+}
+
+/* Ghi đè màu của app-icon khi nằm trong search-btn */
+.search-btn ::ng-deep .icon-search {
+  color: white !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.search-btn ::ng-deep svg {
+  width: 20px;
+  height: 20px;
+  fill: white !important;
 }
 
 .staff-table {
