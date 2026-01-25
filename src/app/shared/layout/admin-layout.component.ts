@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './sidebar.component';
 import { TopbarComponent } from './topbar.component';
+import { ToastComponent } from '../components/toast/toast';
+import { ConfirmDialogComponent } from '../components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent, ToastComponent, ConfirmDialogComponent],
   template: `
     <div class="admin-layout">
       <app-sidebar [sidebarOpen]="sidebarOpen()"></app-sidebar>
@@ -19,6 +21,8 @@ import { TopbarComponent } from './topbar.component';
         <main class="content">
           <router-outlet></router-outlet>
         </main>
+        <app-toast></app-toast>
+        <app-confirm-dialog></app-confirm-dialog>
       </div>
     </div>
   `,
