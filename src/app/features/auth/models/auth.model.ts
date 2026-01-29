@@ -18,6 +18,9 @@ export interface RegisterRequest {
   email: string;
   password: string;
   phoneNumber: string;
+  shopName:String;
+  address:String;
+  aim:String;
 }
 
 export interface RegisterResponse {

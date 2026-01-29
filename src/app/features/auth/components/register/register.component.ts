@@ -6,8 +6,7 @@ import {
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
-import { Router } from '@angular/router';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -27,15 +26,23 @@ export class RegisterComponent {
     private authService: AuthService,
     private router: Router
   ) {
-    this.form = this.fb.group({
-      username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required]
-    }, {
-      validators: this.passwordMatchValidator
-    });
+    this.form = this.fb.group(
+      {
+        username: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        phoneNumber: ['', Validators.required],
+
+        shopName: ['', Validators.required],
+        address: ['', Validators.required],
+        aim: [''],
+
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', Validators.required]
+      },
+      {
+        validators: this.passwordMatchValidator
+      }
+    );
   }
 
   passwordMatchValidator(form: FormGroup) {
@@ -52,13 +59,24 @@ export class RegisterComponent {
 
     this.loading = true;
 
-    const { username, email, password, phoneNumber } = this.form.value;
+    const {
+      username,
+      email,
+      phoneNumber,
+      shopName,
+      address,
+      aim,
+      password
+    } = this.form.value;
 
     this.authService.register({
       username,
       email,
-      password,
-      phoneNumber
+      phoneNumber,
+      shopName,
+      address,
+      aim,
+      password
     }).subscribe({
       next: () => {
         this.router.navigate(['/login']);
