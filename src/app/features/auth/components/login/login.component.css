@@ -4,17 +4,18 @@
 
 .login-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;   
   width: 100%;
 }
 
 /* PHẦN BÊN TRÁI: FORM */
 .login-form-section {
-  flex: 0 0 45%; /* Chiếm 45% chiều rộng */
+  flex: 0 0 45%;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #fff;
+  padding: 40px 0;
 }
 
 .form-wrapper {
@@ -155,10 +156,10 @@
 
 /* PHẦN BÊN PHẢI: IMAGE */
 .login-image-section {
-  flex: 0 0 55%; /* Chiếm 55% chiều rộng */
-  background-color: #f3f4f6; /* Màu nền xám nhạt */
-  background-image: url('/assets/images/login-bg.png'); /* Đường dẫn ảnh của bạn */
-  background-size: contain;
+  flex: 0 0 55%;
+  min-height: 100%;
+  background-image: url('/assets/images/login.jpg');
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 }
