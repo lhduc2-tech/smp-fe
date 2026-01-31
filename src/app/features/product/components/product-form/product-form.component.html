@@ -1,0 +1,75 @@
+<div class="staff-form-container">
+  <div class="header">
+    <h1>{{ isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới' }}</h1>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+
+    <!-- Mã sản phẩm -->
+    <div class="form-group">
+      <label>
+        Mã sản phẩm
+        <span class="required-asterisk">*</span>
+      </label>
+      <input
+        type="text"
+        formControlName="code"
+        placeholder="Nhập mã sản phẩm"
+      >
+    </div>
+
+    <!-- Tên sản phẩm -->
+    <div class="form-group">
+      <label>
+        Tên sản phẩm
+        <span class="required-asterisk">*</span>
+      </label>
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="Nhập tên sản phẩm"
+      >
+    </div>
+
+    <!-- Giá + Shop -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>
+          Giá
+          <span class="required-asterisk">*</span>
+        </label>
+        <input
+          type="number"
+          formControlName="price"
+          placeholder="Nhập giá sản phẩm"
+          min="0"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Shop ID</label>
+        <input
+          type="text"
+          formControlName="shopId"
+          placeholder="Nhập shop ID"
+        >
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn-submit"
+        [disabled]="form.invalid"
+      >
+        {{ isEdit ? 'Cập nhật' : 'Thêm mới' }}
+      </button>
+
+      <a routerLink="/products" class="btn-cancel">
+        Hủy
+      </a>
+    </div>
+
+  </form>
+</div>

@@ -55,7 +55,9 @@ export const routes: Routes = [
       },
       {
         path: 'products',
-        component: DashboardComponent
+        loadChildren: () =>
+          import('./features/product/product.module')
+            .then(m => m.ProductModule)
       },
       {
         path: 'inventory',
