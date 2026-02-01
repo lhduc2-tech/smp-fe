@@ -11,7 +11,7 @@ export class AuthService {
   private readonly API_URL =
     'http://localhost:8082/sales/public/api/v1/auth';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http
@@ -39,31 +39,37 @@ export class AuthService {
     );
   }
   loginWithGoogle(idToken: string): Observable<LoginResponse> {
-  return this.http
-    .post<LoginResponse>(`${this.API_URL}/google`, {
-      idToken: idToken
-    })
-    .pipe(
-      tap((res: LoginResponse) => {
-        localStorage.setItem('access_token', res.access_token);
-        localStorage.setItem('username', res.username);
-        localStorage.setItem('user_id', res.user_id);
-        localStorage.setItem('roles', JSON.stringify(res.roles));
-        localStorage.setItem('permissions', JSON.stringify(res.permissions));
+    return this.http
+      .post<LoginResponse>(`${this.API_URL}/google`, {
+        idToken: idToken
       })
-    );
-}
-logout(): void {
-  // gọi API nếu muốn
-  // this.http.post(`${this.API_URL}/logout`, {}).subscribe();
+      .pipe(
+        tap((res: LoginResponse) => {
+          localStorage.setItem('access_token', res.access_token);
+          localStorage.setItem('username', res.username);
+          localStorage.setItem('user_id', res.user_id);
+          localStorage.setItem('roles', JSON.stringify(res.roles));
+          localStorage.setItem('permissions', JSON.stringify(res.permissions));
+        })
+      );
+  }
+  logout(): void {
+    // 1. Xóa sạch dữ liệu ngay lập tức (đồng bộ) để UI và Guards cập nhật kịp thời
+    this.clearUserData();
 
-  // xóa token
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('username');
-  localStorage.removeItem('user_id');
-  localStorage.removeItem('roles');
-  localStorage.removeItem('permissions');
-}
+    // 2. Gọi API logout để blacklist token phía server (Fire and forget)
+    // Lưu ý: Nếu interceptor của bạn lấy token từ localStorage, bạn có thể cần lấy token ra biến tạm trước khi xóa
+    this.http.post(`${this.API_URL}/logout`, {}).subscribe();
+  }
+
+  private clearUserData(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('roles');
+    localStorage.removeItem('permissions');
+  }
   get token(): string | null {
     return localStorage.getItem('access_token');
   }

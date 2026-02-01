@@ -2,6 +2,7 @@ import { Component, Output, EventEmitter, Input, HostListener } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../features/auth/services/auth.service';
 
 @Component({
   selector: 'app-topbar',
@@ -40,7 +41,7 @@ import { HttpClient } from '@angular/common/http';
 
           <!-- DROPDOWN -->
           <div class="dropdown-menu" *ngIf="dropdownOpen">
-            <button class="dropdown-item logout" (click)="logout()">
+            <button class="dropdown-item logout" (click)="logout($event)">
               Đăng xuất
             </button>
           </div>
@@ -198,26 +199,21 @@ export class TopbarComponent {
 
   constructor(
     private http: HttpClient,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
   toggleDropdown(event: Event) {
     event.stopPropagation();
     this.dropdownOpen = !this.dropdownOpen;
   }
 
-  logout() {
-    this.http.post('/api/private/auth/logout', {}).subscribe({
-      next: () => this.handleLogout(),
-      error: () => this.handleLogout()
-    });
-  }
-
-  private handleLogout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+  logout(event: Event) {
+    event.stopPropagation();
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
+
 
   @HostListener('document:click')
   closeDropdown() {
