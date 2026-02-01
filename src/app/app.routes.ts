@@ -50,6 +50,12 @@ export const routes: Routes = [
         component: DashboardComponent
       },
       {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/components/profile/profile.component')
+            .then(m => m.ProfileComponent)
+      },
+      {
         path: 'orders',
         component: DashboardComponent
       },
@@ -78,15 +84,6 @@ export const routes: Routes = [
             .then(m => m.StaffModule)
       },
 
-      // Example: users with permission
-      {
-        path: 'users',
-        canActivate: [permissionGuard],
-        data: { permissions: ['user:read'] },
-        loadComponent: () =>
-          import('./features/user/components/user.component')
-            .then(m => m.UserListComponent)
-      }
     ]
   },
 

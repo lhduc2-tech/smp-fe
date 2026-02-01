@@ -42,14 +42,14 @@ export class LoginComponent implements AfterViewInit {
   async ngAfterViewInit(): Promise<void> {
     // Nếu đã login → redirect
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/users']);
+      this.router.navigate(['/dashboard']);
       return;
     }
 
     // ✅ ĐỢI GOOGLE SDK LOAD + INIT
     await this.googleAuth.initialize((idToken: string) => {
       this.authService.loginWithGoogle(idToken).subscribe({
-        next: () => this.router.navigate(['/users']),
+        next: () => this.router.navigate(['/dashboard']),
         error: err => console.error('Google login failed', err)
       });
     });
@@ -65,7 +65,7 @@ export class LoginComponent implements AfterViewInit {
     const { username, password } = this.form.value;
 
     this.authService.login({ username, password }).subscribe({
-      next: () => this.router.navigate(['/users']),
+      next: () => this.router.navigate(['/dashboard']),
       error: err => {
         console.error(err);
         this.loading = false;
