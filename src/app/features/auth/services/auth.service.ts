@@ -74,6 +74,10 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
 
+  get username(): string | null {
+    return localStorage.getItem('username');
+  }
+
   get roles(): string[] {
     return JSON.parse(localStorage.getItem('roles') || '[]');
   }

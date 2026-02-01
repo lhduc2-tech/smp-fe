@@ -30,11 +30,11 @@ import { AuthService } from '../../features/auth/services/auth.service';
         <!-- USER PROFILE (GIỮ NGUYÊN UI) -->
         <div class="user-profile" (click)="toggleDropdown($event)">
           <img 
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tduc" 
+            [src]="userName ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + userName : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'" 
             alt="User Avatar" 
             class="avatar"
           />
-          <span class="username">Tduc</span>
+          <span class="username">{{ userName || 'Guest' }}</span>
           <button class="dropdown-toggle" type="button">
             <span>▼</span>
           </button>
@@ -202,6 +202,10 @@ export class TopbarComponent {
     private router: Router,
     private authService: AuthService
   ) { }
+
+  get userName(): string | null {
+    return this.authService.username;
+  }
 
   toggleDropdown(event: Event) {
     event.stopPropagation();
