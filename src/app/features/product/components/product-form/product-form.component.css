@@ -30,13 +30,6 @@
     margin-bottom: 20px;
 }
 
-/* ===== Row ===== */
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
 /* ===== Label ===== */
 label {
     display: block;
@@ -88,7 +81,7 @@ input:disabled {
 .form-actions {
     display: flex;
     gap: 14px;
-    margin-top: 30px;
+    margin-top: 32px;
     justify-content: flex-end;
 }
 
@@ -132,15 +125,22 @@ input:disabled {
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
     .staff-form-container {
         padding: 16px;
     }
 
     .form {
         padding: 16px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+        justify-content: center;
     }
 }

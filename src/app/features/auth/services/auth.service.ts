@@ -1,8 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { LoginRequest, LoginResponse } from '../models/auth.model';
-import { RegisterRequest, RegisterResponse } from '../models/auth.model';
+import { jwtDecode } from 'jwt-decode';
+
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse
+} from '../models/auth.model';
+
+import { JwtPayload } from '../../../core/models/jwt-payload.model';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -18,16 +27,20 @@ export class AuthService {
       .post<LoginResponse>(`${this.API_URL}/login`, request)
       .pipe(
         tap(res => {
-          // Token
+          // 1. Lưu token
           localStorage.setItem('access_token', res.access_token);
 
-          // User info
-          localStorage.setItem('username', res.username);
-          localStorage.setItem('user_id', res.user_id);
+          // 2. Decode JWT
+          const payload = jwtDecode<JwtPayload>(res.access_token);
 
-          // Authorization
-          localStorage.setItem('roles', JSON.stringify(res.roles));
-          localStorage.setItem('permissions', JSON.stringify(res.permissions));
+          // 3. Lưu thông tin user từ JWT
+          localStorage.setItem('username', payload.sub);
+          localStorage.setItem('user_id', payload.userId);
+          localStorage.setItem('shop_id', payload.shopId);
+
+          // 4. Lưu role & permission từ JWT
+          localStorage.setItem('roles', JSON.stringify(payload.roles));
+          localStorage.setItem('permissions', JSON.stringify(payload.permissions));
         })
       );
   }
@@ -38,27 +51,28 @@ export class AuthService {
       request
     );
   }
+
   loginWithGoogle(idToken: string): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.API_URL}/google`, {
-        idToken: idToken
-      })
+      .post<LoginResponse>(`${this.API_URL}/google`, { idToken })
       .pipe(
-        tap((res: LoginResponse) => {
+        tap(res => {
           localStorage.setItem('access_token', res.access_token);
-          localStorage.setItem('username', res.username);
-          localStorage.setItem('user_id', res.user_id);
-          localStorage.setItem('roles', JSON.stringify(res.roles));
-          localStorage.setItem('permissions', JSON.stringify(res.permissions));
+
+          const payload = jwtDecode<JwtPayload>(res.access_token);
+
+          localStorage.setItem('username', payload.sub);
+          localStorage.setItem('user_id', payload.userId);
+          localStorage.setItem('shop_id', payload.shopId);
+
+          localStorage.setItem('roles', JSON.stringify(payload.roles));
+          localStorage.setItem('permissions', JSON.stringify(payload.permissions));
         })
       );
   }
-  logout(): void {
-    // 1. Xóa sạch dữ liệu ngay lập tức (đồng bộ) để UI và Guards cập nhật kịp thời
-    this.clearUserData();
 
-    // 2. Gọi API logout để blacklist token phía server (Fire and forget)
-    // Lưu ý: Nếu interceptor của bạn lấy token từ localStorage, bạn có thể cần lấy token ra biến tạm trước khi xóa
+  logout(): void {
+    this.clearUserData();
     this.http.post(`${this.API_URL}/logout`, {}).subscribe();
   }
 
@@ -67,15 +81,27 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('username');
     localStorage.removeItem('user_id');
+    localStorage.removeItem('shop_id');
     localStorage.removeItem('roles');
     localStorage.removeItem('permissions');
   }
+
+  // ===== GETTERS =====
+
   get token(): string | null {
     return localStorage.getItem('access_token');
   }
 
   get username(): string | null {
     return localStorage.getItem('username');
+  }
+
+  get userId(): string | null {
+    return localStorage.getItem('user_id');
+  }
+
+  get shopId(): string | null {
+    return localStorage.getItem('shop_id');
   }
 
   get roles(): string[] {

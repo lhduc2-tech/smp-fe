@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AuthService } from '../../auth/services/auth.service';
+
 import {
   Product,
   ProductResponse,
@@ -13,7 +15,7 @@ import { ApiService } from '../../../core/services/api.service';
   providedIn: 'root'
 })
 export class ProductService {
-
+  private authService = inject(AuthService);
   private readonly API_ENDPOINT = '/private/api/v1/products';
   private apiService = inject(ApiService);
 
@@ -44,8 +46,8 @@ export class ProductService {
       code: product.code,
       name: product.name,
       price: product.price,
-      shopId: product.shopId,
-      createdBy: localStorage.getItem('username')
+      shopId: this.authService.shopId,   // ⭐ lấy từ localStorage
+      createdBy: this.authService.username
     };
 
     return this.apiService.post<ProductResponse>(
@@ -56,6 +58,7 @@ export class ProductService {
     );
   }
 
+
   /**
    * Cập nhật sản phẩm
    */
@@ -64,8 +67,8 @@ export class ProductService {
       code: product.code,
       name: product.name,
       price: product.price,
-      shopId: product.shopId,
-      updatedBy: localStorage.getItem('username')
+      shopId: this.authService.shopId,   // ⭐ luôn dùng shop hiện tại
+      updatedBy: this.authService.username
     };
 
     return this.apiService.put<ProductResponse>(
@@ -75,6 +78,7 @@ export class ProductService {
       map(res => this.transformProduct(res))
     );
   }
+
 
   /**
    * Xóa
