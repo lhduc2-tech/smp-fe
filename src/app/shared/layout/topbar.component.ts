@@ -18,13 +18,7 @@ import { AuthService } from '../../features/auth/services/auth.service';
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <div class="search-wrapper">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" class="search-box" placeholder="Tìm kiếm hệ thống..." />
-        </div>
+
       </div>
 
       <div class="topbar-right">
@@ -105,38 +99,7 @@ import { AuthService } from '../../features/auth/services/auth.service';
       height: 20px;
     }
 
-    .search-wrapper {
-      position: relative;
-      flex: 1;
-      max-width: 400px;
-    }
 
-    .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
-      color: #94a3b8;
-    }
-
-    .search-box {
-      width: 100%;
-      padding: 10px 16px 10px 40px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.875rem;
-      background-color: #f8fafc;
-      transition: all 0.2s;
-      outline: none;
-    }
-
-    .search-box:focus {
-      background-color: #fff;
-      border-color: #6366f1;
-      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-    }
 
     .topbar-right {
       display: flex;

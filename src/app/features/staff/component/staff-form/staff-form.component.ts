@@ -29,7 +29,9 @@ export class StaffFormComponent implements OnInit {
     this.staffForm = this.formBuilder.group({
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required]]
+      phoneNumber: ['', [Validators.required]],
+      status: ['ACTIVE', [Validators.required]],
+      position: ['CASHIER', [Validators.required]]
     });
   }
 
@@ -49,7 +51,9 @@ export class StaffFormComponent implements OnInit {
         this.staffForm.patchValue({
           fullName: staff.fullName,
           email: staff.email,
-          phoneNumber: staff.phoneNumber
+          phoneNumber: staff.phoneNumber,
+          status: staff.status || 'ACTIVE',
+          position: staff.position || 'CASHIER'
         });
       },
       error: (error) => {
@@ -75,7 +79,9 @@ export class StaffFormComponent implements OnInit {
         id: this.staffId,
         fullName: formData.fullName,
         email: formData.email,
-        phoneNumber: formData.phoneNumber
+        phoneNumber: formData.phoneNumber,
+        status: formData.status,
+        position: formData.position
       };
 
       this.staffService.updateStaff(staffData).subscribe({

@@ -53,7 +53,10 @@ export class StaffService {
       fullName: staff.fullName,
       email: staff.email,
       phoneNumber: staff.phoneNumber,
-      createdBy: localStorage.getItem('username') // Lấy trực tiếp từ local storage
+      position: staff.position,
+      status: staff.status,
+      shopId: staff.shopId,
+      createdBy: localStorage.getItem('username')
     };
 
     return this.apiService.post<StaffResponse>(
@@ -72,7 +75,10 @@ export class StaffService {
       fullName: staff.fullName,
       email: staff.email,
       phoneNumber: staff.phoneNumber,
-      updatedBy: localStorage.getItem('username') // Lưu người thực hiện cập nhật
+      position: staff.position,
+      status: staff.status,
+      shopId: staff.shopId,
+      updatedBy: localStorage.getItem('username')
     };
 
     return this.apiService.put<StaffResponse>(
@@ -110,6 +116,9 @@ export class StaffService {
       fullName: response.full_name || response.fullName || '',
       email: response.email || '',
       phoneNumber: response.phone_number || response.phoneNumber || '',
+      position: response.position,
+      status: response.status,
+      shopId: response.shop_id || response.shopId,
       createdAt: response.created_at || response.createdAt,
       updatedAt: response.updated_at || response.updatedAt,
       createdBy: response.created_by || response.createdBy,

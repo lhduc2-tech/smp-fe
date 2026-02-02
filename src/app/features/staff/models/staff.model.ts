@@ -3,6 +3,9 @@ export interface Staff {
   fullName: string;
   email: string;
   phoneNumber: string;
+  position?: string;
+  status?: string;
+  shopId?: string;
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string;
@@ -14,6 +17,9 @@ export interface StaffResponse {
   full_name: string;
   email: string;
   phone_number: string;
+  status?: string;
+  position?: string;
+  shop_id?: string;
   created_at?: string;
   updated_at?: string;
   created_by?: string;
@@ -32,6 +38,8 @@ export interface SearchStaffRequest {
   fullName?: string;
   email?: string;
   phoneNumber?: string;
+  status?: string;
+  position?: string;
   page?: number;
   size?: number;
   sortBy?: string;

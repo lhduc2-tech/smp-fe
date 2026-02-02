@@ -1,7 +1,7 @@
 <div class="staff-list-container">
   <div class="header">
     <h1>Quản lý nhân viên</h1>
-    <a routerLink="add" class="btn-add">+ Thêm nhân viên</a>
+    <a routerLink="add" class="btn-add">Thêm nhân viên</a>
   </div>
 
   <div class="search-wrap">
@@ -14,68 +14,86 @@
     </div>
   </div>
 
-  <div class="staff-table">
+  <div class="staff-table-card">
     <div *ngIf="isLoading" class="loading-state">
       <div class="spinner"></div>
       <p>Đang tải dữ liệu...</p>
     </div>
 
-    <table *ngIf="!isLoading && staffList.length > 0">
-      <thead>
-        <tr>
-          <th>Tên nhân viên</th>
-          <th>Email</th>
-          <th>Số điện thoại</th>
-          <th>Ngày tạo</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let staff of staffList">
-          <td>{{ staff.fullName }}</td>
-          <td>{{ staff.email }}</td>
-          <td>{{ staff.phoneNumber }}</td>
-          <td>{{ staff.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-          <td>
-            <div class="actions">
-              <a [routerLink]="staff.id" class="action-icon" title="Sửa">
-                <app-icon type="edit"></app-icon>
-              </a>
-              <button (click)="deleteStaff(staff.id)" class="action-icon" title="Xóa">
-                <app-icon type="delete"></app-icon>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive" *ngIf="!isLoading && staffList.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Tên nhân viên</th>
+            <th>Email</th>
+            <th>Số điện thoại</th>
+            <th>Chức vụ</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let staff of staffList">
+            <td>
+              <div class="staff-name">{{ staff.fullName }}</div>
+            </td>
+            <td>
+              <div class="staff-email">{{ staff.email }}</div>
+            </td>
+            <td>{{ staff.phoneNumber }}</td>
+            <td>
+              <span class="position-badge">{{ staff.position || 'N/A' }}</span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="(staff.status || '').toLowerCase()">
+                {{ staff.status || 'N/A' }}
+              </span>
+            </td>
+            <td>
+              <div class="actions">
+                <a [routerLink]="staff.id" class="action-btn edit" title="Sửa">
+                  <app-icon type="edit"></app-icon>
+                </a>
+                <button (click)="deleteStaff(staff.id)" class="action-btn delete" title="Xóa">
+                  <app-icon type="delete"></app-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Pagination -->
-    <div class="pagination" *ngIf="!isLoading && totalPages > 1">
-      <button [disabled]="currentPage === 0" (click)="onPageChange(0)" class="page-nav">
-        &laquo;
-      </button>
-      <button [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)" class="page-nav">
-        &lsaquo;
-      </button>
+    <div class="pagination-container" *ngIf="!isLoading && totalPages > 1">
+      <div class="pagination-info">
+        Trang {{ currentPage + 1 }} / {{ totalPages }}
+      </div>
+      <div class="pagination-controls">
+        <button [disabled]="currentPage === 0" (click)="onPageChange(0)" class="page-btn">
+          &laquo;
+        </button>
+        <button [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)" class="page-btn">
+          &lsaquo;
+        </button>
 
-      <div class="pages">
         <ng-container *ngFor="let page of displayPages">
-          <button *ngIf="page !== '...'; else dots" [class.active]="page === currentPage" (click)="onPageChange(page)">
+          <button *ngIf="page !== '...'; else dots" [class.active]="page === currentPage" (click)="onPageChange(page)"
+            class="page-btn">
             {{ getPageLabel(page) }}
           </button>
           <ng-template #dots>
             <span class="dots">...</span>
           </ng-template>
         </ng-container>
-      </div>
 
-      <button [disabled]="currentPage === totalPages - 1" (click)="onPageChange(currentPage + 1)" class="page-nav">
-        &rsaquo;
-      </button>
-      <button [disabled]="currentPage === totalPages - 1" (click)="onPageChange(totalPages - 1)" class="page-nav">
-        &raquo;
-      </button>
+        <button [disabled]="currentPage === totalPages - 1" (click)="onPageChange(currentPage + 1)" class="page-btn">
+          &rsaquo;
+        </button>
+        <button [disabled]="currentPage === totalPages - 1" (click)="onPageChange(totalPages - 1)" class="page-btn">
+          &raquo;
+        </button>
+      </div>
     </div>
 
     <div *ngIf="!isLoading && staffList.length === 0" class="no-data">
