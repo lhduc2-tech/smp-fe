@@ -36,7 +36,6 @@ export class ProductFormComponent implements OnInit {
       code: ['', Validators.required],
       name: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
-      shopId: ['']
     });
 
     this.productId = this.route.snapshot.paramMap.get('id') || undefined;
