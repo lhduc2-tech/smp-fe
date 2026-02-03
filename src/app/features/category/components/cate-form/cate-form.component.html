@@ -1,0 +1,47 @@
+<div class="staff-form-container">
+  <div class="header">
+    <h1>{{ isEdit ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới' }}</h1>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+
+    <!-- Tên danh mục -->
+    <div class="form-group">
+      <label>
+        Tên danh mục
+        <span class="required-asterisk">*</span>
+      </label>
+      <input
+        type="text"
+        formControlName="categoryName"
+        placeholder="Nhập tên danh mục"
+      >
+    </div>
+
+    <!-- Mô tả -->
+    <div class="form-group">
+      <label>Mô tả</label>
+      <input
+        type="text"
+        formControlName="categoryDescription"
+        placeholder="Nhập mô tả danh mục"
+      >
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn-submit"
+        [disabled]="form.invalid"
+      >
+        {{ isEdit ? 'Cập nhật' : 'Thêm mới' }}
+      </button>
+
+      <a routerLink="/categories" class="btn-cancel">
+        Hủy
+      </a>
+    </div>
+
+  </form>
+</div>
