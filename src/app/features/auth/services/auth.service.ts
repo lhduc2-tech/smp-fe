@@ -119,8 +119,24 @@ export class AuthService {
   hasPermission(permission: string): boolean {
     return this.permissions.includes(permission);
   }
+  isTokenExpired(token?: string): boolean {
+      try {
+        const jwt = token || this.token;
+        if (!jwt) return true;
 
+        const payload = jwtDecode<JwtPayload>(jwt);
+        if (!payload.exp) return true;
+
+        const now = Math.floor(Date.now() / 1000);
+        return payload.exp < now; // true = đã hết hạn
+      } catch (e) {
+        return true; // token lỗi hoặc không decode được -> coi như hết hạn
+      }
+    }
+  /**
+   * KIỂM TRA ĐÃ ĐĂNG NHẬP (CÓ TOKEN VÀ CÒN HẠN)
+   */
   isAuthenticated(): boolean {
-    return !!this.token;
+    return !!this.token && !this.isTokenExpired();
   }
 }

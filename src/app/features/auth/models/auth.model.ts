@@ -20,7 +20,7 @@ export interface RegisterRequest {
   phoneNumber: string;
   shopName:String;
   address:String;
-  aim:String;
+  shopType:String;
 }
 
 export interface RegisterResponse {

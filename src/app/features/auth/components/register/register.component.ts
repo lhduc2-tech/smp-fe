@@ -34,7 +34,7 @@ export class RegisterComponent {
 
         shopName: ['', Validators.required],
         address: ['', Validators.required],
-        aim: [''],
+        shopType: [''],
 
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', Validators.required]
@@ -65,7 +65,7 @@ export class RegisterComponent {
       phoneNumber,
       shopName,
       address,
-      aim,
+      shopType,
       password
     } = this.form.value;
 
@@ -75,7 +75,7 @@ export class RegisterComponent {
       phoneNumber,
       shopName,
       address,
-      aim,
+      shopType,
       password
     }).subscribe({
       next: () => {
