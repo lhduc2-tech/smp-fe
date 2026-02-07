@@ -2,59 +2,60 @@
   <div class="login-form-section">
     <div class="form-wrapper">
 
-      <h1 class="title">CREATE ACCOUNT</h1>
-      <p class="subtitle">Please fill in your information</p>
+      <h1 class="title">TẠO TÀI KHOẢN</h1>
+      <p class="subtitle">Vui lòng điền đầy đủ thông tin của bạn</p>
 
       <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
 
         <div class="input-group">
-          <label>Username</label>
-          <input formControlName="username" placeholder="Enter username">
+          <label>Tên đăng nhập</label>
+          <input formControlName="username" placeholder="Nhập tên đăng nhập">
         </div>
 
         <div class="input-group">
           <label>Email</label>
-          <input formControlName="email" placeholder="Enter email">
+          <input formControlName="email" placeholder="Nhập email">
         </div>
 
         <div class="input-group">
-          <label>Phone number</label>
-          <input formControlName="phoneNumber" placeholder="Enter phone number">
+          <label>Số điện thoại</label>
+          <input formControlName="phoneNumber" placeholder="Nhập số điện thoại">
         </div>
 
         <div class="input-group">
-          <label>Shop Name</label>
-          <input formControlName="shopName" placeholder="Enter shop name">
+          <label>Tên cửa hàng</label>
+          <input formControlName="shopName" placeholder="Nhập tên cửa hàng">
         </div>
 
         <div class="input-group">
-          <label>Address</label>
-          <input formControlName="address" placeholder="Enter your address">
+          <label>Địa chỉ</label>
+          <input formControlName="address" placeholder="Nhập địa chỉ">
         </div>
 
         <div class="input-group">
-          <label>Shop Type</label>
-          <input formControlName="shopType" placeholder="Enter Shop type">
+          <label>Loại cửa hàng</label>
+          <input formControlName="shopType" placeholder="Nhập loại cửa hàng">
         </div>
 
         <div class="input-group">
-          <label>Password</label>
+          <label>Mật khẩu</label>
           <input type="password" formControlName="password" placeholder="********">
         </div>
+
         <div class="input-group">
-          <label>Confirm password</label>
-          <input type="password" formControlName="confirmPassword">
+          <label>Xác nhận mật khẩu</label>
+          <input type="password" formControlName="confirmPassword" placeholder="Nhập lại mật khẩu">
         </div>
 
         <button type="submit" class="btn-primary btn-signup">
-          Create account
+          Tạo tài khoản
         </button>
 
       </form>
 
       <p class="signup-text">
-        Already have an account?
-        <a routerLink="/login">Sign in</a>
+        Đã có tài khoản?
+        <a routerLink="/login">Đăng nhập</a>
       </p>
 
     </div>
