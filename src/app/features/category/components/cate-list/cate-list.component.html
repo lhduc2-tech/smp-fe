@@ -3,7 +3,11 @@
   <!-- Header -->
   <div class="header">
     <h1>Quản lý danh mục</h1>
-    <a routerLink="add" class="btn-add">+ Thêm danh mục</a>
+    <z-button-group>
+      <a routerLink="add" class="btn-add">
+        + Thêm danh mục
+      </a>
+    </z-button-group>
   </div>
 
   <!-- Search -->
@@ -46,22 +50,15 @@
           <td>{{ c.categoryDescription || '-' }}</td>
           <td>{{ c.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
           <td>
-            <div class="actions">
-              <a
-                [routerLink]="c.id"
-                class="action-icon"
-                title="Sửa"
-              >
+            <z-button-group zOrientation="horizontal">
+              <button class="action-icon" [routerLink]="c.id">
                 <app-icon type="edit"></app-icon>
-              </a>
-              <button
-                (click)="deleteCategory(c.id)"
-                class="action-icon"
-                title="Xóa"
-              >
+              </button>
+
+              <button class="action-icon" (click)="deleteCategory(c.id)">
                 <app-icon type="delete"></app-icon>
               </button>
-            </div>
+            </z-button-group>
           </td>
         </tr>
       </tbody>

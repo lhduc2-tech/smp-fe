@@ -19,9 +19,9 @@ export const appConfig: ApplicationConfig = {
     // HttpClient + Auth Interceptor
     provideHttpClient(
       withInterceptors([authInterceptor,
-    provideZard(),])
+    ])
     ),
-
+    provideZard(),
     // Social login module
     importProvidersFrom(SocialLoginModule),
 
