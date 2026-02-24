@@ -18,8 +18,8 @@ import {
   buttonGroupVariants,
   type ZardButtonGroupVariants,
 } from './button-group.variants';
-import { ZardDividerComponent } from './../divider/divider.component';
-import { type ZardDividerVariants } from './../divider/divider.variants';
+import { ZardDividerComponent } from '../divider/divider.component';
+import { type ZardDividerVariants } from '../divider/divider.variants';
 
 @Component({
   selector: 'z-button-group',
