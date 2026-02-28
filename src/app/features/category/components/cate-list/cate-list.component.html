@@ -135,7 +135,57 @@
       </div>
 
     </div>
+<!-- ================= PAGINATION ================= -->
+<div
+  *ngIf="!isLoading && totalPages > 1"
+  class="pt-6 border-t flex justify-center"
+>
+  <z-pagination
+    [zPageIndex]="currentPage + 1"
+    [zTotal]="totalPages"
+    (zPageIndexChange)="onPageChange($event - 1)"
+  >
+    <ul z-pagination-content>
 
+      <!-- Previous -->
+      <li z-pagination-item>
+        <z-pagination-previous
+          [zDisabled]="currentPage === 0"
+          (click)="onPageChange(currentPage - 1)"
+        />
+      </li>
+
+      <!-- Page Numbers -->
+      <li
+        z-pagination-item
+        *ngFor="let page of displayPages"
+      >
+        <ng-container *ngIf="page !== '...'; else ellipsisTpl">
+          <button
+            z-pagination-button
+            [zActive]="currentPage === page"
+            (click)="onPageChange(page)"
+          >
+            {{ getPageLabel(page) }}
+          </button>
+        </ng-container>
+
+        <ng-template #ellipsisTpl>
+          <z-pagination-ellipsis />
+        </ng-template>
+      </li>
+
+      <!-- Next -->
+      <li z-pagination-item>
+        <z-pagination-next
+          [zDisabled]="currentPage === totalPages - 1"
+          (click)="onPageChange(currentPage + 1)"
+        />
+      </li>
+
+    </ul>
+  </z-pagination>
+</div>
   </div>
 
 </z-card>
