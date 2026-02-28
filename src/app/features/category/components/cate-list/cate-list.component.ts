@@ -17,7 +17,6 @@ import { ToastService } from '../../../../shared/components/toast/toast';
     CommonModule,
     FormsModule,
     RouterLink,
-    IconComponent,
      ...SHARED_UI_IMPORTS
   ],
   templateUrl: './cate-list.component.html',
