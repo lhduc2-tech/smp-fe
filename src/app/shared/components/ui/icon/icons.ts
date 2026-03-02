@@ -8,6 +8,7 @@ import {
   ArrowUpRight,
   BadgeCheck,
   Ban,
+  BarChart3,
   Bell,
   Bold,
   BookOpen,
@@ -60,6 +61,7 @@ import {
   Monitor,
   Moon,
   MoveRight,
+  Package,
   Palette,
   PanelLeft,
   Plus,
@@ -69,6 +71,7 @@ import {
   Search,
   Settings,
   Shield,
+  ShoppingCart,
   Smartphone,
   Sparkles,
   Square,
@@ -192,6 +195,9 @@ export const ZARD_ICONS = {
   'user-plus': UserPlus,
   'credit-card': CreditCard,
   activity: Activity,
+  'shopping-cart': ShoppingCart,
+  package: Package,
+  'bar-chart-3': BarChart3,
 } as const satisfies Record<string, LucideIconData>;
 
 export declare type ZardIcon = keyof typeof ZARD_ICONS | LucideIconData;

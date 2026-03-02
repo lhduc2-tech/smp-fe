@@ -8,7 +8,7 @@ import { CategoryService } from '../../services/cate.service';
 import { Category, SearchCategoryRequest } from '../../models/cate.model';
 import { IconComponent } from '../../../../shared/components/icon.component';
 import { ConfirmService } from '../../../../shared/components/confirm-dialog/confirm-dialog';
-import { ToastService } from '../../../../shared/components/toast/toast';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-category-list',
@@ -17,7 +17,7 @@ import { ToastService } from '../../../../shared/components/toast/toast';
     CommonModule,
     FormsModule,
     RouterLink,
-     ...SHARED_UI_IMPORTS
+    ...SHARED_UI_IMPORTS
   ],
   templateUrl: './cate-list.component.html',
   styleUrls: ['./cate-list.component.css']
@@ -30,16 +30,17 @@ export class CategoryListComponent implements OnInit {
 
   currentPage = 0;
   pageSize = 10;
+  pageSizeOptions = [10, 20, 50];
   totalPages = 0;
+  totalElements = 0;
 
   displayPages: (number | '...')[] = [];
 
   constructor(
     private categoryService: CategoryService,
     private cd: ChangeDetectorRef,
-    private confirmService: ConfirmService,
-    private toastService: ToastService
-  ) {}
+    private confirmService: ConfirmService
+  ) { }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -64,13 +65,14 @@ export class CategoryListComponent implements OnInit {
         next: res => {
           this.categories = res.content;
           this.totalPages = res.totalPages;
+          this.totalElements = res.total;
           this.updateDisplayPages();
           this.isLoading = false;
           this.cd.detectChanges();
         },
         error: () => {
           this.isLoading = false;
-          this.toastService.error('Không thể tải danh sách danh mục');
+          toast.error('Không thể tải danh sách danh mục');
         }
       });
   }
@@ -85,7 +87,14 @@ export class CategoryListComponent implements OnInit {
   /* ================= PAGINATION ================= */
 
   onPageChange(page: number): void {
+    if (page < 0 || page >= this.totalPages) return;
     this.currentPage = page;
+    this.loadCategories();
+  }
+
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
+    this.currentPage = 0;
     this.loadCategories();
   }
 
@@ -136,7 +145,7 @@ export class CategoryListComponent implements OnInit {
 
     if (ok) {
       this.categoryService.deleteCategory(id).subscribe(() => {
-        this.toastService.success('Xóa danh mục thành công');
+        toast.success('Xóa danh mục thành công');
         this.loadCategories();
       });
     }

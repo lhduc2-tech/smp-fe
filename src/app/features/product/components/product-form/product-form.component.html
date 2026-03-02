@@ -1,66 +1,57 @@
-<div class="staff-form-container">
-  <div class="header">
-    <h1>{{ isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới' }}</h1>
-  </div>
-
-  <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+<z-card [zTitle]="isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'" zDescription="Quản lý thông tin sản phẩm"
+  class="product-form-card">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
 
     <!-- Mã sản phẩm -->
-    <div class="form-group">
-      <label>
-        Mã sản phẩm
-        <span class="required-asterisk">*</span>
-      </label>
-      <input
-        type="text"
-        formControlName="code"
-        placeholder="Nhập mã sản phẩm"
-      >
-    </div>
+    <z-form-field>
+      <label z-form-label zRequired>Mã sản phẩm</label>
+      <z-form-control>
+        <input z-input type="text" formControlName="code" placeholder="Nhập mã sản phẩm" />
+      </z-form-control>
+    </z-form-field>
 
     <!-- Tên sản phẩm -->
-    <div class="form-group">
-      <label>
-        Tên sản phẩm
-        <span class="required-asterisk">*</span>
-      </label>
-      <input
-        type="text"
-        formControlName="name"
-        placeholder="Nhập tên sản phẩm"
-      >
-    </div>
+    <z-form-field>
+      <label z-form-label zRequired>Tên sản phẩm</label>
+      <z-form-control>
+        <input z-input type="text" formControlName="name" placeholder="Nhập tên sản phẩm" />
+      </z-form-control>
+    </z-form-field>
 
-    <!-- Giá + Shop -->
-    <div class="form-row">
-      <div class="form-group">
-        <label>
-          Giá
-          <span class="required-asterisk">*</span>
-        </label>
-        <input
-          type="number"
-          formControlName="price"
-          placeholder="Nhập giá sản phẩm"
-          min="0"
-        >
-      </div>
-    </div>
+    <!-- Giá -->
+    <z-form-field>
+      <label z-form-label zRequired>Giá</label>
+      <z-form-control>
+        <input z-input type="number" formControlName="price" placeholder="Nhập giá sản phẩm" min="0" />
+      </z-form-control>
+    </z-form-field>
+
+    <!-- Danh mục -->
+    <z-form-field>
+      <label z-form-label zRequired>Danh mục</label>
+      <z-form-control>
+        <select formControlName="categoryId"
+          class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+          <option value="" disabled selected>Chọn danh mục</option>
+          <option *ngFor="let category of categories" [value]="category.id">
+            {{ category.categoryName }}
+          </option>
+        </select>
+      </z-form-control>
+    </z-form-field>
+
+    <!-- Divider -->
+    <z-divider />
 
     <!-- Actions -->
-    <div class="form-actions">
-      <button
-        type="submit"
-        class="btn-submit"
-        [disabled]="form.invalid"
-      >
-        {{ isEdit ? 'Cập nhật' : 'Thêm mới' }}
-      </button>
-
-      <a routerLink="/products" class="btn-cancel">
+    <div class="flex justify-end gap-3 mt-6">
+      <a z-button zType="outline" routerLink="/products">
         Hủy
       </a>
+      <button z-button zType="default" type="submit" [zDisabled]="form.invalid">
+        {{ isEdit ? 'Cập nhật' : 'Thêm mới' }}
+      </button>
     </div>
 
   </form>
-</div>
+</z-card>

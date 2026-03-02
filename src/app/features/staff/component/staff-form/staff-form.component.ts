@@ -4,12 +4,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StaffService } from '../../services/staff.service';
 import { Staff } from '../../models/staff.model';
-import { ToastService } from '../../../../shared/components/toast/toast';
+import { toast } from 'ngx-sonner';
+import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 
 @Component({
   selector: 'app-staff-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ...SHARED_UI_IMPORTS],
   templateUrl: './staff-form.component.html',
   styleUrls: ['./staff-form.component.css']
 })
@@ -23,8 +24,7 @@ export class StaffFormComponent implements OnInit {
     private formBuilder: FormBuilder,
     private staffService: StaffService,
     private route: ActivatedRoute,
-    private router: Router,
-    private toastService: ToastService
+    private router: Router
   ) {
     this.staffForm = this.formBuilder.group({
       fullName: ['', [Validators.required]],
@@ -59,7 +59,7 @@ export class StaffFormComponent implements OnInit {
       error: (error) => {
         console.error('Lỗi khi tải thông tin nhân viên:', error);
         const errorMessage = this.getErrorMessage(error);
-        this.toastService.error(`Không thể tải thông tin nhân viên: ${errorMessage}`);
+        toast.error(`Không thể tải thông tin nhân viên: ${errorMessage}`);
         this.router.navigate(['/settings/staff']);
       }
     });
@@ -67,7 +67,7 @@ export class StaffFormComponent implements OnInit {
 
   submitForm(): void {
     if (!this.staffForm.valid) {
-      this.toastService.error('Vui lòng điền đầy đủ thông tin bắt buộc!');
+      toast.error('Vui lòng điền đầy đủ thông tin bắt buộc!');
       return;
     }
 
@@ -86,29 +86,26 @@ export class StaffFormComponent implements OnInit {
 
       this.staffService.updateStaff(staffData).subscribe({
         next: () => {
-          this.toastService.success('Cập nhật nhân viên thành công');
-          this.router.navigate(['/settings/staff']);
+          toast.success('Cập nhật nhân viên thành công');
         },
         error: (error) => {
           console.error('Lỗi khi cập nhật nhân viên:', error);
           const errorMessage = this.getErrorMessage(error);
-          this.toastService.error(errorMessage);
+          toast.error(errorMessage);
           this.isLoading = false;
         }
       });
     } else {
       this.staffService.addStaff(formData).subscribe({
         next: () => {
-          this.toastService.success('Thêm nhân viên thành công');
-          this.router.navigate(['/settings/staff']);
+          toast.success('Thêm nhân viên thành công');
         },
         error: (error) => {
-          // Log chi tiết lỗi ra console để debug
           console.error('Lỗi khi thêm nhân viên (Chi tiết):', JSON.stringify(error, null, 2));
           console.error('Error Object Direct:', error);
 
           const errorMessage = this.getErrorMessage(error);
-          this.toastService.error(errorMessage);
+          toast.error(errorMessage);
           this.isLoading = false;
         }
       });
@@ -116,12 +113,9 @@ export class StaffFormComponent implements OnInit {
   }
 
   private getErrorMessage(error: any): string {
-    // Kiểm tra lỗi từ backend
     if (error?.error?.message) {
       return error.error.message;
     }
-
-    // Kiểm tra lỗi validation từ backend
     if (error?.error?.errors) {
       const errors = error.error.errors;
       if (Array.isArray(errors)) {
@@ -129,8 +123,6 @@ export class StaffFormComponent implements OnInit {
       }
       return Object.values(errors).join('\n');
     }
-
-    // Kiểm tra HTTP error status
     if (error?.status) {
       const statusMessages: { [key: number]: string } = {
         400: 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.',
@@ -142,12 +134,9 @@ export class StaffFormComponent implements OnInit {
       };
       return statusMessages[error.status] || `Lỗi (${error.status}): ${error.statusText || 'Không xác định'}`;
     }
-
-    // Lỗi network
     if (error?.status === 0) {
       return 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
     }
-
     return 'Đã xảy ra lỗi. Vui lòng thử lại sau!';
   }
 }

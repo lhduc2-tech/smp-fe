@@ -1,47 +1,35 @@
-<div class="staff-form-container">
-  <div class="header">
-    <h1>{{ isEdit ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới' }}</h1>
-  </div>
-
-  <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+<z-card [zTitle]="isEdit ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'"
+  zDescription="Quản lý thông tin danh mục sản phẩm" class="category-form-card">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
 
     <!-- Tên danh mục -->
-    <div class="form-group">
-      <label>
-        Tên danh mục
-        <span class="required-asterisk">*</span>
-      </label>
-      <input
-        type="text"
-        formControlName="categoryName"
-        placeholder="Nhập tên danh mục"
-      >
-    </div>
+    <z-form-field>
+      <label z-form-label zRequired>Tên danh mục</label>
+      <z-form-control>
+        <input z-input type="text" formControlName="categoryName" placeholder="Nhập tên danh mục" />
+      </z-form-control>
+    </z-form-field>
 
     <!-- Mô tả -->
-    <div class="form-group">
-      <label>Mô tả</label>
-      <input
-        type="text"
-        formControlName="categoryDescription"
-        placeholder="Nhập mô tả danh mục"
-      >
-    </div>
+    <z-form-field>
+      <label z-form-label>Mô tả</label>
+      <z-form-control>
+        <input z-input type="text" formControlName="categoryDescription" placeholder="Nhập mô tả danh mục" />
+      </z-form-control>
+    </z-form-field>
+
+    <!-- Divider -->
+    <z-divider />
 
     <!-- Actions -->
     <div class="form-actions">
-      <button
-        type="submit"
-        class="btn-submit"
-        [disabled]="form.invalid"
-      >
-        {{ isEdit ? 'Cập nhật' : 'Thêm mới' }}
-      </button>
-
-      <a routerLink="/categories" class="btn-cancel">
+      <a z-button zType="outline" routerLink="/categories">
         Hủy
       </a>
+      <button z-button zType="default" type="submit" [zDisabled]="form.invalid">
+        {{ isEdit ? 'Cập nhật' : 'Thêm mới' }}
+      </button>
     </div>
 
   </form>
-</div>
+</z-card>

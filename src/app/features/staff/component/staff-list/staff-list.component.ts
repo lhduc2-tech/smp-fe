@@ -6,13 +6,14 @@ import { StaffService } from '../../services/staff.service';
 import { Staff, SearchStaffRequest } from '../../models/staff.model';
 import { IconComponent } from '../../../../shared/components/icon.component';
 import { ConfirmService } from '../../../../shared/components/confirm-dialog/confirm-dialog';
-import { ToastService } from '../../../../shared/components/toast/toast';
+import { toast } from 'ngx-sonner';
 import { retry } from 'rxjs/operators';
+import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 
 @Component({
   selector: 'app-staff-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, IconComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ...SHARED_UI_IMPORTS],
   templateUrl: './staff-list.component.html',
   styleUrls: ['./staff-list.component.css']
 })
@@ -21,22 +22,25 @@ export class StaffListComponent implements OnInit {
   searchTerm = '';
   isLoading = false;
 
-  // Pagination State
   currentPage = 0;
   pageSize = 10;
+  pageSizeOptions = [10, 20, 50];
   totalElements = 0;
   totalPages = 0;
+
+  displayPages: (number | '...')[] = [];
 
   constructor(
     private staffService: StaffService,
     private cd: ChangeDetectorRef,
-    private confirmService: ConfirmService,
-    private toastService: ToastService
+    private confirmService: ConfirmService
   ) { }
 
   ngOnInit(): void {
     this.loadStaff();
   }
+
+  /* ================= LOAD ================= */
 
   loadStaff(): void {
     this.isLoading = true;
@@ -48,10 +52,8 @@ export class StaffListComponent implements OnInit {
       sortDir: 'desc'
     };
 
-    // Nếu có search term, gán vào các field search (giả định backend search OR hoặc match partial)
     if (this.searchTerm.trim()) {
       request.fullName = this.searchTerm.trim();
-      // Hoặc tùy backend logic, có thể truyền vào email/phone
     }
 
     this.staffService.getStaffPage(request)
@@ -66,15 +68,8 @@ export class StaffListComponent implements OnInit {
           this.staffList = response.content || [];
           this.totalElements = response.total;
           this.totalPages = response.totalPages;
+          this.updateDisplayPages();
           this.isLoading = false;
-
-          console.log('Pagination Debug:', {
-            currentPage: this.currentPage,
-            totalPages: this.totalPages,
-            totalElements: this.totalElements,
-            shouldShow: this.totalPages > 1
-          });
-
           this.cd.detectChanges();
         },
         error: (error) => {
@@ -90,23 +85,72 @@ export class StaffListComponent implements OnInit {
             this.totalElements = 2;
             this.totalPages = 1;
           }
+          this.updateDisplayPages();
           this.cd.detectChanges();
         }
       });
   }
+
+  /* ================= SEARCH ================= */
 
   onSearch(): void {
     this.currentPage = 0; // Reset về trang đầu khi search
     this.loadStaff();
   }
 
-  onPageChange(page: any): void {
-    const pageNum = Number(page);
-    if (!isNaN(pageNum) && pageNum >= 0 && pageNum < this.totalPages) {
-      this.currentPage = pageNum;
-      this.loadStaff();
-    }
+  /* ================= PAGINATION ================= */
+
+  onPageChange(page: number): void {
+    if (page < 0 || page >= this.totalPages) return;
+    this.currentPage = page;
+    this.loadStaff();
   }
+
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
+    this.currentPage = 0;
+    this.loadStaff();
+  }
+
+  private updateDisplayPages(): void {
+    const pages: (number | '...')[] = [];
+    const maxVisible = 5;
+
+    if (this.totalPages <= maxVisible) {
+      for (let i = 0; i < this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(0); // Luôn hiện trang đầu
+
+      if (this.currentPage > 2) {
+        pages.push('...'); // Dấu ... nếu trang hiện tại cách trang đầu tiên > 2
+      }
+
+      const start = Math.max(1, this.currentPage - 1);
+      const end = Math.min(this.totalPages - 2, this.currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (this.currentPage < this.totalPages - 3) {
+        pages.push('...'); // Dấu ... nếu trang hiện tại cách trang cuối > 2
+      }
+
+      pages.push(this.totalPages - 1); // Luôn hiện trang cuối
+    }
+    this.displayPages = pages;
+  }
+
+  getPageLabel(page: number | '...'): string {
+    if (page === '...') {
+      return '...';
+    }
+    return (page + 1).toString();
+  }
+
+  /* ================= DELETE ================= */
 
   async deleteStaff(id: string): Promise<void> {
     const confirmed = await this.confirmService.confirm(
@@ -118,45 +162,14 @@ export class StaffListComponent implements OnInit {
     if (confirmed) {
       this.staffService.deleteStaff(id).subscribe({
         next: () => {
-          this.toastService.success('Xóa nhân viên thành công');
+          toast.success('Xóa nhân viên thành công');
           this.loadStaff();
         },
         error: (error) => {
           console.error('Lỗi khi xóa nhân viên:', error);
-          this.toastService.error('Không thể xóa nhân viên. Vui lòng thử lại!');
+          toast.error('Không thể xóa nhân viên. Vui lòng thử lại!');
         }
       });
     }
-  }
-
-  get displayPages(): (number | string)[] {
-    const pages: (number | string)[] = [];
-    const total = this.totalPages;
-    const current = this.currentPage;
-
-    if (total <= 7) {
-      for (let i = 0; i < total; i++) pages.push(i);
-    } else {
-      pages.push(0);
-      if (current > 2) pages.push('...');
-
-      const start = Math.max(1, current - 1);
-      const end = Math.min(total - 2, current + 1);
-
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      if (current < total - 3) pages.push('...');
-      pages.push(total - 1);
-    }
-    return pages;
-  }
-
-  getPageLabel(page: number | string): string {
-    if (typeof page === 'number') {
-      return (page + 1).toString();
-    }
-    return page;
   }
 }

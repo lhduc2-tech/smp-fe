@@ -48,7 +48,7 @@ type IconType = 'edit' | 'delete' | 'add' | 'search' | 'view';
       color: #6b7280;
     }
     
-    ::ng-deep svg {
+    :host ::ng-deep .icon svg {
       width: 18px;
       height: 18px;
       fill: currentColor;

@@ -43,13 +43,20 @@ export class CategoryService {
       .pipe(map(res => this.transformPageResponse(res)));
   }
 
+  getAllCategories(): Observable<Category[]> {
+    return this.apiService
+      .get<any[]>(this.API_ENDPOINT)
+      .pipe(map(res => res.map(item => this.transformCategory(item))));
+  }
+
   /* ================= CRUD ================= */
 
   addCategory(data: Partial<Category>): Observable<Category> {
     const request = {
       categoryName: data.categoryName,
       categoryDescription: data.categoryDescription,
-      createdBy: this.authService.username
+      createdBy: this.authService.username,
+      shopId: this.authService.shopId
     };
 
     return this.apiService
@@ -61,7 +68,8 @@ export class CategoryService {
     const request = {
       categoryName: data.categoryName,
       categoryDescription: data.categoryDescription,
-      updatedBy: this.authService.username
+      updatedBy: this.authService.username,
+      shopId: this.authService.shopId
     };
 
     return this.apiService

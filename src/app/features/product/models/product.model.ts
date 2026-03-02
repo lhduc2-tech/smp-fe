@@ -4,6 +4,8 @@ export interface Product {
   name: string;
   price: number;
   shopId?: string;
+  category_name?: string;
+  categoryId?: string;
 
   createdAt?: string;
   updatedAt?: string;

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -9,16 +8,17 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CategoryService } from '../../services/cate.service';
-import { ToastService } from '../../../../shared/components/toast/toast';
+import { toast } from 'ngx-sonner';
 import { AuthService } from '../../../auth/services/auth.service';
+import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 
 @Component({
   selector: 'app-category-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    ...SHARED_UI_IMPORTS,
   ],
   templateUrl: './cate-form.component.html',
   styleUrls: ['./cate-form.component.css']
@@ -35,9 +35,8 @@ export class CategoryFormComponent implements OnInit {
     private categoryService: CategoryService,
     private route: ActivatedRoute,
     private router: Router,
-    private toast: ToastService,
     private authService: AuthService
-  ) {}
+  ) { }
 
   // ================= INIT =================
   ngOnInit(): void {
@@ -74,7 +73,7 @@ export class CategoryFormComponent implements OnInit {
         });
       },
       error: () => {
-        this.toast.error('Không tải được dữ liệu danh mục');
+        toast.error('Không tải được dữ liệu danh mục');
         this.router.navigate(['/categories']);
       },
       complete: () => {
@@ -93,7 +92,7 @@ export class CategoryFormComponent implements OnInit {
     const shopId = this.authService.shopId;
 
     if (!shopId) {
-      this.toast.error('Không tìm thấy thông tin cửa hàng');
+      toast.error('Không tìm thấy thông tin cửa hàng');
       return;
     }
 
@@ -111,15 +110,17 @@ export class CategoryFormComponent implements OnInit {
 
     action$.subscribe({
       next: () => {
-        this.toast.success(
+        toast.success(
           this.isEdit
             ? 'Cập nhật danh mục thành công'
             : 'Thêm danh mục thành công'
         );
-        this.router.navigate(['/categories']);
+        if (!this.isEdit) {
+          this.router.navigate(['/categories']);
+        }
       },
       error: () => {
-        this.toast.error(
+        toast.error(
           this.isEdit
             ? 'Cập nhật danh mục thất bại'
             : 'Thêm danh mục thất bại'

@@ -46,7 +46,8 @@ export class ProductService {
       code: product.code,
       name: product.name,
       price: product.price,
-      shopId: this.authService.shopId,   // ⭐ lấy từ localStorage
+      categoryId: product.categoryId,
+      shopId: this.authService.shopId,
       createdBy: this.authService.username
     };
 
@@ -67,7 +68,8 @@ export class ProductService {
       code: product.code,
       name: product.name,
       price: product.price,
-      shopId: this.authService.shopId,   // ⭐ luôn dùng shop hiện tại
+      categoryId: product.categoryId,
+      shopId: this.authService.shopId,
       updatedBy: this.authService.username
     };
 
@@ -107,6 +109,7 @@ export class ProductService {
       name: res.name,
       price: res.price,
       shopId: res.shop_id || res.shopId,
+      category_name: res.category_name || res.categoryName,
       createdAt: res.created_at,
       updatedAt: res.updated_at,
       createdBy: res.created_by,

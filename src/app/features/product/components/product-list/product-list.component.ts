@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { retry } from 'rxjs/operators';
 
+import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 import { ProductService } from '../../services/product.service';
 import { Product, SearchProductRequest } from '../../models/product.model';
-import { IconComponent } from '../../../../shared/components/icon.component';
 import { ConfirmService } from '../../../../shared/components/confirm-dialog/confirm-dialog';
-import { ToastService } from '../../../../shared/components/toast/toast';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-product-list',
@@ -19,7 +19,7 @@ import { ToastService } from '../../../../shared/components/toast/toast';
     RouterLink,
     DatePipe,
     DecimalPipe,
-    IconComponent
+    ...SHARED_UI_IMPORTS
   ],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
@@ -32,14 +32,17 @@ export class ProductListComponent implements OnInit {
 
   currentPage = 0;
   pageSize = 10;
+  pageSizeOptions = [10, 20, 50];
   totalPages = 0;
+  totalElements = 0;
+
+  displayPages: (number | '...')[] = [];
 
   constructor(
     private productService: ProductService,
     private cd: ChangeDetectorRef,
-    private confirmService: ConfirmService,
-    private toastService: ToastService
-  ) {}
+    private confirmService: ConfirmService
+  ) { }
 
   ngOnInit(): void {
     this.loadProducts();
@@ -62,12 +65,14 @@ export class ProductListComponent implements OnInit {
         next: res => {
           this.products = res.content;
           this.totalPages = res.totalPages;
+          this.totalElements = res.total;
+          this.updateDisplayPages();
           this.isLoading = false;
           this.cd.detectChanges();
         },
         error: () => {
           this.isLoading = false;
-          this.toastService.error('Không thể tải danh sách sản phẩm');
+          toast.error('Không thể tải danh sách sản phẩm');
         }
       });
   }
@@ -78,47 +83,53 @@ export class ProductListComponent implements OnInit {
   }
 
   onPageChange(page: number): void {
+    if (page < 0 || page >= this.totalPages) return;
     this.currentPage = page;
     this.loadProducts();
   }
 
-  displayPages: (number | '...')[] = [];
-
-private updateDisplayPages(): void {
-  const pages: (number | '...')[] = [];
-  const maxVisible = 5;
-
-  if (this.totalPages <= maxVisible) {
-    for (let i = 0; i < this.totalPages; i++) {
-      pages.push(i);
-    }
-  } else {
-    pages.push(0);
-
-    if (this.currentPage > 2) {
-      pages.push('...');
-    }
-
-    const start = Math.max(1, this.currentPage - 1);
-    const end = Math.min(this.totalPages - 2, this.currentPage + 1);
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    if (this.currentPage < this.totalPages - 3) {
-      pages.push('...');
-    }
-
-    pages.push(this.totalPages - 1);
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
+    this.currentPage = 0;
+    this.loadProducts();
   }
 
-  this.displayPages = pages;
-}
 
-getPageLabel(page: number | '...'): string {
-  return page === '...' ? '...' : (page + 1).toString();
-}
+  private updateDisplayPages(): void {
+    const pages: (number | '...')[] = [];
+    const maxVisible = 5;
+
+    if (this.totalPages <= maxVisible) {
+      for (let i = 0; i < this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(0);
+
+      if (this.currentPage > 2) {
+        pages.push('...');
+      }
+
+      const start = Math.max(1, this.currentPage - 1);
+      const end = Math.min(this.totalPages - 2, this.currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (this.currentPage < this.totalPages - 3) {
+        pages.push('...');
+      }
+
+      pages.push(this.totalPages - 1);
+    }
+
+    this.displayPages = pages;
+  }
+
+  getPageLabel(page: number | '...'): string {
+    return page === '...' ? '...' : (page + 1).toString();
+  }
 
   async deleteProduct(id: string): Promise<void> {
     const ok = await this.confirmService.confirm(
@@ -129,7 +140,7 @@ getPageLabel(page: number | '...'): string {
 
     if (ok) {
       this.productService.deleteProduct(id).subscribe(() => {
-        this.toastService.success('Xóa sản phẩm thành công');
+        toast.success('Xóa sản phẩm thành công');
         this.loadProducts();
       });
     }

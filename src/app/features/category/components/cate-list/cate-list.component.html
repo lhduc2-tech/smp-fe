@@ -15,30 +15,19 @@
       <!-- Search -->
       <div class="flex items-center gap-3 w-full max-w-md">
 
-        <input
-          type="text"
-          class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
-          placeholder="Tìm kiếm theo tên danh mục..."
-          [(ngModel)]="searchTerm"
-          (keyup.enter)="onSearch()"
-        />
+        <input type="text"
+          class="flex-1 h-10 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
+          placeholder="Tìm kiếm theo tên danh mục..." [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" />
 
-        <button
-          z-button
-          zType="default"
-          (click)="onSearch()"
-        >
+        <button z-button zType="default" class="h-10" (click)="onSearch()">
           <z-icon zType="search" />
         </button>
 
       </div>
 
       <!-- Add Button -->
-      <a
-        z-button
-        routerLink="add"
-        zType="outline"
-      >
+      <a z-button routerLink="add" zType="default" class="h-10"
+        style="background-color: black; color: white; border-color: black;">
         + Thêm danh mục
       </a>
 
@@ -55,10 +44,7 @@
       </div>
 
       <!-- Table -->
-      <div
-        *ngIf="!isLoading && categories.length > 0"
-        class="overflow-x-auto rounded-xl border"
-      >
+      <div *ngIf="!isLoading && categories.length > 0" class="overflow-x-auto rounded-xl border">
         <table class="w-full text-sm">
 
           <thead class="bg-muted/40">
@@ -72,10 +58,7 @@
 
           <tbody class="divide-y">
 
-            <tr
-              *ngFor="let c of categories"
-              class="hover:bg-muted/30 transition-colors"
-            >
+            <tr *ngFor="let c of categories" class="hover:bg-muted/30 transition-colors">
               <td class="p-4 font-medium">
                 {{ c.categoryName }}
               </td>
@@ -91,20 +74,11 @@
               <td class="p-4">
                 <div class="flex gap-2 justify-center">
 
-                  <button
-                    z-button
-                    zSize="sm"
-                    [routerLink]="c.id"
-                  >
+                  <button z-button zSize="sm" [routerLink]="c.id">
                     <z-icon zType="edit" />
                   </button>
 
-                  <button
-                    z-button
-                    zType="destructive"
-                    zSize="sm"
-                    (click)="deleteCategory(c.id)"
-                  >
+                  <button z-button zType="destructive" zSize="sm" (click)="deleteCategory(c.id)">
                     <z-icon zType="trash" />
                   </button>
 
@@ -117,75 +91,72 @@
       </div>
 
       <!-- Empty -->
-      <div
-        *ngIf="!isLoading && categories.length === 0"
-        class="text-center py-14 border rounded-xl"
-      >
+      <div *ngIf="!isLoading && categories.length === 0" class="text-center py-14 border rounded-xl">
         <p class="text-muted-foreground mb-4">
           Không tìm thấy danh mục
         </p>
 
-        <button
-          z-button
-          zType="secondary"
-          (click)="loadCategories()"
-        >
+        <button z-button zType="secondary" (click)="loadCategories()">
           Thử lại
         </button>
       </div>
 
     </div>
-<!-- ================= PAGINATION ================= -->
-<div
-  *ngIf="!isLoading && totalPages > 1"
-  class="pt-6 border-t flex justify-center"
->
-  <z-pagination
-    [zPageIndex]="currentPage + 1"
-    [zTotal]="totalPages"
-    (zPageIndexChange)="onPageChange($event - 1)"
-  >
-    <ul z-pagination-content>
+    <!-- ================= PAGINATION ================= -->
+    <div *ngIf="!isLoading && totalPages > 0" class="pt-6 flex items-center justify-between">
+      <!-- Page size selector -->
+      <div class="page-size-selector">
+        <label for="pageSize">Số bản ghi:</label>
+        <select id="pageSize" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          <option *ngFor="let opt of pageSizeOptions" [ngValue]="opt">
+            {{ opt }}
+          </option>
+        </select>
+      </div>
 
-      <!-- Previous -->
-      <li z-pagination-item>
-        <z-pagination-previous
-          [zDisabled]="currentPage === 0"
-          (click)="onPageChange(currentPage - 1)"
-        />
-      </li>
+      <!-- Page navigation -->
+      <div class="pagination-nav" *ngIf="totalPages > 1">
+        <!-- First page << -->
+        <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(0)" title="Trang đầu">
+          &laquo;
+        </button>
 
-      <!-- Page Numbers -->
-      <li
-        z-pagination-item
-        *ngFor="let page of displayPages"
-      >
-        <ng-container *ngIf="page !== '...'; else ellipsisTpl">
-          <button
-            z-pagination-button
-            [zActive]="currentPage === page"
-            (click)="onPageChange(page)"
-          >
+        <!-- Previous < -->
+        <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)"
+          title="Trang trước">
+          &lsaquo;
+        </button>
+
+        <!-- Page Numbers -->
+        <ng-container *ngFor="let page of displayPages">
+          <button *ngIf="page !== '...'; else ellipsisTpl" class="page-btn" [class.active]="currentPage === page"
+            (click)="onPageChange(page)">
             {{ getPageLabel(page) }}
           </button>
+
+          <ng-template #ellipsisTpl>
+            <span class="page-ellipsis">...</span>
+          </ng-template>
         </ng-container>
 
-        <ng-template #ellipsisTpl>
-          <z-pagination-ellipsis />
-        </ng-template>
-      </li>
+        <!-- Next > -->
+        <button class="page-btn" [disabled]="currentPage === totalPages - 1" (click)="onPageChange(currentPage + 1)"
+          title="Trang sau">
+          &rsaquo;
+        </button>
 
-      <!-- Next -->
-      <li z-pagination-item>
-        <z-pagination-next
-          [zDisabled]="currentPage === totalPages - 1"
-          (click)="onPageChange(currentPage + 1)"
-        />
-      </li>
+        <!-- Last page >> -->
+        <button class="page-btn" [disabled]="currentPage === totalPages - 1" (click)="onPageChange(totalPages - 1)"
+          title="Trang cuối">
+          &raquo;
+        </button>
+      </div>
 
-    </ul>
-  </z-pagination>
-</div>
+      <!-- Page info -->
+      <div class="page-info">
+        Trang {{ currentPage + 1 }} / {{ totalPages }}
+      </div>
+    </div>
   </div>
 
 </z-card>

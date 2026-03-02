@@ -19,6 +19,8 @@ import {
   ZardPaginationNextComponent,
   ZardPaginationPreviousComponent,
 } from '@/shared/components/ui/pagination/pagination.component';
+import { ZardInputDirective } from './input';
+import { ZardFormImports } from './form/form.imports';
 
 export const SHARED_UI_IMPORTS = [
   // Base UI
@@ -26,6 +28,12 @@ export const SHARED_UI_IMPORTS = [
   ZardCardComponent,
   ZardButtonComponent,
   ZardIconComponent,
+
+  // Input
+  ZardInputDirective,
+
+  // Form
+  ...ZardFormImports,
 
   // Button group
   ZardButtonGroupComponent,
