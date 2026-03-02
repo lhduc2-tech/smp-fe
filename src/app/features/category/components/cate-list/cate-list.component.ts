@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { retry } from 'rxjs/operators';
-
+import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 import { CategoryService } from '../../services/cate.service';
 import { Category, SearchCategoryRequest } from '../../models/cate.model';
 import { IconComponent } from '../../../../shared/components/icon.component';
@@ -17,7 +17,7 @@ import { ToastService } from '../../../../shared/components/toast/toast';
     CommonModule,
     FormsModule,
     RouterLink,
-    IconComponent
+     ...SHARED_UI_IMPORTS
   ],
   templateUrl: './cate-list.component.html',
   styleUrls: ['./cate-list.component.css']
