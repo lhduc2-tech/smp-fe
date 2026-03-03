@@ -4,4 +4,4 @@ import { CategoryRoutingModule } from './cate-routing.module';
 @NgModule({
   imports: [CategoryRoutingModule]
 })
-export class ProductModule {}
+export class CategoryModule {}

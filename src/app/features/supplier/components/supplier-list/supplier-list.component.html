@@ -1,0 +1,211 @@
+<z-card class="rounded-2xl shadow-sm p-8">
+
+  <div class="space-y-8">
+
+    <!-- ================= TITLE ================= -->
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">
+        Quản lý nhà cung cấp
+      </h1>
+    </div>
+
+    <!-- ================= TOOLBAR (Search + Add Button) ================= -->
+    <div class="flex items-center justify-between">
+
+      <!-- Search -->
+      <div class="flex items-center gap-3 w-full max-w-md">
+
+        <input type="text"
+          class="flex-1 h-10 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
+          placeholder="Tìm kiếm theo tên nhà cung cấp..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()" />
+
+        <button z-button zType="default" class="h-10" (click)="onSearch()">
+          <z-icon zType="search" />
+        </button>
+
+      </div>
+
+      <!-- Add Button -->
+      <a z-button
+         routerLink="add"
+         zType="default"
+         class="h-10"
+         style="background-color: black; color: white; border-color: black;">
+        + Thêm nhà cung cấp
+      </a>
+
+    </div>
+
+    <!-- ================= CONTENT ================= -->
+    <div class="space-y-6">
+
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="flex justify-center py-10">
+        <z-button zLoading zDisabled>
+          Đang tải dữ liệu...
+        </z-button>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="!isLoading && suppliers.length > 0"
+           class="overflow-x-auto rounded-xl border">
+
+        <table class="w-full text-sm">
+
+          <thead class="bg-muted/40">
+            <tr>
+              <th class="p-4 text-left font-medium">Tên NCC</th>
+              <th class="p-4 text-left font-medium">Mã</th>
+              <th class="p-4 text-left font-medium">SĐT</th>
+              <th class="p-4 text-left font-medium">Email</th>
+              <th class="p-4 text-left font-medium">Ngày tạo</th>
+              <th class="p-4 text-center font-medium">Hành động</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+
+            <tr *ngFor="let s of suppliers"
+                class="hover:bg-muted/30 transition-colors">
+
+              <td class="p-4 font-medium">
+                {{ s.supplierName }}
+              </td>
+
+              <td class="p-4">
+                {{ s.code }}
+              </td>
+
+              <td class="p-4">
+                {{ s.phoneNumber }}
+              </td>
+
+              <td class="p-4 text-muted-foreground">
+                {{ s.email || '-' }}
+              </td>
+
+              <td class="p-4">
+                {{ s.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td class="p-4">
+                <div class="flex gap-2 justify-center">
+
+                  <button z-button zSize="sm" [routerLink]="s.id">
+                    <z-icon zType="edit" />
+                  </button>
+
+                  <button z-button
+                          zType="destructive"
+                          zSize="sm"
+                          (click)="deleteSupplier(s.id)">
+                    <z-icon zType="trash" />
+                  </button>
+
+                </div>
+              </td>
+
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="!isLoading && suppliers.length === 0"
+           class="text-center py-14 border rounded-xl">
+
+        <p class="text-muted-foreground mb-4">
+          Không tìm thấy nhà cung cấp
+        </p>
+
+        <button z-button zType="secondary" (click)="loadSuppliers()">
+          Thử lại
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ================= PAGINATION ================= -->
+    <div *ngIf="!isLoading && totalPages > 0"
+         class="pt-6 flex items-center justify-between">
+
+      <!-- Page size selector -->
+      <div class="page-size-selector">
+        <label for="pageSize">Số bản ghi:</label>
+        <select id="pageSize"
+                [ngModel]="pageSize"
+                (ngModelChange)="onPageSizeChange($event)">
+          <option *ngFor="let opt of pageSizeOptions"
+                  [ngValue]="opt">
+            {{ opt }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Page navigation -->
+      <div class="pagination-nav" *ngIf="totalPages > 1">
+
+        <!-- First -->
+        <button class="page-btn"
+                [disabled]="currentPage === 0"
+                (click)="onPageChange(0)"
+                title="Trang đầu">
+          &laquo;
+        </button>
+
+        <!-- Previous -->
+        <button class="page-btn"
+                [disabled]="currentPage === 0"
+                (click)="onPageChange(currentPage - 1)"
+                title="Trang trước">
+          &lsaquo;
+        </button>
+
+        <!-- Page Numbers -->
+        <ng-container *ngFor="let page of displayPages">
+
+          <button *ngIf="page !== '...'; else ellipsisTpl"
+                  class="page-btn"
+                  [class.active]="currentPage === page"
+                  (click)="onPageChange(page)">
+            {{ getPageLabel(page) }}
+          </button>
+
+          <ng-template #ellipsisTpl>
+            <span class="page-ellipsis">...</span>
+          </ng-template>
+
+        </ng-container>
+
+        <!-- Next -->
+        <button class="page-btn"
+                [disabled]="currentPage === totalPages - 1"
+                (click)="onPageChange(currentPage + 1)"
+                title="Trang sau">
+          &rsaquo;
+        </button>
+
+        <!-- Last -->
+        <button class="page-btn"
+                [disabled]="currentPage === totalPages - 1"
+                (click)="onPageChange(totalPages - 1)"
+                title="Trang cuối">
+          &raquo;
+        </button>
+
+      </div>
+
+      <!-- Page info -->
+      <div class="page-info">
+        Trang {{ currentPage + 1 }} / {{ totalPages }}
+      </div>
+
+    </div>
+
+  </div>
+
+</z-card>

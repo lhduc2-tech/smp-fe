@@ -300,6 +300,11 @@ export class SidebarComponent {
           icon: 'tag',
           route: '/categories'
         },
+        {
+          label: 'Nhà cung cấp',
+          icon: 'tag',
+          route: '/supplier'
+        },
       ]
     },
     {

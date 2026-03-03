@@ -71,7 +71,13 @@ export const routes: Routes = [
         path: 'categories',
         loadChildren: () =>
           import('./features/category/cate.module')
-            .then(m => m.ProductModule)
+            .then(m => m.CategoryModule)
+      },
+      {
+        path: 'supplier',
+        loadChildren: () =>
+          import('./features/supplier/supplier.module')
+            .then(m => m.SupplierModule)
       },
       {
         path: 'inventory',
