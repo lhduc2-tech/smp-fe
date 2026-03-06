@@ -75,3 +75,16 @@ export interface PageResponse<T> {
     total: number;
     totalPages: number;
 }
+
+export interface CreateOrderRequest {
+    orderDate: string;
+    customerName: string;
+    orderOrigin: string;
+    price: number;
+    paymentState: string;
+    processState: string;
+    deliveryService: string;
+    shopId: string;
+    createdBy: string;
+    updatedBy: string;
+}

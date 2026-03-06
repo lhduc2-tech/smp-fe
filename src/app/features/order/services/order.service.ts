@@ -8,7 +8,8 @@ import {
     SearchOrderRequest,
     PageResponse,
     OrderItem,
-    OrderItemResponse
+    OrderItemResponse,
+    CreateOrderRequest
 } from '../models/order.model';
 
 import { ApiService } from '../../../core/services/api.service';
@@ -43,6 +44,14 @@ export class OrderService {
                 searchRequest
             )
             .pipe(map(res => this.transformPageResponse(res)));
+    }
+
+    /* ================= CREATE ================= */
+
+    createOrder(request: CreateOrderRequest): Observable<Order> {
+        return this.apiService
+            .post<OrderResponse>(this.API_ENDPOINT, request)
+            .pipe(map(res => this.transformOrder(res)));
     }
 
     /* ================= TRANSFORM ================= */

@@ -1,0 +1,284 @@
+<!-- ================= HEADER ================= -->
+<div class="order-create-header">
+    <h1 class="text-2xl font-bold tracking-tight">Tạo đơn hàng mới</h1>
+    <div class="flex items-center gap-3">
+        <button z-button zType="outline" (click)="cancel()">Hủy</button>
+        <button z-button zType="default" (click)="submit()" [zLoading]="isLoading" [zDisabled]="isLoading">
+            Tạo đơn hàng
+        </button>
+    </div>
+</div>
+
+<!-- ================= MAIN LAYOUT ================= -->
+<div class="order-create-layout">
+
+    <!-- ========= LEFT COLUMN ========= -->
+    <div class="order-create-left">
+
+        <!-- 1) THÔNG TIN KHÁCH HÀNG -->
+        <z-card class="section-card">
+            <div class="section-title">
+                <lucide-icon [img]="iconUser" class="text-primary" [size]="24"></lucide-icon>
+                <h2 class="text-lg font-semibold">Thông tin khách hàng</h2>
+            </div>
+
+            <form [formGroup]="form" class="section-body">
+                <div class="form-grid">
+                    <!-- Chọn khách hàng (Zard Combobox) -->
+                    <div class="form-col">
+                        <z-form-field>
+                            <label z-form-label>Chọn khách hàng</label>
+                            <z-form-control>
+                                <z-combobox [options]="customerOptions" placeholder="Tìm kiếm hoặc chọn khách hàng"
+                                    searchPlaceholder="Tìm tên hoặc SĐT khách hàng..."
+                                    emptyText="Không tìm thấy khách hàng." (zComboSelected)="onCustomerSelected($event)"
+                                    class="w-full" zWidth="full" />
+                            </z-form-control>
+                        </z-form-field>
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div class="form-col">
+                        <z-form-field>
+                            <label z-form-label>Số điện thoại</label>
+                            <z-form-control>
+                                <input z-input type="text" formControlName="customerPhone"
+                                    placeholder="Nhập số điện thoại" />
+                            </z-form-control>
+                        </z-form-field>
+                    </div>
+                </div>
+
+                <!-- Địa chỉ giao hàng -->
+                <z-form-field>
+                    <label z-form-label>Địa chỉ giao hàng</label>
+                    <z-form-control>
+                        <input z-input type="text" formControlName="deliveryAddress"
+                            placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." />
+                    </z-form-control>
+                </z-form-field>
+            </form>
+        </z-card>
+
+        <!-- 2) DANH SÁCH SẢN PHẨM -->
+        <z-card class="section-card">
+            <div class="section-title">
+                <lucide-icon [img]="iconPackage" class="text-primary" [size]="24"></lucide-icon>
+                <h2 class="text-lg font-semibold">Danh sách sản phẩm</h2>
+
+                <!-- Search Product (Zard Combobox) -->
+                <div class="product-search-wrapper">
+                    <z-combobox [options]="productOptions" placeholder="Thêm sản phẩm..."
+                        searchPlaceholder="Tìm tên hoặc mã sản phẩm..." emptyText="Không tìm thấy sản phẩm."
+                        (zComboSelected)="onProductSelected($event)" class="w-full" zWidth="full" />
+                </div>
+            </div>
+
+            <div class="section-body">
+                <!-- Product Table (Zard Table) -->
+                <div *ngIf="orderItems.length > 0" class="overflow-x-auto rounded-xl">
+                    <table z-table>
+                        <thead>
+                            <tr>
+                                <th class="text-left">SẢN PHẨM</th>
+                                <th class="text-left">SKU</th>
+                                <th class="text-center">SỐ LƯỢNG</th>
+                                <th class="text-right">ĐƠN GIÁ</th>
+                                <th class="text-right">THÀNH TIỀN</th>
+                                <th class="text-center"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of orderItems; let i = index">
+                                <td class="font-medium">{{ item.product.name }}</td>
+                                <td>
+                                    <z-badge>{{ item.product.code }}</z-badge>
+                                </td>
+                                <td>
+                                    <div class="qty-control">
+                                        <button z-button zType="outline" zSize="sm" (click)="decreaseQty(item)"
+                                            [zDisabled]="item.quantity <= 1">−</button>
+                                        <input class="qty-input" type="number" [value]="item.quantity"
+                                            (change)="updateQty(item, $event)" min="1" />
+                                        <button z-button zType="outline" zSize="sm"
+                                            (click)="increaseQty(item)">+</button>
+                                    </div>
+                                </td>
+                                <td class="text-right">{{ item.unitPrice | number:'1.0-0' }}đ</td>
+                                <td class="text-right font-semibold text-primary">
+                                    {{ item.totalPrice | number:'1.0-0' }}đ
+                                </td>
+                                <td class="text-center">
+                                    <button z-button zType="ghost" zSize="sm" (click)="removeItem(i)" title="Xóa">
+                                        <lucide-icon [img]="iconX" [size]="16"></lucide-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty state -->
+                <div *ngIf="orderItems.length === 0" class="empty-products">
+                    <p class="text-muted-foreground">Chưa có sản phẩm nào. Tìm kiếm và thêm sản phẩm ở trên.</p>
+                </div>
+            </div>
+        </z-card>
+
+        <!-- 3) THANH TOÁN & GHI CHÚ -->
+        <z-card class="section-card">
+            <div class="section-title">
+                <lucide-icon [img]="iconCreditCard" class="text-primary" [size]="24"></lucide-icon>
+                <h2 class="text-lg font-semibold">Thanh toán & Ghi chú</h2>
+            </div>
+
+            <form [formGroup]="form" class="section-body">
+                <div class="form-grid">
+                    <!-- Nguồn đơn (Zard Select) -->
+                    <div class="form-col">
+                        <z-form-field>
+                            <label z-form-label>Nguồn đơn hàng</label>
+                            <z-form-control>
+                                <z-select zPlaceholder="Chọn nguồn đơn hàng" [(zValue)]="selectedOrderOrigin"
+                                    class="w-full">
+                                    <z-select-item *ngFor="let o of orderOrigins" [zValue]="o.value">
+                                        {{ o.label }}
+                                    </z-select-item>
+                                </z-select>
+                            </z-form-control>
+                        </z-form-field>
+                    </div>
+
+                    <!-- Phương thức thanh toán (Zard Select) -->
+                    <div class="form-col">
+                        <z-form-field>
+                            <label z-form-label>Phương thức thanh toán</label>
+                            <z-form-control>
+                                <z-select zPlaceholder="Chọn phương thức" [(zValue)]="selectedPaymentMethod"
+                                    class="w-full">
+                                    <z-select-item *ngFor="let pm of paymentMethods" [zValue]="pm.value">
+                                        {{ pm.label }}
+                                    </z-select-item>
+                                </z-select>
+                            </z-form-control>
+                        </z-form-field>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <!-- Dịch vụ giao hàng (Zard Select) -->
+                    <div class="form-col">
+                        <z-form-field>
+                            <label z-form-label>Dịch vụ giao hàng</label>
+                            <z-form-control>
+                                <z-select zPlaceholder="Chọn dịch vụ giao hàng" [(zValue)]="selectedDeliveryService"
+                                    class="w-full">
+                                    <z-select-item *ngFor="let ds of deliveryServices" [zValue]="ds.value">
+                                        {{ ds.label }}
+                                    </z-select-item>
+                                </z-select>
+                            </z-form-control>
+                        </z-form-field>
+                    </div>
+
+                    <!-- Mã giảm giá (Input Group) -->
+                    <div class="form-col">
+                        <z-form-field>
+                            <label z-form-label>Mã giảm giá / Voucher</label>
+                            <z-form-control>
+                                <div class="voucher-input">
+                                    <input z-input type="text" formControlName="voucherCode"
+                                        placeholder="Nhập mã giảm giá" [readonly]="appliedVoucher ? true : null" />
+                                    <button *ngIf="!appliedVoucher" z-button zType="outline" type="button"
+                                        (click)="applyVoucher()">
+                                        Áp dụng
+                                    </button>
+                                    <button *ngIf="appliedVoucher" z-button zType="outline" type="button"
+                                        (click)="removeVoucher()" class="text-red-500 border-red-500 hover:bg-red-50">
+                                        Hủy
+                                    </button>
+                                </div>
+                            </z-form-control>
+                        </z-form-field>
+                    </div>
+                </div>
+
+                <!-- Ghi chú -->
+                <z-form-field>
+                    <label z-form-label>Ghi chú đơn hàng</label>
+                    <z-form-control>
+                        <textarea z-input formControlName="note" rows="3"
+                            placeholder="Ghi chú về đơn hàng, thời gian giao hàng..."></textarea>
+                    </z-form-control>
+                </z-form-field>
+            </form>
+        </z-card>
+
+    </div>
+
+    <!-- ========= RIGHT COLUMN ========= -->
+    <div class="order-create-right">
+
+        <!-- Tổng kết đơn hàng -->
+        <z-card class="summary-card">
+            <h3 class="text-lg font-semibold mb-6">Tổng kết đơn hàng</h3>
+
+            <div class="summary-rows">
+                <div class="summary-row">
+                    <span class="text-muted-foreground">
+                        Tạm tính ({{ orderItems.length }} sản phẩm)
+                    </span>
+                    <span>{{ subtotal | number:'1.0-0' }}đ</span>
+                </div>
+
+                <div class="summary-row" *ngIf="discount > 0">
+                    <span class="text-muted-foreground">Giảm giá</span>
+                    <span class="text-red-500">- {{ discount | number:'1.0-0' }}đ</span>
+                </div>
+
+                <div class="summary-row">
+                    <span class="text-muted-foreground">Phí vận chuyển</span>
+                    <span>{{ shippingFee | number:'1.0-0' }}đ</span>
+                </div>
+
+                <z-divider />
+
+                <div class="summary-row total-row">
+                    <span class="font-semibold">Tổng thanh toán</span>
+                    <span class="grand-total">{{ grandTotal | number:'1.0-0' }}đ</span>
+                </div>
+            </div>
+
+            <div class="summary-actions">
+                <button z-button zType="default" class="w-full submit-btn" (click)="submit()" [zLoading]="isLoading"
+                    [zDisabled]="isLoading">
+                    <lucide-icon [img]="iconShoppingCart" class="mr-2" [size]="20"></lucide-icon> TẠO ĐƠN HÀNG
+                </button>
+                <button z-button zType="ghost" class="w-full" type="button">
+                    Lưu bản nháp
+                </button>
+            </div>
+
+            <p class="summary-notice">
+                <lucide-icon [img]="iconInfo" class="text-muted-foreground mr-1" [size]="16"></lucide-icon>
+                Bằng việc nhấn "Tạo đơn hàng", bạn đồng ý với chính sách bán hàng
+                và bảo mật của hệ thống.
+            </p>
+        </z-card>
+
+        <!-- Promo Card -->
+        <div class="promo-card">
+            <h4 class="promo-title">Cơ hội hôm nay!</h4>
+            <p class="promo-desc">
+                Giảm thêm 5% cho tất cả đơn hàng thanh toán qua chuyển khoản ngân hàng
+            </p>
+            <div class="promo-code">
+                <z-badge class="promo-badge">SALE_ADMIN_2024</z-badge>
+                <button z-button zType="ghost" zSize="sm" title="Copy" (click)="copyVoucher()">
+                    <lucide-icon [img]="iconCopy" [size]="16"></lucide-icon>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,287 @@
+/* ===== Host ===== */
+:host {
+    display: block;
+    padding: 24px;
+}
+
+/* ===== Header ===== */
+.order-create-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+/* ===== Two-column Layout ===== */
+.order-create-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    align-items: start;
+}
+
+.order-create-left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.order-create-right {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: sticky;
+    top: 24px;
+}
+
+/* ===== Section Card ===== */
+.section-card {
+    border-radius: 1rem;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.section-icon {
+    font-size: 1.25rem;
+}
+
+.section-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ===== Form Grid ===== */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Force combobox host and its inner elements to stretch */
+z-combobox {
+    display: block;
+    width: 100%;
+}
+
+::ng-deep z-combobox button[z-button] {
+    display: flex;
+    width: 100% !important;
+    height: 36px !important;
+    /* Forces combobox to match the 36px height of z-input */
+    min-height: 36px !important;
+    justify-content: space-between !important;
+    align-items: center;
+    /* keep content vertical centered */
+}
+
+/* ===== Product Search ===== */
+.product-search-wrapper {
+    margin-left: auto;
+    width: 280px;
+}
+
+/* ===== Quantity Control ===== */
+.qty-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.qty-input {
+    width: 48px;
+    height: 28px;
+    text-align: center;
+    border: 1px solid hsl(var(--border));
+    border-radius: 6px;
+    background: transparent;
+    font-size: 0.875rem;
+    color: hsl(var(--foreground));
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+/* ===== Empty Products ===== */
+.empty-products {
+    text-align: center;
+    padding: 40px 20px;
+    border: 1px dashed hsl(var(--border));
+    border-radius: 0.75rem;
+}
+
+/* ===== Voucher Input ===== */
+.voucher-input {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.voucher-input input[z-input] {
+    flex: 1;
+    height: 36px !important;
+    /* height equal to z-select */
+    min-height: 36px !important;
+    box-sizing: border-box;
+}
+
+.voucher-input button[z-button] {
+    height: 36px !important;
+    /* height equal to z-select */
+    min-height: 36px !important;
+    margin: 0;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* ===== Textarea Styling ===== */
+textarea[z-input] {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ===== Summary Card ===== */
+.summary-card {
+    border-radius: 1rem;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.summary-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.total-row {
+    padding-top: 12px;
+}
+
+.grand-total {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: hsl(var(--primary));
+}
+
+.summary-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.submit-btn {
+    height: 48px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+.summary-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.4;
+}
+
+.info-icon {
+    flex-shrink: 0;
+}
+
+/* ===== Promo Card ===== */
+.promo-card {
+    background: linear-gradient(135deg,
+            hsl(280 60% 55%),
+            hsl(300 50% 60%));
+    border-radius: 1rem;
+    padding: 20px;
+    color: white;
+}
+
+.promo-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.promo-desc {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.promo-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.promo-badge {
+    font-family: monospace;
+    font-weight: 600;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    .order-create-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .order-create-right {
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    :host {
+        padding: 16px;
+    }
+
+    .order-create-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-search-wrapper {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 12px;
+    }
+
+    .section-title {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
