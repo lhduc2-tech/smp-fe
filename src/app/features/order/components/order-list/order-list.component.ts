@@ -98,6 +98,30 @@ export class OrderListComponent implements OnInit {
         this.loadOrders();
     }
 
+    /* ================= DELETE ================= */
+
+    async deleteOrder(id: string): Promise<void> {
+
+    const ok = await this.confirmService.confirm(
+        'Xóa đơn hàng',
+        'Bạn có chắc chắn muốn xóa đơn hàng này?',
+        'danger'
+    );
+
+    if (ok) {
+        this.orderService.deleteOrder(id).subscribe({
+        next: () => {
+            toast.success('Xóa đơn hàng thành công');
+            this.loadOrders();
+        },
+        error: () => {
+            toast.error('Xóa đơn hàng thất bại');
+        }
+        });
+    }
+
+    }
+
     private updateDisplayPages(): void {
         const pages: (number | '...')[] = [];
         const maxVisible = 5;

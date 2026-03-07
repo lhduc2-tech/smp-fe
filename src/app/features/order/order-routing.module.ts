@@ -5,7 +5,8 @@ import { OrderCreateComponent } from './components/order-create/order-create.com
 
 const routes: Routes = [
     { path: '', component: OrderListComponent },
-    { path: 'create', component: OrderCreateComponent }
+    { path: 'create', component: OrderCreateComponent },
+    { path: ':id', component: OrderCreateComponent } 
 ];
 
 @NgModule({

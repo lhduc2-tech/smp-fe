@@ -108,12 +108,22 @@
                             <td class="p-4">
                                 <div class="flex gap-2 justify-center">
 
-                                    <button z-button zSize="sm" [routerLink]="o.id">
+                                    <!-- Update -->
+                                    <button z-button zSize="sm" [routerLink]="['/orders', o.id]">
                                         <z-icon zType="eye" />
                                     </button>
 
+                                    <!-- Delete -->
+                                    <button
+                                    z-button
+                                    zType="destructive"
+                                    zSize="sm"
+                                    (click)="deleteOrder(o.id)">
+                                    <z-icon zType="trash" />
+                                    </button>
+
                                 </div>
-                            </td>
+                                </td>
                         </tr>
 
                     </tbody>

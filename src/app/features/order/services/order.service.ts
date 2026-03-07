@@ -54,6 +54,18 @@ export class OrderService {
             .pipe(map(res => this.transformOrder(res)));
     }
 
+    /* ================= DELETE ================= */
+
+    deleteOrder(id: string): Observable<void> {
+    return this.apiService.delete<void>(`${this.API_ENDPOINT}/${id}`);
+    }
+    /* ================= GET BY ID ================= */
+
+    getOrderById(id: string): Observable<Order> {
+    return this.apiService
+        .get<OrderResponse>(`${this.API_ENDPOINT}/${id}`)
+        .pipe(map(res => this.transformOrder(res)));
+    }
     /* ================= TRANSFORM ================= */
 
     private transformOrderItem(res: any): OrderItem {
