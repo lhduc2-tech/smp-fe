@@ -335,7 +335,9 @@ export class SidebarComponent {
           icon: 'settings',
           expanded: false,
           children: [
-            { label: 'Nhân viên', route: '/settings/staff' }
+            { label: 'Nhân viên', route: '/settings/staff' },
+            { label: 'Nhóm quyền', route: '/settings/permission' },
+            { label: 'Nhóm vai trò', route: '/settings/role' },
           ]
         }
       ]

@@ -1,0 +1,135 @@
+<z-card class="rounded-2xl shadow-sm p-8">
+
+  <div class="space-y-8">
+
+    <!-- TITLE -->
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">
+        Quản lý Permission
+      </h1>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="flex items-center justify-between">
+
+      <!-- Search -->
+      <div class="flex items-center gap-3 w-full max-w-md">
+
+        <input
+          type="text"
+          class="flex-1 h-10 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
+          placeholder="Tìm theo permission code..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        />
+
+        <button z-button zType="default" class="h-10" (click)="onSearch()">
+          <z-icon zType="search" />
+        </button>
+
+      </div>
+
+      <!-- Add -->
+      <a
+        z-button
+        routerLink="add"
+        zType="default"
+        class="h-10"
+        style="background-color:black;color:white;border-color:black;"
+      >
+        + Thêm permission
+      </a>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="space-y-6">
+
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="flex justify-center py-10">
+        <z-button zLoading zDisabled>
+          Đang tải dữ liệu...
+        </z-button>
+      </div>
+
+      <!-- TABLE -->
+      <div *ngIf="!isLoading && permissions.length > 0"
+           class="overflow-x-auto rounded-xl border">
+
+        <table class="w-full text-sm">
+
+          <thead class="bg-muted/40">
+            <tr>
+              <th class="p-4 text-left font-medium">Code</th>
+              <th class="p-4 text-left font-medium">Mô tả</th>
+              <th class="p-4 text-left font-medium">Ngày tạo</th>
+              <th class="p-4 text-center font-medium">Hành động</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+
+            <tr *ngFor="let p of permissions"
+                class="hover:bg-muted/30 transition-colors">
+
+              <td class="p-4 font-medium">
+                {{ p.code }}
+              </td>
+
+              <td class="p-4 text-muted-foreground">
+                {{ p.description || '-' }}
+              </td>
+
+              <td class="p-4">
+                {{ p.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td class="p-4">
+                <div class="flex gap-2 justify-center">
+
+                  <button
+                    z-button
+                    zSize="sm"
+                    [routerLink]="['edit', p.id]"
+                  >
+                    <z-icon zType="edit" />
+                  </button>
+
+                  <button
+                    z-button
+                    zType="destructive"
+                    zSize="sm"
+                    (click)="deletePermission(p.id)"
+                  >
+                    <z-icon zType="trash" />
+                  </button>
+
+                </div>
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+      </div>
+
+      <!-- EMPTY -->
+      <div *ngIf="!isLoading && permissions.length === 0"
+           class="text-center py-14 border rounded-xl">
+
+        <p class="text-muted-foreground mb-4">
+          Không có permission
+        </p>
+
+        <button z-button zType="secondary" (click)="loadPermissions()">
+          Thử lại
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</z-card>

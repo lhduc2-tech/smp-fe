@@ -1,0 +1,158 @@
+<z-card class="rounded-2xl shadow-sm p-8">
+
+  <div class="space-y-8">
+
+    <!-- TITLE -->
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">
+        Quản lý Role
+      </h1>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="flex items-center justify-between">
+
+      <!-- Search -->
+      <div class="flex items-center gap-3 w-full max-w-md">
+
+        <input
+          type="text"
+          class="flex-1 h-10 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
+          placeholder="Tìm theo code hoặc name..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        />
+
+        <button z-button zType="default" class="h-10" (click)="onSearch()">
+          <z-icon zType="search" />
+        </button>
+
+      </div>
+
+      <!-- Add -->
+      <a
+        z-button
+        routerLink="add"
+        zType="default"
+        class="h-10"
+        style="background-color:black;color:white;border-color:black;"
+      >
+        + Thêm role
+      </a>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="space-y-6">
+
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="flex justify-center py-10">
+        <z-button zLoading zDisabled>
+          Đang tải dữ liệu...
+        </z-button>
+      </div>
+
+      <!-- TABLE -->
+      <div *ngIf="!isLoading && roles.length > 0"
+           class="overflow-x-auto rounded-xl border">
+
+        <table class="w-full text-sm">
+
+          <thead class="bg-muted/40">
+            <tr>
+              <th class="p-4 text-left font-medium">Code</th>
+              <th class="p-4 text-left font-medium">Name</th>
+              <th class="p-4 text-left font-medium">Permissions</th>
+              <th class="p-4 text-left font-medium">Status</th>
+              <th class="p-4 text-left font-medium">Ngày tạo</th>
+              <th class="p-4 text-center font-medium">Hành động</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+
+            <tr *ngFor="let r of roles"
+                class="hover:bg-muted/30 transition-colors">
+
+              <td class="p-4 font-medium">
+                {{ r.code }}
+              </td>
+
+              <td class="p-4">
+                {{ r.name }}
+              </td>
+
+              <td class="p-4 text-muted-foreground">
+                {{ r.permissions?.length || 0 }} quyền
+              </td>
+
+              <td class="p-4">
+
+                <span
+                  class="px-2 py-1 rounded text-xs"
+                  [ngClass]="{
+                    'bg-green-100 text-green-700': r.status === 'ACTIVE',
+                    'bg-gray-200 text-gray-600': r.status !== 'ACTIVE'
+                  }"
+                >
+                  {{ r.status }}
+                </span>
+
+              </td>
+
+              <td class="p-4">
+                {{ r.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td class="p-4">
+
+                <div class="flex gap-2 justify-center">
+
+                  <button
+                    z-button
+                    zSize="sm"
+                    [routerLink]="['edit', r.id]"
+                  >
+                    <z-icon zType="edit" />
+                  </button>
+
+                  <button
+                    z-button
+                    zType="destructive"
+                    zSize="sm"
+                    (click)="deleteRole(r.id)"
+                  >
+                    <z-icon zType="trash" />
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- EMPTY -->
+      <div *ngIf="!isLoading && roles.length === 0"
+           class="text-center py-14 border rounded-xl">
+
+        <p class="text-muted-foreground mb-4">
+          Không có role
+        </p>
+
+        <button z-button zType="secondary" (click)="loadRoles()">
+          Thử lại
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</z-card>

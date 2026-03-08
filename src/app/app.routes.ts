@@ -97,7 +97,18 @@ export const routes: Routes = [
           import('./features/staff/staff.module')
             .then(m => m.StaffModule)
       },
-
+      {
+        path: 'settings/permission',
+        loadChildren: () =>
+          import('./features/permission/permission.module')
+            .then(m => m.PermissionModule)
+      },
+      {
+        path: 'settings/role',
+        loadChildren: () =>
+          import('./features/role/role.module')
+            .then(m => m.RoleModule)
+      },
     ]
   },
 
