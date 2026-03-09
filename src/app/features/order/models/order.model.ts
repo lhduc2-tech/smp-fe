@@ -29,6 +29,7 @@ export interface Order {
     price: number;
     orderItems: OrderItem[];
     orderDate: string;
+    customerId?: string;
     customerName: string;
     orderOrigin: string;
     paymentState: string;
@@ -47,6 +48,7 @@ export interface OrderResponse {
     price: number;
     order_items: OrderItemResponse[];
     order_date: string;
+    customer_id?: string;
     customer_name: string;
     order_origin: string;
     payment_state: string;
@@ -66,6 +68,7 @@ export interface SearchOrderRequest {
     sortBy?: string;
     sortDir?: 'asc' | 'desc';
     customerName?: string;
+    shopId?: string;
 }
 
 export interface PageResponse<T> {
@@ -78,7 +81,7 @@ export interface PageResponse<T> {
 
 export interface CreateOrderRequest {
     orderDate: string;
-    customerName: string;
+    customerId?: string;
     orderOrigin: string;
     price: number;
     paymentState: string;

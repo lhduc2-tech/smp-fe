@@ -31,12 +31,19 @@ export class OrderService {
         request?: SearchOrderRequest
     ): Observable<PageResponse<Order>> {
 
+        const shopId = this.authService.shopId;
+
         const searchRequest: SearchOrderRequest = request || {
             page: 0,
             size: 10,
             sortBy: 'createdAt',
             sortDir: 'desc'
         };
+
+        // Thêm shopId từ token vào request
+        if (shopId) {
+            searchRequest.shopId = shopId;
+        }
 
         return this.apiService
             .post<PageResponse<OrderResponse>>(
@@ -89,6 +96,7 @@ export class OrderService {
             price: res.price,
             orderItems: res.order_items?.map((item: any) => this.transformOrderItem(item)) || [],
             orderDate: res.order_date ?? res.orderDate,
+            customerId: res.customer_id ?? res.customerId,
             customerName: res.customer_name ?? res.customerName,
             orderOrigin: res.order_origin ?? res.orderOrigin,
             paymentState: res.payment_state ?? res.paymentState,

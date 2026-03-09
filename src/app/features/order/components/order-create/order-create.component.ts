@@ -255,6 +255,7 @@ export class OrderCreateComponent implements OnInit {
     const customer = this.customers.find(c => c.id === option.value);
 
     if (customer) {
+      this.selectedCustomerValue = customer.id;
       this.form.patchValue({
         customerName: customer.name,
         customerPhone: customer.phone || '',
@@ -428,7 +429,7 @@ export class OrderCreateComponent implements OnInit {
     const request: CreateOrderRequest = {
 
       orderDate: new Date().toISOString(),
-      customerName: this.form.get('customerName')?.value,
+      customerId: this.selectedCustomerValue || undefined,
       orderOrigin: this.selectedOrderOrigin,
       price: this.grandTotal,
       paymentState: 'PENDING',
