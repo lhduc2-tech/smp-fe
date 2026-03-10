@@ -49,6 +49,7 @@ export interface SearchSupplierRequest {
   supplierName?: string;
   code?: string;
   phoneNumber?: string;
+  shopId?: string;
 }
 
 // Generic Page Response (giữ nguyên mẫu bạn đang dùng)

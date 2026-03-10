@@ -160,7 +160,7 @@ export class OrderCreateComponent implements OnInit {
 
   private loadInitialData(): void {
 
-    const products$ = this.productService.getProductPage({ page: 0, size: 100 });
+    const products$ = this.productService.getAllProductByShopId();
     const customers$ = this.customerService.getCustomers();
     const order$ = this.orderId ? this.orderService.getOrderById(this.orderId) : of(null);
 
@@ -174,7 +174,7 @@ export class OrderCreateComponent implements OnInit {
 
         /* ===== PRODUCTS ===== */
 
-        this.products = products.content;
+        this.products = products;
 
         this.productOptions = this.products.map(p => ({
           value: p.id,

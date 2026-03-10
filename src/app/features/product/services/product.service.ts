@@ -20,6 +20,21 @@ export class ProductService {
   private apiService = inject(ApiService);
 
   /**
+   * Lấy tất cả sản phẩm của shop hiện tại
+   */
+  getAllProductByShopId(): Observable<Product[]> {
+    const shopId = this.authService.shopId;
+    if (!shopId) {
+      throw new Error('Shop ID not found');
+    }
+    return this.apiService.get<ProductResponse[]>(
+      `${this.API_ENDPOINT}/by-shop/${shopId}`
+    ).pipe(
+      map(res => res.map(item => this.transformProduct(item)))
+    );
+  }
+
+  /**
    * Phân trang + tìm kiếm
    */
   getProductPage(request?: SearchProductRequest): Observable<PageResponse<Product>> {

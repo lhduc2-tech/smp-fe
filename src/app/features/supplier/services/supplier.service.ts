@@ -36,6 +36,9 @@ export class SupplierService {
       sortDir: 'desc'
     };
 
+    // Add shopId from token to payload
+    searchRequest.shopId = this.authService.shopId || undefined;
+
     return this.apiService
       .post<PageResponse<SupplierResponse>>(
         `${this.API_ENDPOINT}/search`,

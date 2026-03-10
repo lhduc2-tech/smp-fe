@@ -6,7 +6,7 @@ import { retry } from 'rxjs/operators';
 
 import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 import { ProductService } from '../../services/product.service';
-import { Product, SearchProductRequest } from '../../models/product.model';
+import { Product } from '../../models/product.model';
 import { ConfirmService } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { toast } from 'ngx-sonner';
 
@@ -51,21 +51,17 @@ export class ProductListComponent implements OnInit {
   loadProducts(): void {
     this.isLoading = true;
 
-    const request: SearchProductRequest = {
-      page: this.currentPage,
-      size: this.pageSize,
-      sortBy: 'createdAt',
-      sortDir: 'desc',
-      name: this.searchTerm || undefined
-    };
-
-    this.productService.getProductPage(request)
+    this.productService.getAllProductByShopId()
       .pipe(retry({ count: 3, delay: 1000 }))
       .subscribe({
         next: res => {
-          this.products = res.content;
-          this.totalPages = res.totalPages;
-          this.totalElements = res.total;
+          // Filter by search term if present
+          this.products = this.searchTerm
+            ? res.filter(p => p.name.toLowerCase().includes(this.searchTerm.toLowerCase()))
+            : res;
+
+          this.totalElements = this.products.length;
+          this.totalPages = Math.ceil(this.totalElements / this.pageSize);
           this.updateDisplayPages();
           this.isLoading = false;
           this.cd.detectChanges();
@@ -85,13 +81,15 @@ export class ProductListComponent implements OnInit {
   onPageChange(page: number): void {
     if (page < 0 || page >= this.totalPages) return;
     this.currentPage = page;
-    this.loadProducts();
+    this.cd.detectChanges();
   }
 
   onPageSizeChange(newSize: number): void {
     this.pageSize = newSize;
     this.currentPage = 0;
-    this.loadProducts();
+    this.totalPages = Math.ceil(this.totalElements / this.pageSize);
+    this.updateDisplayPages();
+    this.cd.detectChanges();
   }
 
 

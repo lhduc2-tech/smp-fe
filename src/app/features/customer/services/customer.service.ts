@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../auth/services/auth.service';
 import { Customer } from '../models/customer.model';
 
 @Injectable({
@@ -11,11 +12,16 @@ export class CustomerService {
 
     private readonly API_ENDPOINT = '/private/api/v1/customer';
     private apiService = inject(ApiService);
+    private authService = inject(AuthService);
 
     /* ================= GET ALL ================= */
 
     getCustomers(): Observable<Customer[]> {
-        return this.apiService.get<any[]>(this.API_ENDPOINT).pipe(
+        const shopId = this.authService.shopId;
+        if (!shopId) {
+            throw new Error('Shop ID not found');
+        }
+        return this.apiService.get<any[]>(`${this.API_ENDPOINT}/by-shop/${shopId}`).pipe(
             map(res => res.map(item => this.transformCustomer(item)))
         );
     }

@@ -24,6 +24,7 @@ export interface SearchCategoryRequest {
   sortBy?: string;
   sortDir?: 'asc' | 'desc';
   categoryName?: string;
+  shopId?: string;
 }
 
 export interface PageResponse<T> {

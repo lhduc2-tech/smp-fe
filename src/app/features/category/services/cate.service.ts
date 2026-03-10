@@ -35,6 +35,9 @@ export class CategoryService {
       sortDir: 'desc'
     };
 
+    // Add shopId from token to payload
+    searchRequest.shopId = this.authService.shopId || undefined;
+
     return this.apiService
       .post<PageResponse<CategoryResponse>>(
         `${this.API_ENDPOINT}/search`,
