@@ -14,7 +14,7 @@ import {
 } from 'lucide-angular';
 
 import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
-import { Order } from '../../models/order.model';
+import { Order, UpdateOrderRequest } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
 import { toast } from 'ngx-sonner';
 
@@ -162,11 +162,15 @@ export class OrderPaymentService {
                 <!-- Quick amount buttons -->
                 <div class="quick-amounts">
                   @for (amount of quickAmounts; track amount) {
-                    <button class="quick-btn" (click)="setCashAmount(amount)">
+                    <button class="quick-btn"
+                      [class.quick-active]="selectedQuickAmount === amount"
+                      (click)="setCashAmount(amount)">
                       {{ amount | number:'1.0-0' }}đ
                     </button>
                   }
-                  <button class="quick-btn quick-exact" (click)="setCashAmount(order?.price || 0)">
+                  <button class="quick-btn"
+                    [class.quick-active]="selectedQuickAmount === 'exact'"
+                    (click)="setCashExact()">
                     Đúng tiền
                   </button>
                 </div>
@@ -236,10 +240,10 @@ export class OrderPaymentService {
               [disabled]="!canConfirm || isProcessing"
               (click)="confirmPayment()">
               @if (isProcessing) {
-                <lucide-icon [img]="iconLoader" [size]="16" class="spin mr-2"></lucide-icon>
+                <lucide-icon [img]="iconLoader" [size]="16" class="spin"></lucide-icon>
                 Đang xử lý...
               } @else {
-                <lucide-icon [img]="iconCheck" [size]="16" class="mr-2"></lucide-icon>
+                <lucide-icon [img]="iconCheck" [size]="16"></lucide-icon>
                 Xác nhận thanh toán
               }
             </button>
@@ -359,7 +363,7 @@ export class OrderPaymentService {
     .info-total {
       font-size: 20px;
       font-weight: 800;
-      color: hsl(var(--primary, 262 83% 58%));
+      color: #6366F1;
     }
 
     /* ===== Status Badge ===== */
@@ -422,16 +426,16 @@ export class OrderPaymentService {
     }
 
     .method-card:hover {
-      border-color: hsl(var(--primary, 262 83% 58%));
-      background: hsl(var(--primary, 262 83% 58%) / 0.04);
-      color: hsl(var(--primary, 262 83% 58%));
+      border-color: #6366F1;
+      background: rgba(99, 102, 241, 0.04);
+      color: #6366F1;
     }
 
     .method-card.method-active {
-      border-color: hsl(var(--primary, 262 83% 58%));
-      background: hsl(var(--primary, 262 83% 58%) / 0.08);
-      color: hsl(var(--primary, 262 83% 58%));
-      box-shadow: 0 0 0 3px hsl(var(--primary, 262 83% 58%) / 0.15);
+      border-color: #6366F1;
+      background: rgba(99, 102, 241, 0.08);
+      color: #6366F1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
     }
 
     .method-name {
@@ -480,7 +484,7 @@ export class OrderPaymentService {
     }
 
     .cash-input:focus {
-      border-color: hsl(var(--primary, 262 83% 58%));
+      border-color: #6366F1;
     }
 
     .cash-input::-webkit-outer-spin-button,
@@ -520,14 +524,15 @@ export class OrderPaymentService {
       border-color: #d1d5db;
     }
 
-    .quick-exact {
-      background: hsl(var(--primary, 262 83% 58%) / 0.08);
-      border-color: hsl(var(--primary, 262 83% 58%) / 0.3);
-      color: hsl(var(--primary, 262 83% 58%));
+    .quick-btn.quick-active {
+      background: rgba(99, 102, 241, 0.08);
+      border-color: #6366F1;
+      color: #6366F1;
+      font-weight: 600;
     }
 
-    .quick-exact:hover {
-      background: hsl(var(--primary, 262 83% 58%) / 0.15);
+    .quick-btn.quick-active:hover {
+      background: rgba(99, 102, 241, 0.15);
     }
 
     /* ===== Change Display ===== */
@@ -653,6 +658,10 @@ export class OrderPaymentService {
       border: 1px solid #d0d0d0;
       background: white;
       color: #333;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      line-height: 1;
       transition: all 0.2s;
     }
 
@@ -667,15 +676,26 @@ export class OrderPaymentService {
       font-weight: 600;
       cursor: pointer;
       border: none;
-      background: hsl(var(--primary, 262 83% 58%));
+      background: #6366F1;
       color: white;
       display: inline-flex;
       align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      line-height: 1;
       transition: all 0.2s;
     }
 
+    .btn-confirm-payment lucide-icon,
+    .btn-confirm-payment ::ng-deep svg {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+
     .btn-confirm-payment:hover:not(:disabled) {
-      filter: brightness(0.9);
+      background: #4F46E5;
     }
 
     .btn-confirm-payment:disabled {
@@ -683,16 +703,12 @@ export class OrderPaymentService {
       cursor: not-allowed;
     }
 
-    .mr-2 {
-      margin-right: 8px;
-    }
-
     .font-semibold {
       font-weight: 600;
     }
 
     .text-primary {
-      color: hsl(var(--primary, 262 83% 58%));
+      color: #6366F1;
     }
 
     .spin {
@@ -750,6 +766,7 @@ export class OrderPaymentDialogComponent {
   selectedMethod = 'CASH';
   cashReceived = 0;
   isProcessing = false;
+  selectedQuickAmount: number | 'exact' | null = null;
 
   /* ===== Quick amounts for cash ===== */
   quickAmounts = [50000, 100000, 200000, 500000, 1000000];
@@ -791,14 +808,21 @@ export class OrderPaymentDialogComponent {
   selectMethod(method: string): void {
     this.selectedMethod = method;
     this.cashReceived = 0;
+    this.selectedQuickAmount = null;
   }
 
   setCashAmount(amount: number): void {
     this.cashReceived = amount;
+    this.selectedQuickAmount = amount;
+  }
+
+  setCashExact(): void {
+    this.cashReceived = this.order?.price || 0;
+    this.selectedQuickAmount = 'exact';
   }
 
   onCashChange(): void {
-    // ngModelChange keeps cashReceived in sync
+    this.selectedQuickAmount = null;
   }
 
   confirmPayment(): void {
@@ -806,10 +830,21 @@ export class OrderPaymentDialogComponent {
 
     this.isProcessing = true;
 
-    this.orderService.updatePaymentState(this.order.id, {
-      paymentMethod: this.selectedMethod,
-      paymentState: 'PAID'
-    }).subscribe({
+    const request: UpdateOrderRequest = {
+      orderDate: this.order.orderDate,
+      customerId: this.order.customerId || undefined,
+      orderOrigin: this.order.orderOrigin,
+      price: this.order.price,
+      paymentState: 'PAID',
+      processState: this.order.processState,
+      deliveryService: this.order.deliveryService,
+      shopId: this.order.shopId || undefined,
+      createdBy: this.order.createdBy || undefined,
+      updatedBy: this.order.updatedBy || undefined,
+      paymentMethod: this.selectedMethod
+    };
+
+    this.orderService.updateOrder(this.order.id, request).subscribe({
       next: () => {
         toast.success('Thanh toán thành công!');
         this.isProcessing = false;
@@ -832,8 +867,15 @@ export class OrderPaymentDialogComponent {
     this.selectedMethod = 'CASH';
     this.cashReceived = 0;
     this.isProcessing = false;
+    this.selectedQuickAmount = null;
   }
 }
+
+
+
+
+
+
 
 
 

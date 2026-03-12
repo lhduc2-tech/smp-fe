@@ -10,7 +10,7 @@ import {
     OrderItem,
     OrderItemResponse,
     CreateOrderRequest,
-    UpdatePaymentRequest
+    UpdateOrderRequest
 } from '../models/order.model';
 
 import { ApiService } from '../../../core/services/api.service';
@@ -75,11 +75,11 @@ export class OrderService {
         .pipe(map(res => this.transformOrder(res)));
     }
 
-    /* ================= UPDATE PAYMENT ================= */
+    /* ================= UPDATE ORDER ================= */
 
-    updatePaymentState(id: string, request: UpdatePaymentRequest): Observable<Order> {
+    updateOrder(id: string, request: UpdateOrderRequest): Observable<Order> {
         return this.apiService
-            .put<OrderResponse>(`${this.API_ENDPOINT}/${id}/payment`, request)
+            .put<OrderResponse>(`${this.API_ENDPOINT}/${id}`, request)
             .pipe(map(res => this.transformOrder(res)));
     }
     /* ================= TRANSFORM ================= */
