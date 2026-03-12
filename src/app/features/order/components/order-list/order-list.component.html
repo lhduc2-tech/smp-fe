@@ -89,7 +89,7 @@
                         'bg-yellow-100 text-yellow-800': o.paymentState === 'PENDING',
                         'bg-red-100 text-red-800': o.paymentState === 'FAILED'
                       }">
-                                    {{ o.paymentState }}
+                                    {{ o.paymentState === 'PAID' ? 'Đã thanh toán' : o.paymentState === 'PENDING' ? 'Chờ thanh toán' : 'Thất bại' }}
                                 </span>
                             </td>
 
@@ -101,12 +101,23 @@
                         'bg-gray-100 text-gray-800': o.processState === 'DONE',
                         'bg-red-100 text-red-800': o.processState === 'CANCELED'
                       }">
-                                    {{ o.processState }}
+                                    {{ o.processState === 'NEW' ? 'Mới' : o.processState === 'PROCESSING' ? 'Đang xử lý' : o.processState === 'DONE' ? 'Hoàn thành' : 'Đã hủy' }}
                                 </span>
                             </td>
 
                             <td class="p-4">
                                 <div class="flex gap-2 justify-center">
+
+                                    <!-- Payment -->
+                                    <button
+                                    *ngIf="o.paymentState !== 'PAID'"
+                                    z-button
+                                    zType="secondary"
+                                    zSize="sm"
+                                    (click)="payOrder(o)"
+                                    title="Thanh toán">
+                                    <z-icon zType="credit-card" />
+                                    </button>
 
                                     <!-- Update -->
                                     <button z-button zSize="sm" [routerLink]="['/orders', o.id]">

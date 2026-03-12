@@ -9,7 +9,8 @@ import {
     PageResponse,
     OrderItem,
     OrderItemResponse,
-    CreateOrderRequest
+    CreateOrderRequest,
+    UpdatePaymentRequest
 } from '../models/order.model';
 
 import { ApiService } from '../../../core/services/api.service';
@@ -72,6 +73,14 @@ export class OrderService {
     return this.apiService
         .get<OrderResponse>(`${this.API_ENDPOINT}/${id}`)
         .pipe(map(res => this.transformOrder(res)));
+    }
+
+    /* ================= UPDATE PAYMENT ================= */
+
+    updatePaymentState(id: string, request: UpdatePaymentRequest): Observable<Order> {
+        return this.apiService
+            .put<OrderResponse>(`${this.API_ENDPOINT}/${id}/payment`, request)
+            .pipe(map(res => this.transformOrder(res)));
     }
     /* ================= TRANSFORM ================= */
 

@@ -91,3 +91,9 @@ export interface CreateOrderRequest {
     createdBy: string;
     updatedBy: string;
 }
+
+export interface UpdatePaymentRequest {
+    paymentMethod: string;
+    paymentState: string;
+}
+

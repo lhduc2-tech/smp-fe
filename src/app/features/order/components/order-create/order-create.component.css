@@ -285,3 +285,29 @@ textarea[z-input] {
         align-items: flex-start;
     }
 }
+
+/* ===== New Customer Banner ===== */
+.new-customer-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: hsl(var(--primary, 262 83% 58%) / 0.06);
+    border: 1px solid hsl(var(--primary, 262 83% 58%) / 0.2);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: hsl(var(--primary, 262 83% 58%));
+    font-weight: 500;
+}
+
+.ml-auto {
+    margin-left: auto;
+}
+
+.mr-1 {
+    margin-right: 4px;
+}
+
+.text-red-500 {
+    color: #ef4444;
+}

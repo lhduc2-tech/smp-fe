@@ -5,16 +5,17 @@ import { SidebarComponent } from './sidebar.component';
 import { TopbarComponent } from './topbar.component';
 import { ToastComponent } from '../components/toast/toast';
 import { ConfirmDialogComponent } from '../components/confirm-dialog/confirm-dialog';
+import { OrderPaymentDialogComponent } from '../../features/order/components/order-payment/order-payment-dialog.component';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent, ToastComponent, ConfirmDialogComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent, ToastComponent, ConfirmDialogComponent, OrderPaymentDialogComponent],
   template: `
     <div class="admin-layout">
       <app-sidebar [sidebarOpen]="sidebarOpen()"></app-sidebar>
       <div class="main-content">
-        <app-topbar 
+        <app-topbar
           (toggleSidebar)="toggleSidebar()"
           [sidebarOpen]="sidebarOpen()">
         </app-topbar>
@@ -23,6 +24,7 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog/confirm-dia
         </main>
         <app-toast></app-toast>
         <app-confirm-dialog></app-confirm-dialog>
+        <app-order-payment-dialog></app-order-payment-dialog>
       </div>
     </div>
   `,

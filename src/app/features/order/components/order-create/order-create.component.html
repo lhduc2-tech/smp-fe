@@ -3,9 +3,6 @@
     <h1 class="text-2xl font-bold tracking-tight">Tạo đơn hàng mới</h1>
     <div class="flex items-center gap-3">
         <button z-button zType="outline" (click)="cancel()">Hủy</button>
-        <button z-button zType="default" (click)="submit()" [zLoading]="isLoading" [zDisabled]="isLoading">
-            Tạo đơn hàng
-        </button>
     </div>
 </div>
 
@@ -20,43 +17,131 @@
             <div class="section-title">
                 <lucide-icon [img]="iconUser" class="text-primary" [size]="24"></lucide-icon>
                 <h2 class="text-lg font-semibold">Thông tin khách hàng</h2>
+
+                <!-- Toggle button: Khách cũ ↔ Khách mới -->
+                <button z-button
+                    [zType]="isNewCustomer ? 'default' : 'outline'"
+                    zSize="sm"
+                    class="ml-auto"
+                    type="button"
+                    (click)="toggleCustomerMode()">
+                    <lucide-icon [img]="iconUserPlus" [size]="16" class="mr-1"></lucide-icon>
+                    {{ isNewCustomer ? 'Chọn khách hàng cũ' : 'Thêm khách hàng mới' }}
+                </button>
             </div>
 
             <form [formGroup]="form" class="section-body">
-                <div class="form-grid">
-                    <!-- Chọn khách hàng (Zard Combobox) -->
-                    <div class="form-col">
-                        <z-form-field>
-                            <label z-form-label>Chọn khách hàng</label>
-                            <z-form-control>
-                                <z-combobox [options]="customerOptions" placeholder="Tìm kiếm hoặc chọn khách hàng"
-                                    searchPlaceholder="Tìm tên hoặc SĐT khách hàng..."
-                                    emptyText="Không tìm thấy khách hàng." (zComboSelected)="onCustomerSelected($event)"
-                                    class="w-full" zWidth="full" />
-                            </z-form-control>
-                        </z-form-field>
+
+                <!-- === CHẾ ĐỘ: CHỌN KHÁCH HÀNG CŨ === -->
+                <div *ngIf="!isNewCustomer">
+                    <div class="form-grid">
+                        <!-- Chọn khách hàng (Zard Combobox) -->
+                        <div class="form-col">
+                            <z-form-field>
+                                <label z-form-label>Chọn khách hàng</label>
+                                <z-form-control>
+                                    <z-combobox [options]="customerOptions" placeholder="Tìm kiếm hoặc chọn khách hàng"
+                                        searchPlaceholder="Tìm tên hoặc SĐT khách hàng..."
+                                        emptyText="Không tìm thấy khách hàng." (zComboSelected)="onCustomerSelected($event)"
+                                        class="w-full" zWidth="full" />
+                                </z-form-control>
+                            </z-form-field>
+                        </div>
+
+                        <!-- Số điện thoại (readonly khi chọn khách cũ) -->
+                        <div class="form-col">
+                            <z-form-field>
+                                <label z-form-label>Số điện thoại</label>
+                                <z-form-control>
+                                    <input z-input type="text" formControlName="customerPhone"
+                                        placeholder="Số điện thoại" readonly />
+                                </z-form-control>
+                            </z-form-field>
+                        </div>
                     </div>
 
-                    <!-- Số điện thoại -->
-                    <div class="form-col">
-                        <z-form-field>
-                            <label z-form-label>Số điện thoại</label>
-                            <z-form-control>
-                                <input z-input type="text" formControlName="customerPhone"
-                                    placeholder="Nhập số điện thoại" />
-                            </z-form-control>
-                        </z-form-field>
+                    <div class="form-grid" style="margin-top: 16px;">
+                        <!-- Email (readonly) -->
+                        <div class="form-col">
+                            <z-form-field>
+                                <label z-form-label>Email</label>
+                                <z-form-control>
+                                    <input z-input type="email" formControlName="customerEmail"
+                                        placeholder="Email" readonly />
+                                </z-form-control>
+                            </z-form-field>
+                        </div>
+
+                        <!-- Địa chỉ (readonly) -->
+                        <div class="form-col">
+                            <z-form-field>
+                                <label z-form-label>Địa chỉ giao hàng</label>
+                                <z-form-control>
+                                    <input z-input type="text" formControlName="deliveryAddress"
+                                        placeholder="Địa chỉ giao hàng" readonly />
+                                </z-form-control>
+                            </z-form-field>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Địa chỉ giao hàng -->
-                <z-form-field>
-                    <label z-form-label>Địa chỉ giao hàng</label>
-                    <z-form-control>
-                        <input z-input type="text" formControlName="deliveryAddress"
-                            placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." />
-                    </z-form-control>
-                </z-form-field>
+                <!-- === CHẾ ĐỘ: THÊM KHÁCH HÀNG MỚI === -->
+                <div *ngIf="isNewCustomer">
+
+                    <div class="new-customer-banner">
+                        <lucide-icon [img]="iconUserPlus" [size]="18"></lucide-icon>
+                        <span>Nhập thông tin khách hàng mới — sẽ được lưu vào hệ thống khi tạo đơn hàng</span>
+                    </div>
+
+                    <div class="form-grid" style="margin-top: 16px;">
+                        <!-- Tên khách hàng -->
+                        <div class="form-col">
+                            <z-form-field>
+                                <label z-form-label>Tên khách hàng <span class="text-red-500">*</span></label>
+                                <z-form-control>
+                                    <input z-input type="text" formControlName="customerName"
+                                        placeholder="Nhập họ và tên khách hàng" />
+                                </z-form-control>
+                            </z-form-field>
+                        </div>
+
+                        <!-- Số điện thoại -->
+                        <div class="form-col">
+                            <z-form-field>
+                                <label z-form-label>Số điện thoại</label>
+                                <z-form-control>
+                                    <input z-input type="text" formControlName="customerPhone"
+                                        placeholder="Nhập số điện thoại" />
+                                </z-form-control>
+                            </z-form-field>
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="margin-top: 16px;">
+                        <!-- Email -->
+                        <div class="form-col">
+                            <z-form-field>
+                                <label z-form-label>Email</label>
+                                <z-form-control>
+                                    <input z-input type="email" formControlName="customerEmail"
+                                        placeholder="Nhập email khách hàng" />
+                                </z-form-control>
+                            </z-form-field>
+                        </div>
+
+                        <!-- Địa chỉ giao hàng -->
+                        <div class="form-col">
+                            <z-form-field>
+                                <label z-form-label>Địa chỉ giao hàng</label>
+                                <z-form-control>
+                                    <input z-input type="text" formControlName="deliveryAddress"
+                                        placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." />
+                                </z-form-control>
+                            </z-form-field>
+                        </div>
+                    </div>
+                </div>
+
             </form>
         </z-card>
 
@@ -253,9 +338,6 @@
                 <button z-button zType="default" class="w-full submit-btn" (click)="submit()" [zLoading]="isLoading"
                     [zDisabled]="isLoading">
                     <lucide-icon [img]="iconShoppingCart" class="mr-2" [size]="20"></lucide-icon> TẠO ĐƠN HÀNG
-                </button>
-                <button z-button zType="ghost" class="w-full" type="button">
-                    Lưu bản nháp
                 </button>
             </div>
 

@@ -18,19 +18,20 @@ import { ProductService } from '../../../product/services/product.service';
 import { Product } from '../../../product/models/product.model';
 
 import { CustomerService } from '../../../customer/services/customer.service';
-import { Customer } from '../../../customer/models/customer.model';
+import { Customer, CreateCustomerRequest } from '../../../customer/models/customer.model';
 
 import { AuthService } from '../../../auth/services/auth.service';
 
 import { toast } from 'ngx-sonner';
 
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, switchMap } from 'rxjs';
 
 import { type ZardComboboxOption } from '../../../../shared/components/combobox/combobox.component';
 
 import {
   LucideAngularModule,
   User,
+  UserPlus,
   Package,
   CreditCard,
   ShoppingCart,
@@ -76,6 +77,7 @@ export class OrderCreateComponent implements OnInit {
   /* ================= ICONS ================= */
 
   readonly iconUser = User;
+  readonly iconUserPlus = UserPlus;
   readonly iconPackage = Package;
   readonly iconCreditCard = CreditCard;
   readonly iconShoppingCart = ShoppingCart;
@@ -87,6 +89,8 @@ export class OrderCreateComponent implements OnInit {
 
   customers: Customer[] = [];
   customerOptions: ZardComboboxOption[] = [];
+  isNewCustomer = false;
+  isSavingCustomer = false;
 
   /* ================= PRODUCTS ================= */
 
@@ -149,6 +153,7 @@ export class OrderCreateComponent implements OnInit {
     this.form = this.fb.group({
       customerName: ['', Validators.required],
       customerPhone: [''],
+      customerEmail: [''],
       deliveryAddress: [''],
       note: [''],
       voucherCode: ['']
@@ -217,6 +222,7 @@ export class OrderCreateComponent implements OnInit {
   this.form.patchValue({
     customerName: order.customerName,
     customerPhone: customer?.phone || '',
+    customerEmail: customer?.email || '',
     deliveryAddress: customer?.address || ''
   });
 
@@ -248,6 +254,19 @@ export class OrderCreateComponent implements OnInit {
 
 }
 
+  /* ================= CUSTOMER MODE TOGGLE ================= */
+
+  toggleCustomerMode(): void {
+    this.isNewCustomer = !this.isNewCustomer;
+    this.selectedCustomerValue = '';
+    this.form.patchValue({
+      customerName: '',
+      customerPhone: '',
+      customerEmail: '',
+      deliveryAddress: ''
+    });
+  }
+
   /* ================= CUSTOMER SELECT ================= */
 
   onCustomerSelected(option: ZardComboboxOption): void {
@@ -259,6 +278,7 @@ export class OrderCreateComponent implements OnInit {
       this.form.patchValue({
         customerName: customer.name,
         customerPhone: customer.phone || '',
+        customerEmail: customer.email || '',
         deliveryAddress: customer.address || ''
       });
     }
@@ -426,36 +446,97 @@ export class OrderCreateComponent implements OnInit {
       return;
     }
 
-    const request: CreateOrderRequest = {
-
-      orderDate: new Date().toISOString(),
-      customerId: this.selectedCustomerValue || undefined,
-      orderOrigin: this.selectedOrderOrigin,
-      price: this.grandTotal,
-      paymentState: 'PENDING',
-      processState: 'NEW',
-      deliveryService: this.selectedDeliveryService,
-      shopId: shopId,
-      createdBy: username || '',
-      updatedBy: username || ''
-
-    };
-
     this.isLoading = true;
 
-    this.orderService.createOrder(request).subscribe({
+    /* === Nếu là khách mới → tạo customer trước, rồi tạo order === */
+    if (this.isNewCustomer) {
 
-      next: () => {
-        toast.success('Tạo đơn hàng thành công');
-        this.router.navigate(['/orders']);
-      },
+      const customerName = this.form.get('customerName')?.value?.trim();
+      const customerPhone = this.form.get('customerPhone')?.value?.trim();
+      const customerEmail = this.form.get('customerEmail')?.value?.trim();
+      const deliveryAddress = this.form.get('deliveryAddress')?.value?.trim();
 
-      error: () => {
-        toast.error('Tạo đơn hàng thất bại');
+      if (!customerName) {
+        toast.error('Vui lòng nhập tên khách hàng');
         this.isLoading = false;
+        return;
       }
 
-    });
+      const customerReq: CreateCustomerRequest = {
+        fullName: customerName,
+        phoneNumber: customerPhone || undefined,
+        email: customerEmail || undefined,
+        address: deliveryAddress || undefined,
+        shopId: shopId,
+        createdBy: username || '',
+        updatedBy: username || ''
+      };
+
+      this.isSavingCustomer = true;
+
+      this.customerService.createCustomer(customerReq).pipe(
+        switchMap((newCustomer) => {
+
+          /* Thêm customer mới vào danh sách local */
+          this.customers.push(newCustomer);
+          this.selectedCustomerValue = newCustomer.id;
+          this.isSavingCustomer = false;
+
+          const request: CreateOrderRequest = {
+            orderDate: new Date().toISOString(),
+            customerId: newCustomer.id,
+            orderOrigin: this.selectedOrderOrigin,
+            price: this.grandTotal,
+            paymentState: 'PENDING',
+            processState: 'NEW',
+            deliveryService: this.selectedDeliveryService,
+            shopId: shopId,
+            createdBy: username || '',
+            updatedBy: username || ''
+          };
+
+          return this.orderService.createOrder(request);
+        })
+      ).subscribe({
+        next: () => {
+          toast.success('Tạo khách hàng và đơn hàng thành công');
+          this.router.navigate(['/orders']);
+        },
+        error: () => {
+          toast.error('Tạo đơn hàng thất bại');
+          this.isLoading = false;
+          this.isSavingCustomer = false;
+        }
+      });
+
+    } else {
+
+      /* === Khách hàng cũ → tạo order trực tiếp === */
+      const request: CreateOrderRequest = {
+        orderDate: new Date().toISOString(),
+        customerId: this.selectedCustomerValue || undefined,
+        orderOrigin: this.selectedOrderOrigin,
+        price: this.grandTotal,
+        paymentState: 'PENDING',
+        processState: 'NEW',
+        deliveryService: this.selectedDeliveryService,
+        shopId: shopId,
+        createdBy: username || '',
+        updatedBy: username || ''
+      };
+
+      this.orderService.createOrder(request).subscribe({
+        next: () => {
+          toast.success('Tạo đơn hàng thành công');
+          this.router.navigate(['/orders']);
+        },
+        error: () => {
+          toast.error('Tạo đơn hàng thất bại');
+          this.isLoading = false;
+        }
+      });
+
+    }
 
   }
 

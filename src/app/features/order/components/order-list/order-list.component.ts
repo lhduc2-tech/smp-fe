@@ -8,6 +8,7 @@ import { OrderService } from '../../services/order.service';
 import { Order, SearchOrderRequest } from '../../models/order.model';
 import { IconComponent } from '../../../../shared/components/icon.component';
 import { ConfirmService } from '../../../../shared/components/confirm-dialog/confirm-dialog';
+import { OrderPaymentService } from '../order-payment/order-payment-dialog.component';
 import { toast } from 'ngx-sonner';
 
 @Component({
@@ -39,7 +40,8 @@ export class OrderListComponent implements OnInit {
     constructor(
         private orderService: OrderService,
         private cd: ChangeDetectorRef,
-        private confirmService: ConfirmService
+        private confirmService: ConfirmService,
+        private paymentService: OrderPaymentService
     ) { }
 
     ngOnInit(): void {
@@ -120,6 +122,15 @@ export class OrderListComponent implements OnInit {
         });
     }
 
+    }
+
+    /* ================= PAY ORDER ================= */
+
+    async payOrder(order: Order): Promise<void> {
+        const success = await this.paymentService.open(order);
+        if (success) {
+            this.loadOrders();
+        }
     }
 
     private updateDisplayPages(): void {
