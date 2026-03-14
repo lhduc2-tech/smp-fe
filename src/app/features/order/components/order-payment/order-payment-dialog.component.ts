@@ -151,12 +151,20 @@ export class OrderPaymentService {
                     <input
                       type="number"
                       class="cash-input"
+                      [class.cash-input-error]="cashReceived > 0 && (cashReceived < 1000 || cashReceived > 999999999)"
                       [(ngModel)]="cashReceived"
                       (ngModelChange)="onCashChange()"
                       placeholder="Nhập số tiền khách đưa"
-                      min="0" />
+                      min="1000"
+                      max="999999999" />
                     <span class="cash-suffix">đ</span>
                   </div>
+                  @if (cashReceived > 0 && cashReceived < 1000) {
+                    <span class="cash-error">Số tiền tối thiểu là 1,000đ</span>
+                  }
+                  @if (cashReceived > 999999999) {
+                    <span class="cash-error">Số tiền tối đa là 999,999,999đ</span>
+                  }
                 </div>
 
                 <!-- Quick amount buttons -->
@@ -487,6 +495,16 @@ export class OrderPaymentService {
       border-color: #6366F1;
     }
 
+    .cash-input-error {
+      border-color: #ef4444 !important;
+    }
+
+    .cash-error {
+      font-size: 12px;
+      color: #ef4444;
+      margin-top: 4px;
+    }
+
     .cash-input::-webkit-outer-spin-button,
     .cash-input::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -798,7 +816,7 @@ export class OrderPaymentDialogComponent {
   get canConfirm(): boolean {
     if (!this.selectedMethod) return false;
     if (this.selectedMethod === 'CASH') {
-      return this.cashReceived >= (this.order?.price || 0);
+      return this.cashReceived >= 1000 && this.cashReceived <= 999999999 && this.cashReceived >= (this.order?.price || 0);
     }
     return true;
   }
