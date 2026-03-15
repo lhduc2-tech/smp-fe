@@ -91,3 +91,18 @@ export interface CreateOrderRequest {
     createdBy: string;
     updatedBy: string;
 }
+
+export interface UpdateOrderRequest {
+    orderDate: string;
+    customerId?: string;
+    orderOrigin: string;
+    price: number;
+    paymentState: string;
+    processState: string;
+    deliveryService: string;
+    shopId?: string;
+    createdBy?: string;
+    updatedBy?: string;
+    paymentMethod?: string;
+}
+

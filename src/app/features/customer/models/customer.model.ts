@@ -10,3 +10,14 @@ export interface Customer {
     createdBy?: string;
     updatedBy?: string;
 }
+
+export interface CreateCustomerRequest {
+    fullName: string;
+    phoneNumber?: string;
+    email?: string;
+    address?: string;
+    shopId: string;
+    createdBy?: string;
+    updatedBy?: string;
+}
+

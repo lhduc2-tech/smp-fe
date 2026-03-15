@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../auth/services/auth.service';
-import { Customer } from '../models/customer.model';
+import { Customer, CreateCustomerRequest } from '../models/customer.model';
 
 @Injectable({
     providedIn: 'root'
@@ -24,6 +24,14 @@ export class CustomerService {
         return this.apiService.get<any[]>(`${this.API_ENDPOINT}/by-shop/${shopId}`).pipe(
             map(res => res.map(item => this.transformCustomer(item)))
         );
+    }
+
+    /* ================= CREATE ================= */
+
+    createCustomer(request: CreateCustomerRequest): Observable<Customer> {
+        return this.apiService
+            .post<any>(this.API_ENDPOINT, request)
+            .pipe(map(res => this.transformCustomer(res)));
     }
 
     /* ================= TRANSFORM ================= */
