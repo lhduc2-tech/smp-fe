@@ -1,0 +1,186 @@
+<z-card class="rounded-2xl shadow-sm p-8">
+
+  <div class="space-y-8">
+
+    <!-- ================= TITLE ================= -->
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">
+        Lịch sử kho
+      </h1>
+    </div>
+
+    <!-- ================= TOOLBAR ================= -->
+    <div class="flex items-center justify-between">
+
+      <!-- Search -->
+      <div class="flex items-center gap-3 w-full max-w-md">
+
+        <input
+          type="text"
+          class="flex-1 h-10 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
+          placeholder="Tìm theo sản phẩm..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        />
+
+        <button z-button zType="default" class="h-10" (click)="onSearch()">
+          <z-icon zType="search" />
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ================= CONTENT ================= -->
+    <div class="space-y-6">
+
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="flex justify-center py-10">
+        <z-button zLoading zDisabled>
+          Đang tải dữ liệu...
+        </z-button>
+      </div>
+
+      <!-- TABLE -->
+      <div *ngIf="!isLoading && stockMovements.length > 0" class="overflow-x-auto rounded-xl border">
+
+        <table class="w-full text-sm">
+
+          <thead class="bg-muted/40">
+            <tr>
+              <th class="p-4 text-left font-medium">Sản phẩm</th>
+              <th class="p-4 text-left font-medium">Shop</th>
+              <th class="p-4 text-center font-medium">Loại</th>
+              <th class="p-4 text-right font-medium">Số lượng</th>
+              <th class="p-4 text-left font-medium">Ghi chú</th>
+              <th class="p-4 text-center font-medium">Ngày tạo</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+
+            <tr
+              *ngFor="let m of stockMovements | slice:(currentPage * pageSize):(currentPage * pageSize + pageSize)"
+              class="hover:bg-muted/30 transition-colors"
+            >
+
+              <!-- PRODUCT -->
+              <td class="p-4 font-medium">
+                {{ m.product_id }}
+              </td>
+
+              <!-- SHOP -->
+              <td class="p-4 text-muted-foreground">
+                {{ m.shop_id }}
+              </td>
+
+              <!-- TYPE -->
+              <td class="p-4 text-center">
+                <z-badge
+                  [ngClass]="{
+                    'badge-success': m.movement_type === 'IMPORT',
+                    'badge-destructive': m.movement_type === 'EXPORT'
+                  }"
+                >
+                  {{ m.movement_type }}
+                </z-badge>
+              </td>
+
+              <!-- QUANTITY -->
+              <td class="p-4 text-right font-semibold">
+                {{ m.quantity }}
+              </td>
+
+              <!-- NOTE -->
+              <td class="p-4 text-muted-foreground">
+                {{ m.note || '-' }}
+              </td>
+
+              <!-- DATE -->
+              <td class="p-4 text-center text-muted-foreground">
+                {{ m.created_at | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+            </tr>
+
+          </tbody>
+        </table>
+
+      </div>
+
+      <!-- EMPTY -->
+      <div *ngIf="!isLoading && stockMovements.length === 0" class="text-center py-14 border rounded-xl">
+        <p class="text-muted-foreground mb-4">
+          Không có dữ liệu kho
+        </p>
+
+        <button z-button zType="secondary" (click)="loadStockMovements()">
+          Thử lại
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ================= PAGINATION ================= -->
+    <div *ngIf="!isLoading && totalPages > 0" class="pt-6 flex items-center justify-between">
+
+      <!-- Page size -->
+      <div class="page-size-selector">
+        <label>Số bản ghi:</label>
+        <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          <option *ngFor="let opt of pageSizeOptions" [ngValue]="opt">
+            {{ opt }}
+          </option>
+        </select>
+      </div>
+
+      <!-- NAV -->
+      <div class="pagination-nav" *ngIf="totalPages > 1">
+
+        <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(0)">
+          &laquo;
+        </button>
+
+        <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)">
+          &lsaquo;
+        </button>
+
+        <ng-container *ngFor="let page of displayPages">
+
+          <button
+            *ngIf="page !== '...'; else ellipsisTpl"
+            class="page-btn"
+            [class.active]="currentPage === page"
+            (click)="onPageClick(page)"
+            >
+            {{ getPageLabel(page) }}
+        </button>
+
+          <ng-template #ellipsisTpl>
+            <span class="page-ellipsis">...</span>
+          </ng-template>
+
+        </ng-container>
+
+        <button class="page-btn" [disabled]="currentPage === totalPages - 1"
+          (click)="onPageChange(currentPage + 1)">
+          &rsaquo;
+        </button>
+
+        <button class="page-btn" [disabled]="currentPage === totalPages - 1"
+          (click)="onPageChange(totalPages - 1)">
+          &raquo;
+        </button>
+
+      </div>
+
+      <!-- INFO -->
+      <div class="page-info">
+        Trang {{ currentPage + 1 }} / {{ totalPages }}
+      </div>
+
+    </div>
+
+  </div>
+
+</z-card>

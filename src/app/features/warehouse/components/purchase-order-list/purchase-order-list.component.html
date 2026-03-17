@@ -1,0 +1,167 @@
+<div class="p-4 space-y-4">
+
+  <!-- HEADER -->
+  <div class="flex items-center justify-between">
+    <h1 class="text-xl font-semibold">Danh sách phiếu nhập</h1>
+
+    <a routerLink="/purchase-orders/create" class="btn btn-primary">
+      + Tạo phiếu nhập
+    </a>
+  </div>
+
+  <!-- SEARCH -->
+  <z-card class="p-4">
+    <div class="flex gap-4 items-center">
+
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Tìm theo ghi chú..."
+        class="input input-bordered w-full"
+      />
+
+      <select [(ngModel)]="statusFilter" class="select select-bordered">
+        <option value="">Tất cả trạng thái</option>
+        <option value="DRAFT">Nháp</option>
+        <option value="CONFIRMED">Đã nhập</option>
+      </select>
+
+      <button class="btn btn-primary" (click)="onSearch()">
+        Tìm
+      </button>
+
+    </div>
+  </z-card>
+
+  <!-- TABLE -->
+  <z-card>
+    <div class="overflow-x-auto">
+
+      <table class="table w-full">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nhà cung cấp</th>
+            <th>Trạng thái</th>
+            <th>Ghi chú</th>
+            <th>Ngày tạo</th>
+            <th class="text-right">Hành động</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- LOADING -->
+          <tr *ngIf="isLoading">
+            <td colspan="6" class="text-center py-6">
+              Đang tải dữ liệu...
+            </td>
+          </tr>
+
+          <!-- EMPTY -->
+          <tr *ngIf="!isLoading && purchaseOrders.length === 0">
+            <td colspan="6" class="text-center py-6 text-gray-500">
+              Không có dữ liệu
+            </td>
+          </tr>
+
+          <!-- DATA -->
+          <tr *ngFor="let po of purchaseOrders; let i = index">
+            <td>{{ i + 1 + currentPage * pageSize }}</td>
+
+            <td>{{ po.supplier_id }}</td>
+
+            <td>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'badge-warning': po.status === 'DRAFT',
+                  'badge-success': po.status === 'CONFIRMED'
+                }"
+              >
+                {{ po.status }}
+              </span>
+            </td>
+
+            <td>{{ po.note || '-' }}</td>
+
+            <td>{{ po.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+
+            <td class="text-right space-x-2">
+
+              <a
+                [routerLink]="['/purchase-orders', po.id]"
+                class="btn btn-sm btn-info"
+              >
+                Chi tiết
+              </a>
+
+              <button
+                *ngIf="po.status === 'DRAFT'"
+                class="btn btn-sm btn-success"
+                (click)="confirm(po.id)"
+              >
+                Nhập kho
+              </button>
+
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+    </div>
+  </z-card>
+
+  <!-- PAGINATION -->
+  <div class="flex items-center justify-between">
+
+    <!-- Page size -->
+    <div class="flex items-center gap-2">
+      <span>Hiển thị</span>
+
+      <select
+        [(ngModel)]="pageSize"
+        (change)="onPageSizeChange(pageSize)"
+        class="select select-bordered select-sm"
+      >
+        <option *ngFor="let size of pageSizeOptions" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+
+      <span>bản ghi</span>
+    </div>
+
+    <!-- Page buttons -->
+    <div class="flex gap-1">
+
+      <button
+        class="btn btn-sm"
+        [disabled]="currentPage === 0"
+        (click)="onPageChange(currentPage - 1)"
+      >
+        «
+      </button>
+
+      <button
+        *ngFor="let page of displayPages"
+        class="btn btn-sm"
+        [class.btn-active]="page === currentPage"
+        (click)="page !== '...' ? onPageChange(page) : null"
+      >
+        {{ getPageLabel(page) }}
+      </button>
+
+      <button
+        class="btn btn-sm"
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="onPageChange(currentPage + 1)"
+      >
+        »
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

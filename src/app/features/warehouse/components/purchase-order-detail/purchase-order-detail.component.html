@@ -1,0 +1,247 @@
+<!-- ================= HEADER ================= -->
+<div class="order-create-header">
+  <h1 class="text-2xl font-bold tracking-tight">
+    Chi tiết phiếu nhập
+  </h1>
+
+  <div class="flex items-center gap-3">
+    <button z-button zType="outline" (click)="goBack()">Quay lại</button>
+
+    <button
+      *ngIf="purchaseOrder?.status === 'DRAFT'"
+      z-button
+      zType="default"
+      (click)="confirm()"
+      [zLoading]="isLoading"
+    >
+      Nhập kho
+    </button>
+  </div>
+</div>
+
+<!-- ================= MAIN ================= -->
+<div class="order-create-layout">
+
+  <!-- ========= LEFT ========= -->
+  <div class="order-create-left">
+
+    <!-- ===== 1. SUPPLIER INFO ===== -->
+    <z-card class="section-card">
+      <div class="section-title">
+        <h2 class="text-lg font-semibold">Nhà cung cấp</h2>
+      </div>
+
+      <div class="section-body">
+        <div class="form-grid">
+
+          <div class="form-col">
+            <z-form-field>
+              <label z-form-label>Supplier ID</label>
+              <z-form-control>
+                <input
+                z-input
+                [value]="purchaseOrder?.supplier_id ?? ''"
+                readonly
+                />
+              </z-form-control>
+            </z-form-field>
+          </div>
+
+          <div class="form-col">
+            <z-form-field>
+              <label z-form-label>Trạng thái</label>
+              <z-form-control>
+                <z-badge
+                  [ngClass]="{
+                    'badge-warning': purchaseOrder?.status === 'DRAFT',
+                    'badge-success': purchaseOrder?.status === 'CONFIRMED'
+                  }"
+                >
+                  {{ purchaseOrder?.status }}
+                </z-badge>
+              </z-form-control>
+            </z-form-field>
+          </div>
+
+        </div>
+      </div>
+    </z-card>
+
+    <!-- ===== 2. ADD PRODUCT ===== -->
+    <z-card class="section-card" *ngIf="purchaseOrder?.status === 'DRAFT'">
+      <div class="section-title">
+        <h2 class="text-lg font-semibold">Thêm sản phẩm</h2>
+
+        <div class="product-search-wrapper">
+          <z-combobox
+            [options]="productOptions"
+            placeholder="Tìm sản phẩm..."
+            searchPlaceholder="Nhập tên hoặc mã sản phẩm..."
+            (zComboSelected)="onProductSelected($event)"
+            class="w-full"
+            zWidth="full"
+          />
+        </div>
+      </div>
+    </z-card>
+
+    <!-- ===== 3. ITEM LIST ===== -->
+    <z-card class="section-card">
+      <div class="section-title">
+        <h2 class="text-lg font-semibold">Danh sách nhập</h2>
+      </div>
+
+      <div class="section-body">
+
+        <!-- TABLE -->
+        <div *ngIf="items.length > 0" class="overflow-x-auto rounded-xl">
+          <table z-table>
+            <thead>
+              <tr>
+                <th>SẢN PHẨM</th>
+                <th class="text-center">SỐ LƯỢNG</th>
+                <th class="text-right">GIÁ NHẬP</th>
+                <th class="text-right">THÀNH TIỀN</th>
+                <th class="text-center"></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let item of items; let i = index">
+
+                <td class="font-medium">
+                  {{ item.product_name }}
+                </td>
+
+                <!-- QUANTITY -->
+                <td>
+                  <div class="qty-control">
+                    <button
+                      z-button
+                      zType="outline"
+                      zSize="sm"
+                      (click)="decreaseQty(item)"
+                      [zDisabled]="item.quantity <= 1 || purchaseOrder?.status !== 'DRAFT'"
+                    >
+                      −
+                    </button>
+
+                    <input
+                      class="qty-input"
+                      type="number"
+                      [value]="item.quantity"
+                      (change)="updateQty(item, $event)"
+                      min="1"
+                      [disabled]="purchaseOrder?.status !== 'DRAFT'"
+                    />
+
+                    <button
+                      z-button
+                      zType="outline"
+                      zSize="sm"
+                      (click)="increaseQty(item)"
+                      [zDisabled]="purchaseOrder?.status !== 'DRAFT'"
+                    >
+                      +
+                    </button>
+                  </div>
+                </td>
+
+                <!-- IMPORT PRICE -->
+                <td class="text-right">
+                  <input
+                    type="number"
+                    class="input input-sm text-right"
+                    [value]="item.import_price"
+                    (change)="updatePrice(item, $event)"
+                    [disabled]="purchaseOrder?.status !== 'DRAFT'"
+                  />
+                </td>
+
+                <!-- TOTAL -->
+                <td class="text-right font-semibold text-primary">
+                  {{ item.quantity * (item.import_price || 0) | number:'1.0-0' }}đ
+                </td>
+
+                <!-- DELETE -->
+                <td class="text-center">
+                  <button
+                    *ngIf="purchaseOrder?.status === 'DRAFT'"
+                    z-button
+                    zType="ghost"
+                    zSize="sm"
+                    (click)="removeItem(i)"
+                  >
+                    ✕
+                  </button>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EMPTY -->
+        <div *ngIf="items.length === 0" class="empty-products">
+          <p class="text-muted-foreground">
+            Chưa có sản phẩm nào
+          </p>
+        </div>
+
+      </div>
+    </z-card>
+
+    <!-- ===== NOTE ===== -->
+    <z-card class="section-card">
+      <div class="section-title">
+        <h2 class="text-lg font-semibold">Ghi chú</h2>
+      </div>
+
+      <div class="section-body">
+        <textarea
+            z-input
+            [ngModel]="purchaseOrder?.note ?? ''"
+            (ngModelChange)="onNoteChange($event)"
+            rows="3"
+            [readonly]="purchaseOrder?.status !== 'DRAFT'"
+        ></textarea>
+      </div>
+    </z-card>
+
+  </div>
+
+  <!-- ========= RIGHT ========= -->
+  <div class="order-create-right">
+
+    <!-- SUMMARY -->
+    <z-card class="summary-card">
+
+      <h3 class="text-lg font-semibold mb-6">Tổng nhập kho</h3>
+
+      <div class="summary-rows">
+
+        <div class="summary-row">
+          <span>Số sản phẩm</span>
+          <span>{{ items.length }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Tổng số lượng</span>
+          <span>{{ totalQuantity }}</span>
+        </div>
+
+        <z-divider></z-divider>
+
+        <div class="summary-row total-row">
+          <span>Tổng tiền nhập</span>
+          <span class="grand-total">
+            {{ totalAmount | number:'1.0-0' }}đ
+          </span>
+        </div>
+
+      </div>
+
+    </z-card>
+
+  </div>
+</div>
