@@ -79,6 +79,16 @@ export interface PageResponse<T> {
     totalPages: number;
 }
 
+export interface OrderItemRequest {
+    productId: string;
+    quantity: number;
+    orderId?: string;
+    totalPrice?: number;
+    unitPrice?: number;
+    createdBy?: string;
+    updatedBy?: string;
+}
+
 export interface CreateOrderRequest {
     orderDate: string;
     customerId?: string;
@@ -90,6 +100,9 @@ export interface CreateOrderRequest {
     shopId: string;
     createdBy: string;
     updatedBy: string;
+    paymentMethod: string;
+    description?: string;
+    orderItems: OrderItemRequest[];
 }
 
 export interface UpdateOrderRequest {
@@ -104,5 +117,6 @@ export interface UpdateOrderRequest {
     createdBy?: string;
     updatedBy?: string;
     paymentMethod?: string;
+    orderItems?: OrderItemRequest[];
 }
 

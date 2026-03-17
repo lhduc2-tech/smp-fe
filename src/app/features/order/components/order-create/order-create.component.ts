@@ -37,7 +37,8 @@ import {
   ShoppingCart,
   Info,
   Copy,
-  X
+  X,
+  Check
 } from 'lucide-angular';
 
 /* ================= INTERFACE ================= */
@@ -73,6 +74,8 @@ export class OrderCreateComponent implements OnInit {
 
   orderId?: string;
   isViewMode = false;
+  isPaid = false;
+  currentOrder?: Order;
 
   /* ================= ICONS ================= */
 
@@ -84,6 +87,7 @@ export class OrderCreateComponent implements OnInit {
   readonly iconInfo = Info;
   readonly iconCopy = Copy;
   readonly iconX = X;
+  readonly iconCheck = Check;
 
   /* ================= CUSTOMERS ================= */
 
@@ -214,6 +218,7 @@ export class OrderCreateComponent implements OnInit {
   /* ================= POPULATE ORDER ================= */
 
   private populateOrder(order: Order): void {
+  this.currentOrder = order;
 
   const customer = this.customers.find(
     c => c.name === order.customerName
@@ -232,6 +237,11 @@ export class OrderCreateComponent implements OnInit {
 
   this.selectedOrderOrigin = order.orderOrigin;
   this.selectedDeliveryService = order.deliveryService;
+
+  this.isPaid = order.paymentState === 'PAID';
+  if (this.isPaid) {
+    this.form.disable();
+  }
 
   /* ===== ORDER ITEMS ===== */
 
@@ -492,7 +502,17 @@ export class OrderCreateComponent implements OnInit {
             deliveryService: this.selectedDeliveryService,
             shopId: shopId,
             createdBy: username || '',
-            updatedBy: username || ''
+            updatedBy: username || '',
+            paymentMethod: this.selectedPaymentMethod,
+            description: this.form.get('note')?.value || '',
+            orderItems: this.orderItems.map(item => ({
+              productId: item.product.id,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              totalPrice: item.totalPrice,
+              createdBy: username || '',
+              updatedBy: username || ''
+            }))
           };
 
           return this.orderService.createOrder(request);
@@ -522,7 +542,17 @@ export class OrderCreateComponent implements OnInit {
         deliveryService: this.selectedDeliveryService,
         shopId: shopId,
         createdBy: username || '',
-        updatedBy: username || ''
+        updatedBy: username || '',
+        paymentMethod: this.selectedPaymentMethod,
+        description: this.form.get('note')?.value || '',
+        orderItems: this.orderItems.map(item => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+          createdBy: username || '',
+          updatedBy: username || ''
+        }))
       };
 
       this.orderService.createOrder(request).subscribe({
@@ -537,6 +567,56 @@ export class OrderCreateComponent implements OnInit {
       });
 
     }
+
+  }
+
+  /* ================= UPDATE ================= */
+  update(): void {
+    if (!this.orderId || !this.currentOrder || this.form.invalid || this.orderItems.length === 0) {
+      this.form.markAllAsTouched();
+      if (this.orderItems.length === 0) {
+        toast.error('Vui lòng thêm ít nhất một sản phẩm');
+      }
+      return;
+    }
+
+    const shopId = this.authService.shopId;
+    const username = this.authService.username;
+
+    this.isLoading = true;
+
+    const request: any = {
+      orderDate: this.currentOrder.orderDate,
+      customerId: this.selectedCustomerValue || undefined,
+      orderOrigin: this.selectedOrderOrigin,
+      price: this.grandTotal,
+      paymentState: this.currentOrder.paymentState,
+      processState: this.currentOrder.processState,
+      deliveryService: this.selectedDeliveryService,
+      shopId: shopId || undefined,
+      updatedBy: username || '',
+      paymentMethod: this.selectedPaymentMethod,
+      orderItems: this.orderItems.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.totalPrice,
+        createdBy: this.currentOrder?.createdBy || username || '',
+        updatedBy: username || ''
+      }))
+    };
+
+    this.orderService.updateOrder(this.orderId, request).subscribe({
+      next: () => {
+        toast.success('Cập nhật đơn hàng thành công');
+        this.isLoading = false;
+        this.router.navigate(['/orders']);
+      },
+      error: () => {
+        toast.error('Cập nhật đơn hàng thất bại');
+        this.isLoading = false;
+      }
+    });
 
   }
 

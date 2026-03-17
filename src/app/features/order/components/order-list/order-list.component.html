@@ -54,7 +54,7 @@
                             <th class="p-4 text-left font-medium">Nguồn đơn</th>
                             <th class="p-4 text-right font-medium">Tổng giá trị</th>
                             <th class="p-4 text-center font-medium">Trạng thái thanh toán</th>
-                            <th class="p-4 text-center font-medium">Trạng thái xử lý</th>
+
                             <th class="p-4 text-center font-medium">Hành động</th>
                         </tr>
                     </thead>
@@ -93,17 +93,7 @@
                                 </span>
                             </td>
 
-                            <td class="p-4 text-center">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                    [ngClass]="{
-                        'bg-blue-100 text-blue-800': o.processState === 'NEW',
-                        'bg-purple-100 text-purple-800': o.processState === 'PROCESSING',
-                        'bg-gray-100 text-gray-800': o.processState === 'DONE',
-                        'bg-red-100 text-red-800': o.processState === 'CANCELED'
-                      }">
-                                    {{ o.processState === 'NEW' ? 'Mới' : o.processState === 'PROCESSING' ? 'Đang xử lý' : o.processState === 'DONE' ? 'Hoàn thành' : 'Đã hủy' }}
-                                </span>
-                            </td>
+
 
                             <td class="p-4">
                                 <div class="flex gap-2 justify-center">

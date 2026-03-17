@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { ProductService } from './product.service';
@@ -47,7 +48,7 @@ describe('ProductService', () => {
       expect(products[0].shopId).toBe('shop-1');
     });
 
-    expect(apiServiceSpy.get).toHaveBeenCalledWith('/private/api/v1/products/by-shop/shop-1');
+    expect(apiServiceSpy.get).toHaveBeenCalledWith('/private/api/v1/products/all-by-shop/shop-1');
   });
 
   it('should throw error when no shopId', () => {
