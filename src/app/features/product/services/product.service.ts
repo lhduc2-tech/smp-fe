@@ -28,7 +28,7 @@ export class ProductService {
       throw new Error('Shop ID not found');
     }
     return this.apiService.get<ProductResponse[]>(
-      `${this.API_ENDPOINT}/by-shop/${shopId}`
+      `${this.API_ENDPOINT}/all-by-shop/${shopId}`
     ).pipe(
       map(res => res.map(item => this.transformProduct(item)))
     );

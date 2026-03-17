@@ -2,7 +2,7 @@ describe('Product Management Flow', () => {
 
   beforeEach(() => {
 
-    cy.intercept('GET', '**/private/api/v1/products/by-shop/*', {
+    cy.intercept('GET', '**/private/api/v1/products/all-by-shop/*', {
       statusCode: 200,
       body: [
         {
