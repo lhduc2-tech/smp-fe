@@ -19,7 +19,12 @@ import { toast } from 'ngx-sonner';
             
             <!-- Avatar -->
             <div class="relative h-28 w-28 rounded-2xl overflow-hidden bg-white p-1 shadow-lg cursor-pointer group hover:shadow-xl transition-all" (click)="fileInput.click()">
-              <img [src]="avatarPreview || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + profile?.username" alt="Avatar" class="h-full w-full object-cover rounded-xl" />
+              <img 
+                [src]="avatarPreview || profileAvatarUrl" 
+                (error)="handleAvatarError($event)"
+                alt="Avatar" 
+                class="h-full w-full object-cover rounded-xl" 
+              />
               
               <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl m-1">
                 <z-icon zType="edit" class="h-8 w-8 text-white"></z-icon>
@@ -182,6 +187,15 @@ export class ProfileComponent implements OnInit {
   loading = false;
   avatarPreview: string | null = null;
   selectedFile: File | null = null;
+
+  get profileAvatarUrl(): string {
+    const seed = this.profile?.username || 'Guest';
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
+  }
+
+  handleAvatarError(event: any) {
+    event.target.src = 'assets/images/default-avatar.svg';
+  }
 
   constructor(
     private fb: FormBuilder,

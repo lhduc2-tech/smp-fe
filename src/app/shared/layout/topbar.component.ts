@@ -26,7 +26,8 @@ import { AuthService } from '../../features/auth/services/auth.service';
         <div class="user-profile" (click)="toggleDropdown($event)" [class.active]="dropdownOpen">
           <div class="avatar-wrapper">
             <img 
-              [src]="userName ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + userName : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'" 
+              [src]="avatarUrl" 
+              (error)="handleAvatarError($event)"
               alt="User Avatar" 
               class="avatar"
             />
@@ -262,6 +263,15 @@ export class TopbarComponent {
 
   get userName(): string | null {
     return this.authService.username;
+  }
+
+  get avatarUrl(): string {
+    const seed = this.userName || 'Guest';
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
+  }
+
+  handleAvatarError(event: any) {
+    event.target.src = 'assets/images/default-avatar.svg';
   }
 
   toggleDropdown(event: Event) {
