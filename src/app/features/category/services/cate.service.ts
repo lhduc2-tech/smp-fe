@@ -47,8 +47,13 @@ export class CategoryService {
   }
 
   getAllCategories(): Observable<Category[]> {
+    const shopId = this.authService.shopId;
+    if (!shopId) {
+      console.error('ShopId not found in token');
+      return new Observable<Category[]>(subscriber => subscriber.next([]));
+    }
     return this.apiService
-      .get<any[]>(this.API_ENDPOINT)
+      .get<any[]>(`${this.API_ENDPOINT}/by-shop/${shopId}`)
       .pipe(map(res => res.map(item => this.transformCategory(item))));
   }
 
