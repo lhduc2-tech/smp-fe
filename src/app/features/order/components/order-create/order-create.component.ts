@@ -228,7 +228,8 @@ export class OrderCreateComponent implements OnInit {
     customerName: order.customerName,
     customerPhone: customer?.phone || '',
     customerEmail: customer?.email || '',
-    deliveryAddress: customer?.address || ''
+    deliveryAddress: customer?.address || '',
+    note: order.description || ''
   });
 
   if (customer) {
@@ -596,6 +597,7 @@ export class OrderCreateComponent implements OnInit {
       shopId: shopId || undefined,
       updatedBy: username || '',
       paymentMethod: this.selectedPaymentMethod,
+      description: this.form.get('note')?.value || '',
       orderItems: this.orderItems.map(item => ({
         productId: item.product.id,
         quantity: item.quantity,

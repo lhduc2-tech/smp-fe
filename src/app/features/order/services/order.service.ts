@@ -116,7 +116,8 @@ export class OrderService {
             createdBy: res.created_by,
             updatedAt: res.updated_at,
             updatedBy: res.updated_by,
-            orderName: res.order_name ?? res.orderName
+            orderName: res.order_name ?? res.orderName,
+            description: res.description
         };
     }
 

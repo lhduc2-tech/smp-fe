@@ -41,6 +41,7 @@ export interface Order {
     updatedAt?: string;
     updatedBy?: string;
     orderName: string;
+    description?: string;
 }
 
 export interface OrderResponse {
@@ -60,6 +61,7 @@ export interface OrderResponse {
     updated_at?: string;
     updated_by?: string;
     order_name: string;
+    description?: string;
 }
 
 export interface SearchOrderRequest {
@@ -117,6 +119,7 @@ export interface UpdateOrderRequest {
     createdBy?: string;
     updatedBy?: string;
     paymentMethod?: string;
+    description?: string;
     orderItems?: OrderItemRequest[];
 }
 
