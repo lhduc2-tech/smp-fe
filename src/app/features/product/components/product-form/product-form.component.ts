@@ -80,10 +80,13 @@ export class ProductFormComponent implements OnInit {
       : this.productService.addProduct(this.form.value);
 
     action$.subscribe({
-      next: () => {
+      next: (res) => {
         toast.success(
           this.isEdit ? 'Cập nhật thành công' : 'Thêm sản phẩm thành công'
         );
+        if (!this.isEdit && res?.id) {
+          this.router.navigate(['/products', res.id]);
+        }
       },
       error: () => {
         toast.error('Có lỗi xảy ra!');

@@ -24,6 +24,8 @@ export interface ProductResponse {
   updated_at?: string;
   created_by?: string;
   updated_by?: string;
+  category_id?: string;
+  category_name?: string;
 }
 export interface SearchProductRequest {
   page: number;

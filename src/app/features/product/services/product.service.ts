@@ -128,7 +128,8 @@ export class ProductService {
       createdAt: res.created_at,
       updatedAt: res.updated_at,
       createdBy: res.created_by,
-      updatedBy: res.updated_by
+      updatedBy: res.updated_by,
+      categoryId: res.category_id || res.categoryId
     };
   }
 
