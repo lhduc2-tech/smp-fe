@@ -15,7 +15,7 @@ import { Supplier } from '../../../supplier/models/supplier.model';
 import { LucideAngularModule, Package, ArrowLeft } from 'lucide-angular';
 
 import { toast } from 'ngx-sonner';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 import { ZardComboboxOption } from '../../../../shared/components/combobox/combobox.component';
 
@@ -50,7 +50,13 @@ export class PurchaseOrderCreateComponent implements OnInit {
   productOptions: ZardComboboxOption[] = [];
 
   /* ================= FORM DATA ================= */
-  items: any[] = [];
+  items: {
+    productId: string;
+    productName: string;
+    quantity: number;
+    importPrice?: number;
+  }[] = [];
+
   note: string = '';
 
   constructor(
@@ -75,7 +81,7 @@ export class PurchaseOrderCreateComponent implements OnInit {
 
         this.supplierOptions = res.map(s => ({
           value: s.id,
-          label: `${s.supplierName } — ${s.phoneNumber}`
+          label: `${s.supplierName} — ${s.phoneNumber}`
         }));
       }
     });
@@ -156,7 +162,7 @@ export class PurchaseOrderCreateComponent implements OnInit {
     );
   }
 
-  /* ================= CREATE ================= */
+  /* ================= CREATE FLOW ================= */
 
   createOrder(): void {
 
@@ -170,30 +176,54 @@ export class PurchaseOrderCreateComponent implements OnInit {
       return;
     }
 
-    const payload = {
-      supplierId: this.selectedSupplier.id,
-      note: this.note,
-      items: this.items.map(i => ({
-        productId: i.productId,
-        quantity: i.quantity,
-        importPrice: i.importPrice
-      }))
-    };
-
     this.isLoading = true;
 
-    this.inventoryService.createPurchaseOrder(payload)
-      .pipe(finalize(() => this.isLoading = false))
-      .subscribe({
-        next: () => {
-          toast.success('Tạo phiếu nhập thành công');
-          this.goBack();
-        },
-        error: () => {
-          toast.error('Tạo thất bại');
-        }
-      });
+    // STEP 1: CREATE PURCHASE ORDER
+    this.inventoryService.createPurchaseOrder({
+      supplierId: this.selectedSupplier.id,
+      note: this.note
+    })
+    .subscribe({
+      next: (poId: string) => {
 
+        // STEP 2: ADD ITEMS
+        const requests = this.items.map(item =>
+          this.inventoryService.addItemToPurchaseOrder(poId, {
+            productId: item.productId,
+            quantity: item.quantity,
+            importPrice: item.importPrice
+          })
+        );
+
+        forkJoin(requests)
+          .pipe(finalize(() => this.isLoading = false))
+          .subscribe({
+            next: () => {
+
+              // STEP 3: CONFIRM
+              this.inventoryService.confirmPurchaseOrder(poId)
+                .subscribe({
+                  next: () => {
+                    toast.success('Tạo & nhập kho thành công');
+                    this.goBack();
+                  },
+                  error: () => {
+                    toast.error('Confirm thất bại');
+                  }
+                });
+
+            },
+            error: () => {
+              toast.error('Thêm sản phẩm thất bại');
+            }
+          });
+
+      },
+      error: () => {
+        this.isLoading = false;
+        toast.error('Tạo phiếu nhập thất bại');
+      }
+    });
   }
 
   /* ================= NAV ================= */

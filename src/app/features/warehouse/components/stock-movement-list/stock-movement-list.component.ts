@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
@@ -20,6 +20,7 @@ import { toast } from 'ngx-sonner';
   imports: [
     CommonModule,
     FormsModule,
+    DatePipe,
     ...SHARED_UI_IMPORTS
   ],
   templateUrl: './stock-movement-list.component.html',
@@ -29,7 +30,6 @@ export class StockMovementListComponent implements OnInit {
 
   /* ================= DATA ================= */
   stockMovements: StockMovement[] = [];
-
   isLoading = false;
 
   /* ================= SEARCH ================= */
@@ -42,11 +42,11 @@ export class StockMovementListComponent implements OnInit {
   totalElements = 0;
 
   pageSizeOptions = [5, 10, 20, 50];
-
-  displayPages: (number | string)[] = [];
+  displayPages: (number | '...')[] = [];
 
   constructor(
-    private inventoryService: InventoryFlowService
+    private inventoryService: InventoryFlowService,
+    private cd: ChangeDetectorRef
   ) {}
 
   /* ================= INIT ================= */
@@ -62,29 +62,28 @@ export class StockMovementListComponent implements OnInit {
       size: this.pageSize,
       sortBy: 'createdAt',
       sortDir: 'desc',
-
-      // optional filter
       productId: this.searchTerm || undefined
     };
 
     this.isLoading = true;
 
     this.inventoryService.searchStockMovements(request)
-      .pipe(finalize(() => this.isLoading = false))
+      .pipe(finalize(() => {
+        this.isLoading = false;
+        this.cd.detectChanges(); // 👈 giống product
+      }))
       .subscribe({
-
         next: (res: PageResponse<StockMovement>) => {
+
           this.stockMovements = res.content || [];
           this.totalPages = res.totalPages || 0;
           this.totalElements = res.total || 0;
 
-          this.generatePagination();
+          this.updateDisplayPages();
         },
-
         error: () => {
           toast.error('Không thể tải dữ liệu kho');
         }
-
       });
   }
 
@@ -96,33 +95,28 @@ export class StockMovementListComponent implements OnInit {
 
   /* ================= PAGINATION ================= */
 
-onPageChange(page: number | string): void {
-  if (typeof page !== 'number') return;
+  onPageChange(page: number): void {
+    if (page < 0 || page >= this.totalPages) return;
 
-  if (page < 0 || page >= this.totalPages) return;
-
-  this.currentPage = page;
-  this.loadStockMovements();
-}
+    this.currentPage = page;
+    this.loadStockMovements();
+  }
 
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 0;
     this.loadStockMovements();
   }
-onPageClick(page: number | string): void {
-  if (typeof page !== 'number') return;
-  this.onPageChange(page);
-}
 
-getPageLabel(page: number | string): string {
-  return typeof page === 'number' ? String(page + 1) : '';
-}
+  getPageLabel(page: number | '...'): string {
+    return page === '...' ? '...' : (page + 1).toString();
+  }
+
   /* ================= PAGINATION UI ================= */
 
-  generatePagination(): void {
+  private updateDisplayPages(): void {
 
-    const pages: (number | string)[] = [];
+    const pages: (number | '...')[] = [];
     const total = this.totalPages;
     const current = this.currentPage;
 
@@ -148,7 +142,4 @@ getPageLabel(page: number | string): string {
 
     this.displayPages = pages;
   }
-
-
-
 }

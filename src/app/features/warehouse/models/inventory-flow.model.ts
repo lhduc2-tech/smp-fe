@@ -15,7 +15,10 @@ export interface PurchaseOrder {
   status: string;
   note?: string;
 
+  // ⚠️ map từ BE: purchase_order_items
   items: PurchaseOrderItem[];
+
+  shopId?: string; // ✅ thêm
 
   createdAt?: string;
   createdBy?: string;
@@ -24,9 +27,29 @@ export interface PurchaseOrder {
   updatedBy?: string;
 }
 
+export interface PurchaseOrderResponse {
+  id: string;
+
+  supplier_id: string;
+  status: string;
+  note?: string;
+
+  purchase_order_items: PurchaseOrderItemResponse[];
+
+  shop_id: string;
+
+  created_at?: string;
+  created_by?: string;
+
+  updated_at?: string;
+  updated_by?: string;
+}
+
 export interface PurchaseOrderRequest {
   supplierId: string;
   note?: string;
+
+  shopId?: string; // ✅ thêm
 
   createdBy?: string;
   updatedBy?: string;
@@ -40,6 +63,8 @@ export interface SearchPurchaseOrderRequest {
 
   supplierId?: string;
   status?: string;
+
+  shopId?: string; // ✅ thêm
 }
 
 // ================= PURCHASE ORDER ITEM =================
@@ -55,8 +80,25 @@ export interface PurchaseOrderItem {
   importPrice?: number;
 }
 
+export interface PurchaseOrderItemResponse {
+  id: string;
+
+  purchase_order_id: string;
+  product_id: string;
+  product_name?: string;
+
+  quantity: number;
+  import_price?: number;
+}
+
 export interface PurchaseOrderItemRequest {
   productId: string;
+  quantity: number;
+  importPrice?: number;
+}
+
+// ✅ NEW: UPDATE DTO
+export interface UpdatePurchaseOrderItemRequest {
   quantity: number;
   importPrice?: number;
 }

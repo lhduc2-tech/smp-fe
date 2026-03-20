@@ -2,39 +2,34 @@
 
   <div class="space-y-8">
 
-    <!-- ================= TITLE ================= -->
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">
+    <!-- ================= HEADER ================= -->
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold tracking-tight">
         Lịch sử kho
       </h1>
     </div>
 
-    <!-- ================= TOOLBAR ================= -->
-    <div class="flex items-center justify-between">
+    <!-- ================= FILTER ================= -->
+    <div class="flex items-center gap-3 w-full max-w-md">
 
-      <!-- Search -->
-      <div class="flex items-center gap-3 w-full max-w-md">
+      <input
+        type="text"
+        class="flex-1 h-10 border rounded-lg px-4 focus:outline-none focus:ring-2 focus:ring-primary/40"
+        placeholder="Tìm theo sản phẩm..."
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="onSearch()"
+      />
 
-        <input
-          type="text"
-          class="flex-1 h-10 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
-          placeholder="Tìm theo sản phẩm..."
-          [(ngModel)]="searchTerm"
-          (keyup.enter)="onSearch()"
-        />
-
-        <button z-button zType="default" class="h-10" (click)="onSearch()">
-          <z-icon zType="search" />
-        </button>
-
-      </div>
+      <button z-button zType="default" (click)="onSearch()">
+        Tìm
+      </button>
 
     </div>
 
     <!-- ================= CONTENT ================= -->
     <div class="space-y-6">
 
-      <!-- Loading -->
+      <!-- LOADING -->
       <div *ngIf="isLoading" class="flex justify-center py-10">
         <z-button zLoading zDisabled>
           Đang tải dữ liệu...
@@ -42,14 +37,14 @@
       </div>
 
       <!-- TABLE -->
-      <div *ngIf="!isLoading && stockMovements.length > 0" class="overflow-x-auto rounded-xl border">
+      <div *ngIf="!isLoading && stockMovements.length > 0"
+           class="overflow-x-auto rounded-xl border">
 
         <table class="w-full text-sm">
 
           <thead class="bg-muted/40">
             <tr>
               <th class="p-4 text-left font-medium">Sản phẩm</th>
-              <th class="p-4 text-left font-medium">Shop</th>
               <th class="p-4 text-center font-medium">Loại</th>
               <th class="p-4 text-right font-medium">Số lượng</th>
               <th class="p-4 text-left font-medium">Ghi chú</th>
@@ -59,19 +54,12 @@
 
           <tbody class="divide-y">
 
-            <tr
-              *ngFor="let m of stockMovements | slice:(currentPage * pageSize):(currentPage * pageSize + pageSize)"
-              class="hover:bg-muted/30 transition-colors"
-            >
+            <tr *ngFor="let m of stockMovements"
+                class="hover:bg-muted/30 transition">
 
               <!-- PRODUCT -->
               <td class="p-4 font-medium">
                 {{ m.productId }}
-              </td>
-
-              <!-- SHOP -->
-              <td class="p-4 text-muted-foreground">
-                {{ m.shopId }}
               </td>
 
               <!-- TYPE -->
@@ -104,79 +92,55 @@
             </tr>
 
           </tbody>
+
         </table>
 
       </div>
 
       <!-- EMPTY -->
-      <div *ngIf="!isLoading && stockMovements.length === 0" class="text-center py-14 border rounded-xl">
+      <div *ngIf="!isLoading && stockMovements.length === 0"
+           class="text-center py-14 border rounded-xl">
+
         <p class="text-muted-foreground mb-4">
           Không có dữ liệu kho
         </p>
 
         <button z-button zType="secondary" (click)="loadStockMovements()">
-          Thử lại
+          Tải lại
         </button>
+
       </div>
 
     </div>
 
     <!-- ================= PAGINATION ================= -->
-    <div *ngIf="!isLoading && totalPages > 0" class="pt-6 flex items-center justify-between">
+    <div *ngIf="!isLoading && totalPages > 0"
+         class="pt-6 flex items-center justify-between">
 
-      <!-- Page size -->
-      <div class="page-size-selector">
-        <label>Số bản ghi:</label>
-        <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
-          <option *ngFor="let opt of pageSizeOptions" [ngValue]="opt">
-            {{ opt }}
-          </option>
-        </select>
+      <!-- INFO -->
+      <div class="text-sm text-muted-foreground">
+        Trang {{ currentPage + 1 }} / {{ totalPages }}
       </div>
 
       <!-- NAV -->
-      <div class="pagination-nav" *ngIf="totalPages > 1">
+      <div class="flex gap-2">
 
-        <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(0)">
-          &laquo;
+        <button
+          z-button
+          zType="outline"
+          (click)="onPageChange(currentPage - 1)"
+          [disabled]="currentPage === 0">
+          ← Trước
         </button>
 
-        <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)">
-          &lsaquo;
+        <button
+          z-button
+          zType="outline"
+          (click)="onPageChange(currentPage + 1)"
+          [disabled]="currentPage === totalPages - 1">
+          Sau →
         </button>
 
-        <ng-container *ngFor="let page of displayPages">
-
-          <button
-            *ngIf="page !== '...'; else ellipsisTpl"
-            class="page-btn"
-            [class.active]="currentPage === page"
-            (click)="onPageClick(page)"
-            >
-            {{ getPageLabel(page) }}
-        </button>
-
-          <ng-template #ellipsisTpl>
-            <span class="page-ellipsis">...</span>
-          </ng-template>
-
-        </ng-container>
-
-        <button class="page-btn" [disabled]="currentPage === totalPages - 1"
-          (click)="onPageChange(currentPage + 1)">
-          &rsaquo;
-        </button>
-
-        <button class="page-btn" [disabled]="currentPage === totalPages - 1"
-          (click)="onPageChange(totalPages - 1)">
-          &raquo;
-        </button>
-
-      </div>
-
-      <!-- INFO -->
-      <div class="page-info">
-        Trang {{ currentPage + 1 }} / {{ totalPages }}
       </div>
 
     </div>
