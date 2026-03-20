@@ -3,17 +3,26 @@ import { RouterModule, Routes } from '@angular/router';
 
 // components (tạo sau)
 import { PurchaseOrderListComponent } from './components/purchase-order-list/purchase-order-list.component';
-import { PurchaseOrderDetailComponent } from './components/purchase-order-detail/purchase-order-detail.component';
+import { PurchaseOrderCreateComponent } from './components/purchase-order-create/purchase-order-create.component';
 import { StockMovementListComponent } from './components/stock-movement-list/stock-movement-list.component';
 
 const routes: Routes = [
   {
     path: 'purchase-orders',
-    component: PurchaseOrderListComponent
-  },
-  {
-    path: 'purchase-orders/:id',
-    component: PurchaseOrderDetailComponent
+    children: [
+      {
+        path: '',
+        component: PurchaseOrderListComponent
+      },
+      {
+        path: 'create',
+        component: PurchaseOrderCreateComponent
+      },
+      {
+        path: ':id',
+        component: PurchaseOrderCreateComponent
+      }
+    ]
   },
   {
     path: 'stock-movements',

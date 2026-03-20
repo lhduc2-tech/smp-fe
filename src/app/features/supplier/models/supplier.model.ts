@@ -38,6 +38,7 @@ export interface SupplierRequest {
   taxCode?: string;
   createdBy?: string;
   updatedBy?: string;
+  shopId?: string;
 }
 
 // Search & Paging

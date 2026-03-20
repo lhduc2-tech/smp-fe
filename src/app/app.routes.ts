@@ -81,7 +81,9 @@ export const routes: Routes = [
       },
       {
         path: 'inventory',
-        component: DashboardComponent
+        loadChildren: () =>
+          import('./features/warehouse/inventory-flow.module')
+            .then(m => m.InventoryFlowModule)
       },
       {
         path: 'customers',

@@ -308,25 +308,30 @@ export class SidebarComponent {
       ]
     },
     {
-      title: 'Vận hành',
-      items: [
-        {
-          label: 'Quản lý kho',
-          icon: 'package',
-          route: '/inventory'
-        },
-        {
-          label: 'Khách hàng',
-          icon: 'users',
-          route: '/customers'
-        },
-        {
-          label: 'Báo cáo',
-          icon: 'bar-chart-3',
-          route: '/reports'
-        },
-      ]
-    },
+    title: 'Vận hành',
+    items: [
+      {
+        label: 'Phiếu nhập',
+        icon: 'package',
+        route: '/inventory/purchase-orders'
+      },
+      {
+        label: 'Lịch sử kho',
+        icon: 'layers',
+        route: '/inventory/stock-movements'
+      },
+      {
+        label: 'Khách hàng',
+        icon: 'users',
+        route: '/customers'
+      },
+      {
+        label: 'Báo cáo',
+        icon: 'bar-chart-3',
+        route: '/reports'
+      }
+    ]
+  },
     {
       title: 'Hệ thống',
       items: [

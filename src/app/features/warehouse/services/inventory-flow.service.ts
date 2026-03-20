@@ -1,6 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../auth/services/auth.service';
 
 import {
   PurchaseOrder,
@@ -17,77 +20,149 @@ import {
 })
 export class InventoryFlowService {
 
-  private baseUrl = '/api'; // chỉnh theo BE của bạn
+  private apiService = inject(ApiService);
+  private authService = inject(AuthService);
 
-  constructor(private http: HttpClient) {}
+  private readonly API_PO = '/private/api/v1/purchase-orders';
+  private readonly API_SM = '/private/api/v1/stock-movements';
 
   // ================= PURCHASE ORDER =================
 
   createPurchaseOrder(request: PurchaseOrderRequest): Observable<PurchaseOrder> {
-    return this.http.post<PurchaseOrder>(
-      `${this.baseUrl}/purchase-orders`,
-      request
-    );
+    const payload = {
+      ...request,
+      shopId: this.authService.shopId,
+      createdBy: this.authService.username
+    };
+
+    return this.apiService.post<any>(this.API_PO, payload)
+      .pipe(map(res => this.transformPurchaseOrder(res)));
   }
 
-  searchPurchaseOrders(request: SearchPurchaseOrderRequest): Observable<PageResponse<PurchaseOrder>> {
-    let params = new HttpParams()
-      .set('page', request.page)
-      .set('size', request.size);
+  searchPurchaseOrders(
+    request?: SearchPurchaseOrderRequest
+  ): Observable<PageResponse<PurchaseOrder>> {
 
-    if (request.sortBy) params = params.set('sortBy', request.sortBy);
-    if (request.sortDir) params = params.set('sortDir', request.sortDir);
-    if (request.supplierId) params = params.set('supplierId', request.supplierId);
-    if (request.status) params = params.set('status', request.status);
+    const body = {
+      page: request?.page ?? 0,
+      size: request?.size ?? 10,
+      sortBy: request?.sortBy ?? 'createdAt',
+      sortDir: request?.sortDir ?? 'desc',
 
-    return this.http.get<PageResponse<PurchaseOrder>>(
-      `${this.baseUrl}/purchase-orders`,
-      { params }
-    );
+      supplierId: request?.supplierId,
+      status: request?.status,
+
+      shopId: this.authService.shopId 
+    };
+
+    return this.apiService.post<any>(`${this.API_PO}/search`, body)
+      .pipe(map(res => this.transformPOPage(res)));
   }
 
   getPurchaseOrderById(id: string): Observable<PurchaseOrder> {
-    return this.http.get<PurchaseOrder>(
-      `${this.baseUrl}/purchase-orders/${id}`
-    );
+    return this.apiService.get<any>(`${this.API_PO}/${id}`)
+      .pipe(map(res => this.transformPurchaseOrder(res)));
   }
 
   addItemToPurchaseOrder(
     purchaseOrderId: string,
     request: PurchaseOrderItemRequest
   ): Observable<any> {
-    return this.http.post(
-      `${this.baseUrl}/purchase-orders/${purchaseOrderId}/items`,
+    return this.apiService.post(
+      `${this.API_PO}/${purchaseOrderId}/items`,
       request
     );
   }
 
-  confirmPurchaseOrder(id: string): Observable<any> {
-    return this.http.post(
-      `${this.baseUrl}/purchase-orders/${id}/confirm`,
-      {}
-    );
-  }
+confirmPurchaseOrder(id: string): Observable<any> {
+  return this.apiService.post(
+    `${this.API_PO}/${id}/confirm`,
+    {
+      updatedBy: this.authService.username,
+      shopId: this.authService.shopId   // ✅ thêm nếu BE check
+    }
+  );
+}
 
   // ================= STOCK MOVEMENT =================
 
-  searchStockMovements(
-    request: SearchStockMovementRequest
-  ): Observable<PageResponse<StockMovement>> {
+searchStockMovements(
+  request?: SearchStockMovementRequest
+): Observable<PageResponse<StockMovement>> {
 
-    let params = new HttpParams()
-      .set('page', request.page)
-      .set('size', request.size);
+  const body = {
+    page: request?.page ?? 0,
+    size: request?.size ?? 10,
+    sortBy: request?.sortBy ?? 'createdAt',
+    sortDir: request?.sortDir ?? 'desc',
 
-    if (request.sortBy) params = params.set('sortBy', request.sortBy);
-    if (request.sortDir) params = params.set('sortDir', request.sortDir);
-    if (request.productId) params = params.set('productId', request.productId);
-    if (request.shopId) params = params.set('shopId', request.shopId);
-    if (request.movementType) params = params.set('movementType', request.movementType);
+    productId: request?.productId,
+    movementType: request?.movementType,
 
-    return this.http.get<PageResponse<StockMovement>>(
-      `${this.baseUrl}/stock-movements`,
-      { params }
-    );
+    // 🔥 FIX 403
+    shopId: request?.shopId ?? this.authService.shopId
+  };
+
+  return this.apiService.post<any>(`${this.API_SM}/search`, body)
+    .pipe(map(res => this.transformSMPage(res)));
+}
+
+  // ================= TRANSFORM =================
+private transformPurchaseOrder(res: any): PurchaseOrder {
+  return {
+    id: res.id,
+    supplierId: res.supplier_id || res.supplierId,
+    status: res.status,
+    note: res.note,
+
+    items: res.purchaseOrderItems?.map((i: any) => ({
+      id: i.id,
+      purchaseOrderId: i.purchase_order_id,
+      productId: i.product_id,
+      productName: i.product_name,
+      quantity: i.quantity,
+      importPrice: i.import_price
+    })) || [],
+
+    createdAt: res.created_at,
+    updatedAt: res.updated_at,
+    createdBy: res.created_by,
+    updatedBy: res.updated_by
+  };
+}
+  private transformStockMovement(res: any): StockMovement {
+  return {
+    id: res.id,
+    productId: res.product_id,
+    shopId: res.shop_id,
+    movementType: res.movement_type,
+    quantity: res.quantity,
+    note: res.note,
+
+    createdAt: res.created_at,
+    createdBy: res.created_by,
+    updatedAt: res.updated_at,
+    updatedBy: res.updated_by
+  };
+}
+
+  private transformPOPage(res: any): PageResponse<PurchaseOrder> {
+    return {
+      content: res.content?.map((i: any) => this.transformPurchaseOrder(i)) || [],
+      page: res.page_number || 0,
+      size: res.page_size || 10,
+      total: res.total_elements || 0,
+      totalPages: res.total_pages || 0
+    };
+  }
+
+  private transformSMPage(res: any): PageResponse<StockMovement> {
+    return {
+      content: res.content?.map((i: any) => this.transformStockMovement(i)) || [],
+      page: res.page_number || 0,
+      size: res.page_size || 10,
+      total: res.total_elements || 0,
+      totalPages: res.total_pages || 0
+    };
   }
 }

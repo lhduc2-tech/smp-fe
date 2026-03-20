@@ -4,7 +4,7 @@
   <div class="flex items-center justify-between">
     <h1 class="text-xl font-semibold">Danh sách phiếu nhập</h1>
 
-    <a routerLink="/purchase-orders/create" class="btn btn-primary">
+    <a routerLink="/inventory/purchase-orders/create" class="btn btn-primary">
       + Tạo phiếu nhập
     </a>
   </div>
@@ -68,7 +68,7 @@
           <tr *ngFor="let po of purchaseOrders; let i = index">
             <td>{{ i + 1 + currentPage * pageSize }}</td>
 
-            <td>{{ po.supplier_id }}</td>
+            <td>{{ po.supplierId }}</td>
 
             <td>
               <span
@@ -84,7 +84,7 @@
 
             <td>{{ po.note || '-' }}</td>
 
-            <td>{{ po.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ po.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
 
             <td class="text-right space-x-2">
 
