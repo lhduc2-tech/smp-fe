@@ -125,6 +125,7 @@ export class InventoryFlowService {
     return {
       id: res.id,
       supplierId: res.supplier_id ?? res.supplierId,
+      supplierName: res.supplierName,
       status: res.status,
       note: res.note,
       shopId: res.shop_id,
@@ -150,6 +151,7 @@ export class InventoryFlowService {
     return {
       id: res.id,
       productId: res.product_id,
+      productName: res.product_name,
       shopId: res.shop_id,
       movementType: res.movement_type,
       quantity: res.quantity,

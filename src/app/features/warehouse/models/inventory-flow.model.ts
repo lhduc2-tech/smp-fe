@@ -12,6 +12,7 @@ export interface PurchaseOrder {
   id: string;
 
   supplierId: string;
+  supplierName?: string;
   status: string;
   note?: string;
 
@@ -74,7 +75,7 @@ export interface PurchaseOrderItem {
   purchaseOrderId?: string;
 
   productId: string;
-  productName?: string;
+  product_name?: string;
 
   quantity: number;
   importPrice?: number;
@@ -108,6 +109,7 @@ export interface StockMovement {
   id: string;
 
   productId: string;
+  productName?: string;
   shopId: string;
 
   movementType: 'IMPORT' | 'EXPORT';
