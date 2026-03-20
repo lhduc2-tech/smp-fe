@@ -21,12 +21,15 @@ export class StaffService {
  * Lấy danh sách nhân viên phân trang (hỗ trợ cả tìm kiếm)
  */
   getStaffPage(request?: SearchStaffRequest): Observable<PageResponse<Staff>> {
-    const searchRequest = request || {
+    const searchRequest: SearchStaffRequest = request || {
       page: 0,
       size: 10,
       sortBy: 'createdAt',
       sortDir: 'desc'
     };
+
+    // Add shopId from token to payload
+    searchRequest.shopId = this.authService.shopId || undefined;
 
     return this.apiService.post<PageResponse<StaffResponse>>(
       `${this.API_ENDPOINT}/search`,
@@ -55,8 +58,8 @@ export class StaffService {
       phoneNumber: staff.phoneNumber,
       position: staff.position,
       status: staff.status,
-      shopId: staff.shopId,
-      createdBy: localStorage.getItem('username')
+      shopId: this.authService.shopId || undefined,
+      createdBy: this.authService.username || undefined
     };
 
     return this.apiService.post<StaffResponse>(
@@ -77,8 +80,8 @@ export class StaffService {
       phoneNumber: staff.phoneNumber,
       position: staff.position,
       status: staff.status,
-      shopId: staff.shopId,
-      updatedBy: localStorage.getItem('username')
+      shopId: this.authService.shopId || undefined,
+      updatedBy: this.authService.username || undefined
     };
 
     return this.apiService.put<StaffResponse>(

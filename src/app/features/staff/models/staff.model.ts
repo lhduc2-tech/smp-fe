@@ -44,4 +44,5 @@ export interface SearchStaffRequest {
   size?: number;
   sortBy?: string;
   sortDir?: string;
+  shopId?: string;
 }

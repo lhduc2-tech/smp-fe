@@ -80,7 +80,7 @@ export class SupplierFormComponent implements OnInit {
       },
       error: () => {
         toast.error('Không tải được dữ liệu nhà cung cấp');
-        this.router.navigate(['/suppliers']);
+        this.router.navigate(['/supplier']);
       },
       complete: () => {
         this.isLoading = false;
@@ -119,7 +119,7 @@ export class SupplierFormComponent implements OnInit {
         );
 
         if (!this.isEdit) {
-          this.router.navigate(['/suppliers']);
+          this.router.navigate(['/supplier']);
         }
       },
       error: () => {

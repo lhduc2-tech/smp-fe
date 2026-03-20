@@ -44,6 +44,10 @@ describe('SupplierService', () => {
 
     service.addSupplier({ supplierName: 'New', code: 'S002', phoneNumber: '0456' }).subscribe(sup => {
       expect(sup.supplierName).toBe('New');
+      expect(apiServiceSpy.post).toHaveBeenCalledWith(
+        '/private/api/v1/suppliers',
+        expect.objectContaining({ shopId: 'shop-1' })
+      );
     });
   });
 
@@ -52,6 +56,10 @@ describe('SupplierService', () => {
 
     service.updateSupplier('1', { supplierName: 'Updated', code: 'S001', phoneNumber: '0123' }).subscribe(sup => {
       expect(sup.supplierName).toBe('Updated');
+      expect(apiServiceSpy.put).toHaveBeenCalledWith(
+        '/private/api/v1/suppliers/1',
+        expect.objectContaining({ shopId: 'shop-1' })
+      );
     });
   });
 

@@ -57,7 +57,8 @@ export class SupplierService {
       phoneNumber: data.phoneNumber!,
       email: data.email,
       website: data.website,
-      taxCode: data.taxCode
+      taxCode: data.taxCode,
+      shopId: this.authService.shopId || undefined
     };
 
     return this.apiService
@@ -74,7 +75,8 @@ export class SupplierService {
       email: data.email,
       website: data.website,
       taxCode: data.taxCode,
-      createdBy: data.createdBy
+      createdBy: data.createdBy,
+      shopId: this.authService.shopId || undefined
     };
 
     return this.apiService
