@@ -53,7 +53,7 @@
               <th class="p-4 text-left font-medium">Tên sản phẩm</th>
               <th class="p-4 text-left font-medium">Danh mục</th>
               <th class="p-4 text-right font-medium">Giá</th>
-              <th class="p-4 text-center font-medium">Ngày tạo</th>
+              <th class="p-4 text-center font-medium">Ngày cập nhật</th>
               <th class="p-4 text-center font-medium">Hành động</th>
             </tr>
           </thead>
@@ -78,7 +78,7 @@
               </td>
 
               <td class="p-4 text-center text-muted-foreground whitespace-nowrap">
-                {{ p.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                {{ p.updatedAt | date:'dd/MM/yyyy HH:mm' }}
               </td>
 
               <td class="p-4">

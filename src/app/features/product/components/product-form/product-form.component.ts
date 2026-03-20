@@ -39,7 +39,7 @@ export class ProductFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      code: ['', Validators.required],
+      code: [''],
       name: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(1000), Validators.max(999999999)]],
       categoryId: ['', Validators.required],
@@ -80,10 +80,13 @@ export class ProductFormComponent implements OnInit {
       : this.productService.addProduct(this.form.value);
 
     action$.subscribe({
-      next: () => {
+      next: (res) => {
         toast.success(
           this.isEdit ? 'Cập nhật thành công' : 'Thêm sản phẩm thành công'
         );
+        if (!this.isEdit) {
+          this.router.navigate(['/products']);
+        }
       },
       error: () => {
         toast.error('Có lỗi xảy ra!');

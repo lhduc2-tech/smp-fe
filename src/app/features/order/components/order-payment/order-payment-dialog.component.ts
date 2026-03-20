@@ -859,7 +859,8 @@ export class OrderPaymentDialogComponent {
       shopId: this.order.shopId || undefined,
       createdBy: this.order.createdBy || undefined,
       updatedBy: this.order.updatedBy || undefined,
-      paymentMethod: this.selectedMethod
+      paymentMethod: this.selectedMethod,
+      description: this.order.description
     };
 
     this.orderService.updateOrder(this.order.id, request).subscribe({
