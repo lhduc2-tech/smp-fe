@@ -51,17 +51,19 @@ export class ProductListComponent implements OnInit {
   loadProducts(): void {
     this.isLoading = true;
 
-    this.productService.getAllProductByShopId()
+    this.productService.getProductPage({
+      page: this.currentPage,
+      size: this.pageSize,
+      sortBy: 'createdAt',
+      sortDir: 'desc',
+      searchQuery: this.searchTerm || undefined
+    })
       .pipe(retry({ count: 3, delay: 1000 }))
       .subscribe({
         next: res => {
-          // Filter by search term if present
-          this.products = this.searchTerm
-            ? res.filter(p => p.name.toLowerCase().includes(this.searchTerm.toLowerCase()))
-            : res;
-
-          this.totalElements = this.products.length;
-          this.totalPages = Math.ceil(this.totalElements / this.pageSize);
+          this.products = res.content;
+          this.totalElements = res.total;
+          this.totalPages = res.totalPages;
           this.updateDisplayPages();
           this.isLoading = false;
           this.cd.detectChanges();
@@ -81,15 +83,13 @@ export class ProductListComponent implements OnInit {
   onPageChange(page: number): void {
     if (page < 0 || page >= this.totalPages) return;
     this.currentPage = page;
-    this.cd.detectChanges();
+    this.loadProducts();
   }
 
   onPageSizeChange(newSize: number): void {
     this.pageSize = newSize;
     this.currentPage = 0;
-    this.totalPages = Math.ceil(this.totalElements / this.pageSize);
-    this.updateDisplayPages();
-    this.cd.detectChanges();
+    this.loadProducts();
   }
 
 

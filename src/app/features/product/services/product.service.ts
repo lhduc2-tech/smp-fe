@@ -23,14 +23,13 @@ export class ProductService {
    * Lấy tất cả sản phẩm của shop hiện tại
    */
   getAllProductByShopId(): Observable<Product[]> {
-    const shopId = this.authService.shopId;
-    if (!shopId) {
-      throw new Error('Shop ID not found');
-    }
-    return this.apiService.get<ProductResponse[]>(
-      `${this.API_ENDPOINT}/all-by-shop/${shopId}`
-    ).pipe(
-      map(res => res.map(item => this.transformProduct(item)))
+    return this.getProductPage({
+      page: 0,
+      size: 1000,
+      sortBy: 'createdAt',
+      sortDir: 'desc'
+    }).pipe(
+      map(res => res.content)
     );
   }
 
@@ -38,12 +37,15 @@ export class ProductService {
    * Phân trang + tìm kiếm
    */
   getProductPage(request?: SearchProductRequest): Observable<PageResponse<Product>> {
-    const searchRequest = request || {
+    const searchRequest: SearchProductRequest = request || {
       page: 0,
       size: 10,
       sortBy: 'createdAt',
       sortDir: 'desc'
     };
+
+    // Add shopId from token to payload
+    searchRequest.shopId = this.authService.shopId || undefined;
 
     return this.apiService.post<PageResponse<ProductResponse>>(
       `${this.API_ENDPOINT}/search`,

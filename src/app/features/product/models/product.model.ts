@@ -35,6 +35,8 @@ export interface SearchProductRequest {
 
   code?: string;
   name?: string;
+  shopId?: string;
+  searchQuery?: string;
 }
 
 export interface PageResponse<T> {

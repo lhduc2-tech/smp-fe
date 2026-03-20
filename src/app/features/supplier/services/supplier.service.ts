@@ -79,7 +79,7 @@ export class SupplierService {
       email: data.email,
       website: data.website,
       taxCode: data.taxCode,
-      shopId: this.authService.shopId ?? undefined // ✅ thêm
+      shopId: this.authService.shopId || undefined
     };
 
     return this.apiService
@@ -97,7 +97,7 @@ export class SupplierService {
       website: data.website,
       taxCode: data.taxCode,
       createdBy: data.createdBy,
-      shopId: this.authService.shopId ?? undefined // ✅ thêm
+      shopId: this.authService.shopId || undefined
     };
 
     return this.apiService
