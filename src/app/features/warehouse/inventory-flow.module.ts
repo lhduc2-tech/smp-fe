@@ -6,7 +6,6 @@ import { InventoryFlowRoutingModule } from './inventory-flow-routing.module';
   imports: [
     CommonModule,
     InventoryFlowRoutingModule
-    
   ]
 })
 export class InventoryFlowModule {}

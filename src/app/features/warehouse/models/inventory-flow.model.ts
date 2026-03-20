@@ -11,17 +11,17 @@ export interface PageResponse<T> {
 export interface PurchaseOrder {
   id: string;
 
-  supplier_id: string;
+  supplierId: string;
   status: string;
   note?: string;
 
-  purchaseOrderItems: PurchaseOrderItem[];
+  items: PurchaseOrderItem[];
 
-  created_at?: string;
-  created_by?: string;
+  createdAt?: string;
+  createdBy?: string;
 
-  updated_at?: string;
-  updated_by?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface PurchaseOrderRequest {
@@ -46,13 +46,13 @@ export interface SearchPurchaseOrderRequest {
 export interface PurchaseOrderItem {
   id?: string;
 
-  purchase_order_id?: string;
+  purchaseOrderId?: string;
 
-  product_id: string;
-  product_name?: string;
+  productId: string;
+  productName?: string;
 
   quantity: number;
-  import_price?: number;
+  importPrice?: number;
 }
 
 export interface PurchaseOrderItemRequest {
@@ -65,19 +65,19 @@ export interface PurchaseOrderItemRequest {
 export interface StockMovement {
   id: string;
 
-  product_id: string;
-  shop_id: string;
+  productId: string;
+  shopId: string;
 
-  movement_type: 'IMPORT' | 'EXPORT';
+  movementType: 'IMPORT' | 'EXPORT';
 
   quantity: number;
   note?: string;
 
-  created_at?: string;
-  created_by?: string;
+  createdAt?: string;
+  createdBy?: string;
 
-  updated_at?: string;
-  updated_by?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface SearchStockMovementRequest {

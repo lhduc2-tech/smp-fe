@@ -60,7 +60,7 @@ export class StockMovementListComponent implements OnInit {
     const request: SearchStockMovementRequest = {
       page: this.currentPage,
       size: this.pageSize,
-      sortBy: 'created_at',
+      sortBy: 'createdAt',
       sortDir: 'desc',
 
       // optional filter

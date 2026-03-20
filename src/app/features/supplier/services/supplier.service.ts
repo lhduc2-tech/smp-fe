@@ -23,6 +23,28 @@ export class SupplierService {
   private apiService = inject(ApiService);
   private authService = inject(AuthService);
 
+  /* ================= GET ALL (FOR COMBOBOX) ================= */
+
+  getAll(): Observable<Supplier[]> {
+
+    const request: SearchSupplierRequest = {
+      page: 0,
+      size: 1000, // đủ lớn để load dropdown
+      sortBy: 'createdAt',
+      sortDir: 'desc',
+      shopId: this.authService.shopId || undefined
+    };
+
+    return this.apiService
+      .post<PageResponse<SupplierResponse>>(
+        `${this.API_ENDPOINT}/search`,
+        request
+      )
+      .pipe(
+        map(res => res.content?.map((i: any) => this.transformSupplier(i)) || [])
+      );
+  }
+
   /* ================= SEARCH ================= */
 
   getSupplierPage(
@@ -36,7 +58,6 @@ export class SupplierService {
       sortDir: 'desc'
     };
 
-    // Add shopId from token to payload
     searchRequest.shopId = this.authService.shopId || undefined;
 
     return this.apiService
