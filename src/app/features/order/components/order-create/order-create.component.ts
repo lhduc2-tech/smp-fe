@@ -18,7 +18,7 @@ import { ProductService } from '../../../product/services/product.service';
 import { Product } from '../../../product/models/product.model';
 
 import { CustomerService } from '../../../customer/services/customer.service';
-import { Customer, CreateCustomerRequest } from '../../../customer/models/customer.model';
+import { Customer, CustomerRequest } from '../../../customer/models/customer.model';
 
 import { AuthService } from '../../../auth/services/auth.service';
 
@@ -170,7 +170,7 @@ export class OrderCreateComponent implements OnInit {
   private loadInitialData(): void {
 
     const products$ = this.productService.getAllProductByShopId();
-    const customers$ = this.customerService.getCustomers();
+    const customers$ = this.customerService.getAll();
     const order$ = this.orderId ? this.orderService.getOrderById(this.orderId) : of(null);
 
     forkJoin({
@@ -196,7 +196,7 @@ export class OrderCreateComponent implements OnInit {
 
         this.customerOptions = customers.map(c => ({
           value: c.id,
-          label: c.name + (c.phone ? ` — ${c.phone}` : '')
+          label: c.fullName + (c.phoneNumber ? ` — ${c.phoneNumber}` : '')
         }));
 
         /* ===== ORDER ===== */
@@ -221,12 +221,12 @@ export class OrderCreateComponent implements OnInit {
   this.currentOrder = order;
 
   const customer = this.customers.find(
-    c => c.name === order.customerName
+    c => c.fullName === order.customerName
   );
 
   this.form.patchValue({
     customerName: order.customerName,
-    customerPhone: customer?.phone || '',
+    customerPhone: customer?.phoneNumber || '',
     customerEmail: customer?.email || '',
     deliveryAddress: customer?.address || '',
     note: order.description || ''
@@ -287,8 +287,8 @@ export class OrderCreateComponent implements OnInit {
     if (customer) {
       this.selectedCustomerValue = customer.id;
       this.form.patchValue({
-        customerName: customer.name,
-        customerPhone: customer.phone || '',
+        customerName: customer.fullName,
+        customerPhone: customer.phoneNumber || '',
         customerEmail: customer.email || '',
         deliveryAddress: customer.address || ''
       });
@@ -473,7 +473,7 @@ export class OrderCreateComponent implements OnInit {
         return;
       }
 
-      const customerReq: CreateCustomerRequest = {
+      const customerReq: CustomerRequest = {
         fullName: customerName,
         phoneNumber: customerPhone || undefined,
         email: customerEmail || undefined,
@@ -485,7 +485,7 @@ export class OrderCreateComponent implements OnInit {
 
       this.isSavingCustomer = true;
 
-      this.customerService.createCustomer(customerReq).pipe(
+      this.customerService.addCustomer(customerReq).pipe(
         switchMap((newCustomer) => {
 
           /* Thêm customer mới vào danh sách local */

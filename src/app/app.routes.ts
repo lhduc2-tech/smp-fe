@@ -87,7 +87,9 @@ export const routes: Routes = [
       },
       {
         path: 'customers',
-        component: DashboardComponent
+        loadChildren: () =>
+          import('./features/customer/customer.module')
+            .then(m => m.CustomerModule)
       },
       {
         path: 'reports',

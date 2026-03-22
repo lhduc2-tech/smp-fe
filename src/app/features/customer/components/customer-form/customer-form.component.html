@@ -1,0 +1,80 @@
+<z-card
+  [zTitle]="isEdit ? 'Chỉnh sửa khách hàng' : 'Thêm khách hàng mới'"
+  zDescription="Quản lý thông tin khách hàng"
+  class="customer-form-card">
+
+  <form [formGroup]="form"
+        (ngSubmit)="submit()"
+        class="space-y-6">
+
+    <!-- Tên khách hàng -->
+    <z-form-field>
+      <label z-form-label zRequired>Tên khách hàng</label>
+      <z-form-control>
+        <input
+          z-input
+          type="text"
+          formControlName="fullName"
+          placeholder="Nhập tên khách hàng" />
+      </z-form-control>
+    </z-form-field>
+
+    <!-- Số điện thoại -->
+    <z-form-field>
+      <label z-form-label>Số điện thoại</label>
+      <z-form-control>
+        <input
+          z-input
+          type="text"
+          formControlName="phoneNumber"
+          placeholder="Nhập số điện thoại" />
+      </z-form-control>
+    </z-form-field>
+
+    <!-- Email -->
+    <z-form-field>
+      <label z-form-label>Email</label>
+      <z-form-control>
+        <input
+          z-input
+          type="email"
+          formControlName="email"
+          placeholder="Nhập email" />
+      </z-form-control>
+    </z-form-field>
+
+    <!-- Địa chỉ -->
+    <z-form-field>
+      <label z-form-label>Địa chỉ</label>
+      <z-form-control>
+        <input
+          z-input
+          type="text"
+          formControlName="address"
+          placeholder="Nhập địa chỉ" />
+      </z-form-control>
+    </z-form-field>
+
+    <!-- Divider -->
+    <z-divider />
+
+    <!-- Actions -->
+    <div class="form-actions flex justify-end gap-3">
+      <a z-button zType="outline" routerLink="/customer">
+        Hủy
+      </a>
+
+      <button
+        z-button
+        zType="default"
+        type="submit"
+        [zDisabled]="form.invalid">
+
+        {{ isEdit ? 'Cập nhật' : 'Thêm mới' }}
+
+      </button>
+    </div>
+
+  </form>
+
+</z-card>
