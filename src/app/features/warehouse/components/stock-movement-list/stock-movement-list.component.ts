@@ -10,7 +10,7 @@ import {
   SearchStockMovementRequest,
   PageResponse
 } from '../../models/inventory-flow.model';
-
+import { AuthService } from '../../../auth/services/auth.service';
 import { finalize } from 'rxjs';
 import { toast } from 'ngx-sonner';
 
@@ -46,6 +46,7 @@ export class StockMovementListComponent implements OnInit {
 
   constructor(
     private inventoryService: InventoryFlowService,
+    private authService: AuthService,
     private cd: ChangeDetectorRef
   ) {}
 
@@ -57,35 +58,46 @@ export class StockMovementListComponent implements OnInit {
   /* ================= LOAD ================= */
   loadStockMovements(): void {
 
-    const request: SearchStockMovementRequest = {
-      page: this.currentPage,
-      size: this.pageSize,
-      sortBy: 'createdAt',
-      sortDir: 'desc',
-      productId: this.searchTerm || undefined
-    };
+  const shopId = this.authService.shopId;
 
-    this.isLoading = true;
-
-    this.inventoryService.searchStockMovements(request)
-      .pipe(finalize(() => {
-        this.isLoading = false;
-        this.cd.detectChanges(); // 👈 giống product
-      }))
-      .subscribe({
-        next: (res: PageResponse<StockMovement>) => {
-
-          this.stockMovements = res.content || [];
-          this.totalPages = res.totalPages || 0;
-          this.totalElements = res.total || 0;
-
-          this.updateDisplayPages();
-        },
-        error: () => {
-          toast.error('Không thể tải dữ liệu kho');
-        }
-      });
+  // ❗ bảo vệ nếu thiếu shopId
+  if (!shopId) {
+    toast.error('Không tìm thấy shopId');
+    return;
   }
+
+  const request: SearchStockMovementRequest = {
+    page: this.currentPage,
+    size: this.pageSize,
+    sortBy: 'createdAt',
+    sortDir: 'desc',
+    productId: this.searchTerm || undefined,
+
+    // 🔥 QUAN TRỌNG
+    shopId: shopId
+  };
+
+  this.isLoading = true;
+
+  this.inventoryService.searchStockMovements(request)
+    .pipe(finalize(() => {
+      this.isLoading = false;
+      this.cd.detectChanges();
+    }))
+    .subscribe({
+      next: (res: PageResponse<StockMovement>) => {
+
+        this.stockMovements = res.content || [];
+        this.totalPages = res.totalPages || 0;
+        this.totalElements = res.total || 0;
+
+        this.updateDisplayPages();
+      },
+      error: () => {
+        toast.error('Không thể tải dữ liệu kho');
+      }
+    });
+}
 
   /* ================= SEARCH ================= */
   onSearch(): void {

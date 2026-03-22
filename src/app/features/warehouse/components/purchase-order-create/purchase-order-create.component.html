@@ -1,11 +1,18 @@
 <!-- ================= HEADER ================= -->
-<div class="order-create-header">
-  <h1 class="text-2xl font-bold tracking-tight">
-    Tạo phiếu nhập hàng
-  </h1>
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">
+      Tạo phiếu nhập hàng
+    </h1>
+    <p class="text-sm text-muted-foreground">
+      Tạo và quản lý phiếu nhập từ nhà cung cấp
+    </p>
+  </div>
 
   <div class="flex items-center gap-3">
-    <button z-button zType="outline" (click)="goBack()">Huỷ</button>
+    <button z-button zType="outline" (click)="goBack()">
+      Huỷ
+    </button>
 
     <button
       z-button
@@ -18,50 +25,156 @@
   </div>
 </div>
 
-<!-- ================= MAIN ================= -->
-<div class="order-create-layout">
+<!-- ================= MAIN LAYOUT ================= -->
+<div class="grid grid-cols-12 gap-6">
 
-  <!-- ========= LEFT ========= -->
-  <div class="order-create-left">
+  <!-- ================= LEFT ================= -->
+  <div class="col-span-8 flex flex-col gap-6">
 
-    <!-- ===== 1. SUPPLIER ===== -->
-    <z-card class="section-card">
-      <div class="section-title">
-        <h2 class="text-lg font-semibold">Nhà cung cấp</h2>
-      </div>
+    <!-- ===== SUPPLIER ===== -->
+    <!-- ================= SUPPLIER ================= -->
+<z-card class="section-card">
 
-      <div class="section-body">
+  <!-- HEADER -->
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold flex items-center gap-2">
+      <z-icon zType="info" />
+      Nhà cung cấp
+    </h2>
 
+    <button
+      z-button
+      zType="outline"
+      (click)="toggleCreateSupplier()"
+    >
+      <z-icon zType="plus" />
+      {{ isCreatingSupplier ? 'Chọn có sẵn' : 'Thêm mới' }}
+    </button>
+  </div>
+
+  <!-- ================= MODE: SELECT ================= -->
+  <div *ngIf="!isCreatingSupplier" class="space-y-4">
+
+    <z-form-field>
+      <label z-form-label>Chọn nhà cung cấp</label>
+      <z-form-control>
+        <z-combobox
+          [options]="supplierOptions"
+          placeholder="Tìm nhà cung cấp..."
+          searchPlaceholder="Tên / SĐT / mã"
+          (zComboSelected)="onSupplierSelected($event)"
+          zWidth="full"
+        />
+      </z-form-control>
+    </z-form-field>
+
+    <!-- PREVIEW -->
+    <div *ngIf="selectedSupplier" class="p-3 rounded-lg bg-muted text-sm">
+      <p class="font-medium">{{ selectedSupplier.supplierName }}</p>
+      <p class="text-muted-foreground">
+        {{ selectedSupplier.phoneNumber }} | {{ selectedSupplier.email }}
+      </p>
+      <p class="text-muted-foreground">
+        {{ selectedSupplier.phoneNumber || '-' }}
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ================= MODE: CREATE ================= -->
+    <div *ngIf="isCreatingSupplier" class="space-y-4">
+
+      <div class="grid grid-cols-2 gap-4">
+
+        <!-- NAME -->
         <z-form-field>
-          <label z-form-label>Chọn nhà cung cấp</label>
+          <label z-form-label zRequired>Tên nhà cung cấp</label>
           <z-form-control>
-            <z-combobox
-              [options]="supplierOptions"
-              placeholder="Tìm nhà cung cấp..."
-              searchPlaceholder="Nhập tên hoặc SĐT..."
-              (zComboSelected)="onSupplierSelected($event)"
-              zWidth="full"
+            <input
+              z-input
+              [(ngModel)]="newSupplier.supplierName"
+              placeholder="Nhập tên nhà cung cấp"
             />
           </z-form-control>
         </z-form-field>
 
-        <!-- Hiển thị supplier đã chọn -->
-        <div *ngIf="selectedSupplier" class="mt-4 p-3 rounded-lg bg-muted">
-          <p class="font-medium">{{ selectedSupplier.supplierName }}</p>
+        <!-- CODE -->
+        <z-form-field>
+          <label z-form-label zRequired>Mã nhà cung cấp</label>
+          <z-form-control>
+            <input
+              z-input
+              [(ngModel)]="newSupplier.code"
+              placeholder="Nhập mã"
+            />
+          </z-form-control>
+        </z-form-field>
+
+        <!-- PHONE -->
+        <z-form-field>
+          <label z-form-label zRequired>Số điện thoại</label>
+          <z-form-control>
+            <input
+              z-input
+              [(ngModel)]="newSupplier.phoneNumber"
+              placeholder="Số điện thoại"
+            />
+          </z-form-control>
+        </z-form-field>
+
+        <!-- EMAIL -->
+        <z-form-field>
+          <label z-form-label>Email</label>
+          <z-form-control>
+            <input
+              z-input
+              [(ngModel)]="newSupplier.email"
+              placeholder="Email"
+            />
+          </z-form-control>
+        </z-form-field>
+
+        <!-- WEBSITE -->
+        <z-form-field>
+          <label z-form-label>Website</label>
+          <z-form-control>
+            <input
+              z-input
+              [(ngModel)]="newSupplier.website"
+              placeholder="Website"
+            />
+          </z-form-control>
+        </z-form-field>
+
+        <!-- TAX CODE -->
+        <z-form-field>
+          <label z-form-label>Mã số thuế</label>
+          <z-form-control>
+            <input
+              z-input
+              [(ngModel)]="newSupplier.taxCode"
+              placeholder="Mã số thuế"
+            />
+          </z-form-control>
+        </z-form-field>
+
+      </div>
+
+    </div>
+
+  </z-card>
+
+    <!-- ===== PRODUCT LIST ===== -->
+    <z-card class="p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-semibold">Danh sách hàng nhập</h2>
           <p class="text-sm text-muted-foreground">
-            {{ selectedSupplier.phoneNumber }}
+            Thêm sản phẩm vào phiếu nhập
           </p>
         </div>
 
-      </div>
-    </z-card>
-
-    <!-- ===== 2. PRODUCT LIST ===== -->
-    <z-card class="section-card">
-      <div class="section-title flex justify-between items-center">
-        <h2 class="text-lg font-semibold">Danh sách hàng nhập</h2>
-
-        <div class="product-search-wrapper w-72">
+        <div class="w-72">
           <z-combobox
             [options]="productOptions"
             placeholder="Thêm sản phẩm..."
@@ -72,147 +185,161 @@
         </div>
       </div>
 
-      <div class="section-body">
+      <!-- TABLE -->
+      <div *ngIf="items.length > 0" class="overflow-x-auto rounded-xl border">
+        <table z-table>
+          <thead>
+            <tr>
+              <th class="text-left">Sản phẩm</th>
+              <th class="text-center w-40">Số lượng</th>
+              <th class="text-right w-40">Giá nhập</th>
+              <th class="text-right w-40">Thành tiền</th>
+              <th class="w-10"></th>
+            </tr>
+          </thead>
 
-        <!-- TABLE -->
-        <div *ngIf="items.length > 0" class="overflow-x-auto rounded-xl">
-          <table z-table>
-            <thead>
-              <tr>
-                <th>SẢN PHẨM</th>
-                <th class="text-center">SL</th>
-                <th class="text-right">GIÁ NHẬP</th>
-                <th class="text-right">THÀNH TIỀN</th>
-                <th></th>
-              </tr>
-            </thead>
+          <tbody>
+            <tr *ngFor="let item of items; let i = index">
 
-            <tbody>
-              <tr *ngFor="let item of items; let i = index">
+              <!-- PRODUCT -->
+              <td class="font-medium">
+                {{ item.productName }}
+              </td>
 
-                <td class="font-medium">
-                  {{ item.productName }}
-                </td>
-
-                <!-- QUANTITY -->
-                <td>
-                  <div class="qty-control">
-                    <button
-                      z-button
-                      zType="outline"
-                      zSize="sm"
-                      (click)="decreaseQty(item)"
-                    >−</button>
-
-                    <input
-                      type="number"
-                      class="qty-input"
-                      [value]="item.quantity"
-                      (change)="updateQty(item, $event)"
-                      min="1"
-                    />
-
-                    <button
-                      z-button
-                      zType="outline"
-                      zSize="sm"
-                      (click)="increaseQty(item)"
-                    >+</button>
-                  </div>
-                </td>
-
-                <!-- PRICE -->
-                <td class="text-right">
-                  <input
-                    type="number"
-                    class="input input-sm text-right"
-                    [value]="item.importPrice"
-                    (change)="updatePrice(item, $event)"
-                  />
-                </td>
-
-                <!-- TOTAL -->
-                <td class="text-right font-semibold text-primary">
-                  {{ item.quantity * (item.importPrice || 0) | number:'1.0-0' }}đ
-                </td>
-
-                <!-- DELETE -->
-                <td class="text-center">
+              <!-- QUANTITY -->
+              <td>
+                <div class="flex items-center justify-center gap-2">
                   <button
                     z-button
-                    zType="ghost"
+                    zType="outline"
                     zSize="sm"
-                    (click)="removeItem(i)"
+                    (click)="decreaseQty(item)"
                   >
-                    ✕
+                    −
                   </button>
-                </td>
 
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  <input
+                    type="number"
+                    class="w-16 text-center border rounded-md"
+                    [value]="item.quantity"
+                    (change)="updateQty(item, $event)"
+                    min="1"
+                  />
 
-        <!-- EMPTY -->
-        <div *ngIf="items.length === 0" class="empty-products">
-          <p class="text-muted-foreground">
-            Chưa có sản phẩm, hãy thêm từ ô tìm kiếm
-          </p>
-        </div>
+                  <button
+                    z-button
+                    zType="outline"
+                    zSize="sm"
+                    (click)="increaseQty(item)"
+                  >
+                    +
+                  </button>
+                </div>
+              </td>
 
+              <!-- PRICE -->
+              <td class="text-right">
+                <input
+                  type="number"
+                  class="w-full text-right border rounded-md px-2 py-1"
+                  [value]="item.importPrice"
+                  (change)="updatePrice(item, $event)"
+                />
+              </td>
+
+              <!-- TOTAL -->
+              <td class="text-right font-semibold text-primary">
+                {{ item.quantity * (item.importPrice || 0) | number:'1.0-0' }}đ
+              </td>
+
+              <!-- DELETE -->
+              <td class="text-center">
+                <button
+                  z-button
+                  zType="ghost"
+                  zSize="sm"
+                  (click)="removeItem(i)"
+                >
+                  ✕
+                </button>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
       </div>
+
+      <!-- EMPTY STATE -->
+      <div
+        *ngIf="items.length === 0"
+        class="flex flex-col items-center justify-center py-10 text-center"
+      >
+        <p class="text-muted-foreground mb-2">
+          Chưa có sản phẩm nào
+        </p>
+        <p class="text-sm text-muted-foreground">
+          Hãy tìm và thêm sản phẩm ở phía trên
+        </p>
+      </div>
+
     </z-card>
 
-    <!-- ===== 3. NOTE ===== -->
-    <z-card class="section-card">
-      <div class="section-title">
+    <!-- ===== NOTE ===== -->
+    <z-card class="p-5">
+      <div class="mb-4">
         <h2 class="text-lg font-semibold">Ghi chú</h2>
+        <p class="text-sm text-muted-foreground">
+          Thông tin bổ sung cho phiếu nhập
+        </p>
       </div>
 
-      <div class="section-body">
-        <textarea
-          z-input
-          [(ngModel)]="note"
-          rows="3"
-          placeholder="Nhập ghi chú..."
-        ></textarea>
-      </div>
+      <textarea
+        z-input
+        [(ngModel)]="note"
+        rows="4"
+        placeholder="Nhập ghi chú..."
+      ></textarea>
     </z-card>
 
   </div>
 
-  <!-- ========= RIGHT ========= -->
-  <div class="order-create-right">
+  <!-- ================= RIGHT (SUMMARY) ================= -->
+  <div class="col-span-4">
 
-    <!-- SUMMARY -->
-    <z-card class="summary-card">
+    <z-card class="p-5 sticky top-4">
 
-      <h3 class="text-lg font-semibold mb-6">Tổng thông tin</h3>
+      <h3 class="text-lg font-semibold mb-5">
+        Tổng thông tin
+      </h3>
 
-      <div class="summary-rows">
+      <div class="flex flex-col gap-4 text-sm">
 
-        <div class="summary-row">
-          <span>Nhà cung cấp</span>
-          <span>
+        <div class="flex justify-between">
+          <span class="text-muted-foreground">Nhà cung cấp</span>
+          <span class="font-medium">
             {{ selectedSupplier?.supplierName || 'Chưa chọn' }}
           </span>
         </div>
 
-        <div class="summary-row">
-          <span>Số sản phẩm</span>
-          <span>{{ items.length }}</span>
+        <div class="flex justify-between">
+          <span class="text-muted-foreground">Số sản phẩm</span>
+          <span class="font-medium">
+            {{ items.length }}
+          </span>
         </div>
 
-        <div class="summary-row">
-          <span>Tổng số lượng</span>
-          <span>{{ totalQuantity }}</span>
+        <div class="flex justify-between">
+          <span class="text-muted-foreground">Tổng số lượng</span>
+          <span class="font-medium">
+            {{ totalQuantity }}
+          </span>
         </div>
 
         <z-divider></z-divider>
 
-        <div class="summary-row total-row">
+        <div class="flex justify-between text-base font-semibold">
           <span>Tổng tiền</span>
-          <span class="grand-total">
+          <span class="text-primary text-lg">
             {{ totalAmount | number:'1.0-0' }}đ
           </span>
         </div>
@@ -222,4 +349,5 @@
     </z-card>
 
   </div>
+
 </div>

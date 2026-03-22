@@ -45,6 +45,17 @@ export class PurchaseOrderCreateComponent implements OnInit {
   supplierOptions: ZardComboboxOption[] = [];
   selectedSupplier?: Supplier;
 
+  /* ================= CREATE SUPPLIER ================= */
+  isCreatingSupplier = false;
+
+  newSupplier: Partial<Supplier> = {
+    supplierName: '',
+    code: '',
+    phoneNumber: '',
+    email: '',
+    website: '',
+    taxCode: ''
+  };
   /* ================= PRODUCT ================= */
   products: Product[] = [];
   productOptions: ZardComboboxOption[] = [];
@@ -100,11 +111,35 @@ export class PurchaseOrderCreateComponent implements OnInit {
     });
   }
 
+  private resetNewSupplier(): void {
+  this.newSupplier = {
+    supplierName: '',
+    code: '',
+    phoneNumber: '',
+    email: '',
+    website: '',
+    taxCode: ''
+  };
+}
+
+  toggleCreateSupplier(): void {
+  this.isCreatingSupplier = !this.isCreatingSupplier;
+
+  if (this.isCreatingSupplier) {
+    this.selectedSupplier = undefined;
+  } else {
+    this.resetNewSupplier();
+  }
+}
   /* ================= SELECT ================= */
 
-  onSupplierSelected(option: ZardComboboxOption): void {
-    this.selectedSupplier = this.suppliers.find(s => s.id === option.value);
+onSupplierSelected(option: ZardComboboxOption): void {
+  const supplier = this.suppliers.find(s => s.id === option.value);
+  if (supplier) {
+    this.selectedSupplier = supplier;
+    this.isCreatingSupplier = false;
   }
+}
 
   onProductSelected(option: ZardComboboxOption): void {
 
@@ -166,66 +201,110 @@ export class PurchaseOrderCreateComponent implements OnInit {
 
   createOrder(): void {
 
-    if (!this.selectedSupplier) {
-      toast.error('Vui lòng chọn nhà cung cấp');
-      return;
-    }
-
-    if (this.items.length === 0) {
-      toast.error('Vui lòng thêm sản phẩm');
-      return;
-    }
-
-    this.isLoading = true;
-
-    // STEP 1: CREATE PURCHASE ORDER
-    this.inventoryService.createPurchaseOrder({
-      supplierId: this.selectedSupplier.id,
-      note: this.note
-    })
-    .subscribe({
-      next: (poId: string) => {
-
-        // STEP 2: ADD ITEMS
-        const requests = this.items.map(item =>
-          this.inventoryService.addItemToPurchaseOrder(poId, {
-            productId: item.productId,
-            quantity: item.quantity,
-            importPrice: item.importPrice
-          })
-        );
-
-        forkJoin(requests)
-          .pipe(finalize(() => this.isLoading = false))
-          .subscribe({
-            next: () => {
-
-              // STEP 3: CONFIRM
-              this.inventoryService.confirmPurchaseOrder(poId)
-                .subscribe({
-                  next: () => {
-                    toast.success('Tạo & nhập kho thành công');
-                    this.goBack();
-                  },
-                  error: () => {
-                    toast.error('Confirm thất bại');
-                  }
-                });
-
-            },
-            error: () => {
-              toast.error('Thêm sản phẩm thất bại');
-            }
-          });
-
-      },
-      error: () => {
-        this.isLoading = false;
-        toast.error('Tạo phiếu nhập thất bại');
-      }
-    });
+  // ❌ chưa chọn gì
+  if (!this.selectedSupplier && !this.isCreatingSupplier) {
+    toast.error('Vui lòng chọn hoặc tạo nhà cung cấp');
+    return;
   }
 
+  if (this.items.length === 0) {
+    toast.error('Vui lòng thêm sản phẩm');
+    return;
+  }
+
+  this.isLoading = true;
+
+  // ================= CASE 1: CREATE NEW SUPPLIER =================
+  if (this.isCreatingSupplier) {
+
+    // validate
+    if (!this.newSupplier.supplierName ||
+        !this.newSupplier.code ||
+        !this.newSupplier.phoneNumber) {
+
+      toast.error('Vui lòng nhập đầy đủ thông tin bắt buộc');
+      this.isLoading = false;
+      return;
+    }
+
+    this.supplierService.addSupplier(this.newSupplier)
+      .subscribe({
+        next: (supplier) => {
+
+          // 👉 set selected
+          this.selectedSupplier = supplier;
+
+          // 👉 add vào list (UX tốt)
+          this.suppliers.push(supplier);
+          this.supplierOptions.push({
+            value: supplier.id,
+            label: `${supplier.supplierName} — ${supplier.phoneNumber}`
+          });
+
+          // 👉 reset form
+          this.isCreatingSupplier = false;
+          this.resetNewSupplier();
+
+          // 👉 tiếp tục tạo order
+          this.createPurchaseOrderFlow();
+        },
+        error: () => {
+          this.isLoading = false;
+          toast.error('Tạo nhà cung cấp thất bại');
+        }
+      });
+
+  } else {
+    // ================= CASE 2: USE EXISTING =================
+    this.createPurchaseOrderFlow();
+  }
+}
+private createPurchaseOrderFlow(): void {
+
+  this.inventoryService.createPurchaseOrder({
+    supplierId: this.selectedSupplier!.id,
+    note: this.note
+  })
+  .subscribe({
+    next: (poId: string) => {
+
+      const requests = this.items.map(item =>
+        this.inventoryService.addItemToPurchaseOrder(poId, {
+          productId: item.productId,
+          quantity: item.quantity,
+          importPrice: item.importPrice
+        })
+      );
+
+      forkJoin(requests)
+        .pipe(finalize(() => this.isLoading = false))
+        .subscribe({
+          next: () => {
+
+            this.inventoryService.confirmPurchaseOrder(poId)
+              .subscribe({
+                next: () => {
+                  toast.success('Tạo & nhập kho thành công');
+                  this.goBack();
+                },
+                error: () => {
+                  toast.error('Confirm thất bại');
+                }
+              });
+
+          },
+          error: () => {
+            toast.error('Thêm sản phẩm thất bại');
+          }
+        });
+
+    },
+    error: () => {
+      this.isLoading = false;
+      toast.error('Tạo phiếu nhập thất bại');
+    }
+  });
+}
   /* ================= NAV ================= */
 
   goBack(): void {

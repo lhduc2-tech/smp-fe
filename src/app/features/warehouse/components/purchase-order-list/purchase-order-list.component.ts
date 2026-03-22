@@ -13,6 +13,7 @@ import {
 } from '../../models/inventory-flow.model';
 
 import { toast } from 'ngx-sonner';
+import { AuthService } from '@/features/auth/services/auth.service';
 
 @Component({
   selector: 'app-purchase-order-list',
@@ -47,6 +48,7 @@ export class PurchaseOrderListComponent implements OnInit {
 
   constructor(
     private service: InventoryFlowService,
+    private authService: AuthService,
     private cd: ChangeDetectorRef
   ) {}
 
@@ -55,43 +57,46 @@ export class PurchaseOrderListComponent implements OnInit {
   }
 
   // ================= LOAD DATA =================
-  loadData(): void {
-    this.isLoading = true;
+loadData(): void {
+  this.isLoading = true;
 
-    const request: SearchPurchaseOrderRequest = {
-      page: this.currentPage,
-      size: this.pageSize,
-      sortBy: 'createdAt',
-      sortDir: 'desc',
-      status: this.statusFilter || undefined
-    };
+  const request: SearchPurchaseOrderRequest = {
+    page: this.currentPage,
+    size: this.pageSize,
+    sortBy: 'createdAt',
+    sortDir: 'desc',
+    status: this.statusFilter || undefined,
 
-    this.service.searchPurchaseOrders(request)
-      .pipe(retry({ count: 3, delay: 1000 }))
-      .subscribe({
-        next: res => {
+    // 🔥 QUAN TRỌNG: thêm shopId
+    shopId: this.authService.shopId || undefined
+  };
 
-          // filter FE theo note nếu có searchTerm
-          this.purchaseOrders = this.searchTerm
-            ? res.content.filter(po =>
-                (po.note || '').toLowerCase().includes(this.searchTerm.toLowerCase())
-              )
-            : res.content;
+  this.service.searchPurchaseOrders(request)
+    .pipe(retry({ count: 3, delay: 1000 }))
+    .subscribe({
+      next: res => {
 
-          this.totalElements = res.total;
-          this.totalPages = res.totalPages;
+        // filter FE theo note nếu có searchTerm
+        this.purchaseOrders = this.searchTerm
+          ? res.content.filter(po =>
+              (po.note || '').toLowerCase().includes(this.searchTerm.toLowerCase())
+            )
+          : res.content;
 
-          this.updateDisplayPages();
+        this.totalElements = res.total;
+        this.totalPages = res.totalPages;
 
-          this.isLoading = false;
-          this.cd.detectChanges();
-        },
-        error: () => {
-          this.isLoading = false;
-          toast.error('Không thể tải danh sách phiếu nhập');
-        }
-      });
-  }
+        this.updateDisplayPages();
+
+        this.isLoading = false;
+        this.cd.detectChanges();
+      },
+      error: () => {
+        this.isLoading = false;
+        toast.error('Không thể tải danh sách phiếu nhập');
+      }
+    });
+}
 
   // ================= SEARCH =================
   onSearch(): void {
