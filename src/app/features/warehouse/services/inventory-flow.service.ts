@@ -50,6 +50,7 @@ export class InventoryFlowService {
       sortDir: request?.sortDir ?? 'desc',
 
       supplierId: request?.supplierId,
+      supplierName: request?.supplierName,
       status: request?.status,
 
       shopId: this.authService.shopId ?? undefined

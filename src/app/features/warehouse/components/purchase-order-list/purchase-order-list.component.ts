@@ -33,7 +33,6 @@ export class PurchaseOrderListComponent implements OnInit {
   purchaseOrders: PurchaseOrder[] = [];
 
   searchTerm = '';
-  statusFilter = '';
 
   isLoading = false;
 
@@ -65,7 +64,7 @@ loadData(): void {
     size: this.pageSize,
     sortBy: 'createdAt',
     sortDir: 'desc',
-    status: this.statusFilter || undefined,
+    supplierName: this.searchTerm || undefined,
 
     // 🔥 QUAN TRỌNG: thêm shopId
     shopId: this.authService.shopId || undefined
@@ -75,13 +74,7 @@ loadData(): void {
     .pipe(retry({ count: 3, delay: 1000 }))
     .subscribe({
       next: res => {
-
-        // filter FE theo note nếu có searchTerm
-        this.purchaseOrders = this.searchTerm
-          ? res.content.filter(po =>
-              (po.note || '').toLowerCase().includes(this.searchTerm.toLowerCase())
-            )
-          : res.content;
+        this.purchaseOrders = res.content;
 
         this.totalElements = res.total;
         this.totalPages = res.totalPages;

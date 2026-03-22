@@ -110,7 +110,7 @@ interface MenuItem {
     }
 
     :host ::ng-deep .sidebar-wrapper .flex-1.overflow-auto {
-      overflow-x: hidden !important;
+      overflow: hidden !important;
     }
 
     /* Logo */
@@ -156,8 +156,7 @@ interface MenuItem {
     .sidebar-nav {
       flex: 1;
       padding: 0 12px;
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
     .section-divider {
