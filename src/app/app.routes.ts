@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 
 // Layout & pages
 import { AdminLayoutComponent } from './shared/layout/admin-layout.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
 
 // Guards
 import { authGuard } from './core/guards/auth.guard';
