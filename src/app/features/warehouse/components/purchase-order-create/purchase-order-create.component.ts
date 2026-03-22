@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
-
+import { ChangeDetectorRef } from '@angular/core';
 import { InventoryFlowService } from '../../services/inventory-flow.service';
 
 import { ProductService } from '../../../product/services/product.service';
@@ -39,7 +39,8 @@ export class PurchaseOrderCreateComponent implements OnInit {
 
   /* ================= STATE ================= */
   isLoading = false;
-
+  isViewMode = false;
+  orderId?: string;
   /* ================= SUPPLIER ================= */
   suppliers: Supplier[] = [];
   supplierOptions: ZardComboboxOption[] = [];
@@ -82,15 +83,68 @@ export class PurchaseOrderCreateComponent implements OnInit {
     private router: Router,
     private inventoryService: InventoryFlowService,
     private productService: ProductService,
-    private supplierService: SupplierService
+    private supplierService: SupplierService,
+    private cd: ChangeDetectorRef
   ) {}
 
   /* ================= INIT ================= */
+
   ngOnInit(): void {
+    this.resolveMode();
     this.loadSuppliers();
     this.loadProducts();
+
+    if (this.isViewMode) {
+      this.loadOrderDetail();
+    }
   }
 
+  private resolveMode(): void {
+    const url = this.router.url;
+
+    if (url.includes('/view/')) {
+      this.isViewMode = true;
+      this.orderId = this.router.url.split('/').pop();
+    }
+  }
+  /* =======Load view ===========*/
+
+  loadOrderDetail(): void {
+  if (!this.orderId) return;
+
+  this.isLoading = true;
+
+  this.inventoryService.getPurchaseOrderById(this.orderId)
+    .subscribe({
+      next: (po) => {
+        console.log('PO DETAIL:', po); 
+        // supplier
+        this.selectedSupplier = {
+          id: po.supplierId,
+          supplierName: po.supplierName
+        } as any;
+
+        // items
+        this.items = po.items.map(i => ({
+          productId: i.productId,
+          productName: i.product_name || '',
+          quantity: i.quantity,
+          importPrice: i.importPrice
+        }));
+
+        // note
+        this.note = po.note || '';
+        this.cd.detectChanges();
+      },
+      error: () => {
+        toast.error('Không tải được chi tiết phiếu nhập');
+        this.goBack();
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
+}
   /* ================= LOAD ================= */
 
   loadSuppliers(): void {

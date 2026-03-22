@@ -2,7 +2,7 @@
 <div class="flex items-center justify-between mb-6">
   <div>
     <h1 class="text-2xl font-bold tracking-tight">
-      Tạo phiếu nhập hàng
+    {{ isViewMode ? 'Chi tiết phiếu nhập' : 'Tạo phiếu nhập hàng' }}
     </h1>
     <p class="text-sm text-muted-foreground">
       Tạo và quản lý phiếu nhập từ nhà cung cấp
@@ -17,6 +17,7 @@
     <button
       z-button
       zType="default"
+      *ngIf="!isViewMode"
       (click)="createOrder()"
       [zLoading]="isLoading"
     >
@@ -45,6 +46,7 @@
     <button
       z-button
       zType="outline"
+      *ngIf="!isViewMode"
       (click)="toggleCreateSupplier()"
     >
       <z-icon zType="plus" />
@@ -60,6 +62,7 @@
       <z-form-control>
         <z-combobox
           [options]="supplierOptions"
+          *ngIf="!isViewMode"
           placeholder="Tìm nhà cung cấp..."
           searchPlaceholder="Tên / SĐT / mã"
           (zComboSelected)="onSupplierSelected($event)"
@@ -193,6 +196,7 @@
       <button
         z-button
         zType="outline"
+        *ngIf="!isViewMode"
         (click)="toggleCreateProduct()"
       >
         + Tạo mới
@@ -256,6 +260,7 @@
       <button
         z-button
         zType="default"
+        *ngIf="!isViewMode"
         (click)="createProductInline()"
       >
         Lưu & thêm
@@ -299,6 +304,7 @@
                 z-button
                 zType="outline"
                 zSize="sm"
+                *ngIf="!isViewMode"
                 (click)="decreaseQty(item)">
                 −
               </button>
@@ -315,6 +321,7 @@
                 z-button
                 zType="outline"
                 zSize="sm"
+                *ngIf="!isViewMode"
                 (click)="increaseQty(item)">
                 +
               </button>
@@ -327,6 +334,7 @@
             <input
               type="number"
               class="w-full text-right border rounded-md px-2 py-1"
+              [disabled]="isViewMode"
               [value]="item.importPrice"
               (change)="updatePrice(item, $event)"
             />
@@ -343,6 +351,7 @@
               z-button
               zType="ghost"
               zSize="sm"
+              *ngIf="!isViewMode"
               (click)="removeItem(i)">
               ✕
             </button>

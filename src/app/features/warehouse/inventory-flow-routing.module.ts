@@ -19,7 +19,7 @@ const routes: Routes = [
         component: PurchaseOrderCreateComponent
       },
       {
-        path: ':id',
+        path: 'view/:id',
         component: PurchaseOrderCreateComponent
       }
     ]
