@@ -60,6 +60,14 @@ export class PurchaseOrderCreateComponent implements OnInit {
   products: Product[] = [];
   productOptions: ZardComboboxOption[] = [];
 
+  /* ================= CREATE PRODUCT ================= */
+  isCreatingProduct = false;
+
+  newProduct: Partial<Product> = {
+    name: '',
+    code: '',
+    price: 0
+  };
   /* ================= FORM DATA ================= */
   items: {
     productId: string;
@@ -131,6 +139,24 @@ export class PurchaseOrderCreateComponent implements OnInit {
     this.resetNewSupplier();
   }
 }
+
+toggleCreateProduct(): void {
+  this.isCreatingProduct = !this.isCreatingProduct;
+
+  if (this.isCreatingProduct) {
+    // clear combobox select
+  } else {
+    this.resetNewProduct();
+  }
+}
+
+private resetNewProduct(): void {
+  this.newProduct = {
+    name: '',
+    code: '',
+    price: 0
+  };
+}
   /* ================= SELECT ================= */
 
 onSupplierSelected(option: ZardComboboxOption): void {
@@ -141,25 +167,73 @@ onSupplierSelected(option: ZardComboboxOption): void {
   }
 }
 
-  onProductSelected(option: ZardComboboxOption): void {
+onProductSelected(option: ZardComboboxOption): void {
+  const product = this.products.find(p => p.id === option.value);
+  if (!product) return;
 
-    const product = this.products.find(p => p.id === option.value);
-    if (!product) return;
+  this.addProductToOrder(product);
+}
+  createProductInline(): void {
 
-    const existing = this.items.find(i => i.productId === product.id);
-
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      this.items.push({
-        productId: product.id,
-        productName: product.name,
-        quantity: 1,
-        importPrice: product.price || 0
-      });
-    }
+  if (!this.newProduct.name || !this.newProduct.code) {
+    toast.error('Vui lòng nhập đầy đủ thông tin sản phẩm');
+    return;
   }
 
+  this.productService.addProduct(this.newProduct)
+    .subscribe({
+      next: (product) => {
+
+        // 1. Add vào list product
+        this.products.push(product);
+
+        // 2. Add vào combobox
+        this.productOptions.unshift({
+          value: product.id,
+          label: `${product.name} — ${product.code}`
+        });
+
+        // 3. AUTO ADD vào bảng items (QUAN TRỌNG)
+        this.items.push({
+          productId: product.id,
+          productName: product.name,
+          quantity: 1,
+          importPrice: product.price || 0
+        });
+
+        // 4. Reset form
+        this.newProduct = {
+          name: '',
+          code: '',
+          price: 0
+        };
+
+        // 5. Đóng form create (UX chuẩn)
+        this.isCreatingProduct = false;
+
+        toast.success('Tạo & thêm sản phẩm thành công');
+      },
+      error: () => {
+        toast.error('Tạo sản phẩm thất bại');
+      }
+    });
+}
+
+private addProductToOrder(product: Product): void {
+
+  const existing = this.items.find(i => i.productId === product.id);
+
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    this.items.push({
+      productId: product.id,
+      productName: product.name,
+      quantity: 1,
+      importPrice: product.price || 0
+    });
+  }
+}
   /* ================= ITEM ACTION ================= */
 
   increaseQty(item: any): void {
@@ -214,6 +288,7 @@ onSupplierSelected(option: ZardComboboxOption): void {
 
   this.isLoading = true;
 
+  
   // ================= CASE 1: CREATE NEW SUPPLIER =================
   if (this.isCreatingSupplier) {
 
