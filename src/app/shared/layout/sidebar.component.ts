@@ -323,11 +323,6 @@ export class SidebarComponent {
         label: 'Khách hàng',
         icon: 'users',
         route: '/customers'
-      },
-      {
-        label: 'Báo cáo',
-        icon: 'bar-chart-3',
-        route: '/reports'
       }
     ]
   },
@@ -340,8 +335,7 @@ export class SidebarComponent {
           expanded: false,
           children: [
             { label: 'Nhân viên', route: '/settings/staff' },
-            { label: 'Nhóm quyền', route: '/settings/permission' },
-            { label: 'Nhóm vai trò', route: '/settings/role' },
+            { label: 'Nhóm vai trò', route: '/settings/role' }
           ]
         }
       ]
