@@ -63,6 +63,7 @@ export interface SearchPurchaseOrderRequest {
   sortDir?: 'asc' | 'desc';
 
   supplierId?: string;
+  supplierName?: string;
   status?: string;
 
   shopId?: string; // ✅ thêm

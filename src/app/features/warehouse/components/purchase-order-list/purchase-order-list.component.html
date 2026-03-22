@@ -13,24 +13,15 @@
     <div class="flex items-center justify-between">
 
       <!-- Search -->
-      <div class="flex items-center gap-3 w-full max-w-xl">
+      <div class="flex items-center gap-3 w-full max-w-sm">
 
         <input
           type="text"
           class="flex-1 h-10 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
-          placeholder="Tìm theo ghi chú..."
+          placeholder="Tìm theo tên nhà cung cấp..."
           [(ngModel)]="searchTerm"
           (keyup.enter)="onSearch()"
         />
-
-        <select
-          [(ngModel)]="statusFilter"
-          class="h-10 border rounded-lg px-3"
-        >
-          <option value="">Tất cả</option>
-          <option value="DRAFT">Nháp</option>
-          <option value="CONFIRMED">Đã nhập</option>
-        </select>
 
         <button z-button zType="default" class="h-10" (click)="onSearch()">
           <z-icon zType="search" />
