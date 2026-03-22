@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SHARED_UI_IMPORTS } from '../../shared/components/ui';
 import type { ZardIcon } from '../../shared/components/ui/icon/icons';
+import { AuthService } from '../../features/auth/services/auth.service';
 
 interface MenuItem {
   label: string;
@@ -10,6 +11,8 @@ interface MenuItem {
   route?: string;
   children?: MenuItem[];
   expanded?: boolean;
+  roles?: string[];
+  permissions?: string[];
 }
 
 @Component({
@@ -25,7 +28,7 @@ interface MenuItem {
       class="sidebar-wrapper"
       [class.collapsed]="!sidebarOpen"
     >
-      <!-- Logo Section -->
+      <!-- Logo -->
       <div class="sidebar-header">
         <div class="logo">
           <div class="logo-icon">N</div>
@@ -33,42 +36,43 @@ interface MenuItem {
         </div>
       </div>
 
-      <!-- Menu Sections -->
+      <!-- Menu -->
       <nav class="sidebar-nav">
-        <ng-container *ngFor="let section of menuSections; let last = last">
+        <ng-container *ngFor="let section of filteredSections; let last = last">
           <z-sidebar-group>
+
             <z-sidebar-group-label *ngIf="sidebarOpen">
               {{ section.title }}
             </z-sidebar-group-label>
 
             <ng-container *ngFor="let item of section.items">
-              <!-- Regular Link -->
+
+              <!-- Item thường -->
               <a
                 *ngIf="!item.children || item.children.length === 0"
                 [routerLink]="item.route"
                 routerLinkActive="active"
                 class="menu-link"
                 [title]="item.label">
-                <z-icon *ngIf="item.icon" [zType]="item.icon" zSize="default" class="menu-icon" />
-                <span class="label" *ngIf="sidebarOpen">{{ item.label }}</span>
+                <z-icon *ngIf="item.icon" [zType]="item.icon" class="menu-icon" />
+                <span *ngIf="sidebarOpen">{{ item.label }}</span>
               </a>
 
-              <!-- Parent Item with Submenu -->
-              <div *ngIf="item.children && item.children.length > 0" class="menu-group">
+              <!-- Item có submenu -->
+              <div *ngIf="item.children?.length" class="menu-group">
                 <button
                   class="menu-link parent-link"
                   (click)="toggleSubmenu(item)"
-                  [class.expanded]="item.expanded"
-                  [title]="item.label">
-                  <z-icon *ngIf="item.icon" [zType]="item.icon" zSize="default" class="menu-icon" />
-                  <span class="label" *ngIf="sidebarOpen">{{ item.label }}</span>
+                  [class.expanded]="item.expanded">
+
+                  <z-icon *ngIf="item.icon" [zType]="item.icon" class="menu-icon" />
+                  <span *ngIf="sidebarOpen">{{ item.label }}</span>
+
                   <z-icon
                     *ngIf="sidebarOpen"
                     zType="chevron-down"
-                    zSize="default"
                     class="chevron"
-                    [class.rotated]="item.expanded"
-                  />
+                    [class.rotated]="item.expanded" />
                 </button>
 
                 <div class="submenu" *ngIf="item.expanded && sidebarOpen">
@@ -81,6 +85,7 @@ interface MenuItem {
                   </a>
                 </div>
               </div>
+
             </ng-container>
           </z-sidebar-group>
 
@@ -273,79 +278,139 @@ interface MenuItem {
     }
   `]
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
+
   @Input() sidebarOpen = true;
 
-  menuSections: { title: string; items: MenuItem[] }[] = [
+  constructor(private auth: AuthService) {}
+
+  // 🔥 MENU GỐC
+  menuSections = [
     {
       title: 'Quản lý chính',
       items: [
         {
           label: 'Tổng quan',
-          icon: 'layout-dashboard',
-          route: '/dashboard'
+          icon: 'layout-dashboard' as ZardIcon,
+          route: '/dashboard',
+          roles: ['ADMIN', 'STAFF']
         },
         {
           label: 'Đơn hàng',
-          icon: 'clipboard',
-          route: '/orders'
+          icon: 'clipboard' as ZardIcon,
+          route: '/orders',
+          permissions: ['order:read']
         },
         {
           label: 'Sản phẩm',
-          icon: 'shopping-cart',
-          route: '/products'
+          icon: 'shopping-cart' as ZardIcon,
+          route: '/products',
+          permissions: ['product:read']
         },
         {
           label: 'Danh mục',
-          icon: 'tag',
-          route: '/categories'
+          icon: 'tag' as ZardIcon,
+          route: '/categories',
+          permissions: ['category:read']
         },
         {
           label: 'Nhà cung cấp',
-          icon: 'tag',
-          route: '/supplier'
-        },
+          icon: 'tag' as ZardIcon,
+          route: '/supplier',
+          permissions: ['supplier:read']
+        }
       ]
     },
     {
-    title: 'Vận hành',
-    items: [
-      {
-        label: 'Phiếu nhập',
-        icon: 'package',
-        route: '/inventory/purchase-orders'
-      },
-      {
-        label: 'Lịch sử kho',
-        icon: 'layers',
-        route: '/inventory/stock-movements'
-      },
-      {
-        label: 'Khách hàng',
-        icon: 'users',
-        route: '/customers'
-      }
-    ]
-  },
+      title: 'Vận hành',
+      items: [
+        {
+          label: 'Phiếu nhập',
+          icon: 'package' as ZardIcon,
+          route: '/inventory/purchase-orders',
+          permissions: ['purchase_order:read']
+        },
+        {
+          label: 'Lịch sử kho',
+          icon: 'layers' as ZardIcon,
+          route: '/inventory/stock-movements',
+          permissions: ['inventory:read']
+        },
+        {
+          label: 'Khách hàng',
+          icon: 'users' as ZardIcon,
+          route: '/customers',
+          permissions: ['customer:read']
+        }
+      ]
+    },
     {
       title: 'Hệ thống',
       items: [
         {
           label: 'Cấu hình',
-          icon: 'settings',
-          expanded: false,
+          icon: 'settings' as ZardIcon,
+          roles: ['ADMIN'],
           children: [
-            { label: 'Nhân viên', route: '/settings/staff' },
-            { label: 'Nhóm vai trò', route: '/settings/role' }
+            {
+              label: 'Nhân viên',
+              route: '/settings/staff',
+              permissions: ['staff:read']
+            },
+            {
+              label: 'Nhóm vai trò',
+              route: '/settings/role',
+              permissions: ['role:read']
+            }
           ]
         }
       ]
     }
   ];
 
-  toggleSubmenu(item: MenuItem) {
-    if (item.children && item.children.length > 0) {
-      item.expanded = !item.expanded;
-    }
+  // ✅ MENU SAU KHI FILTER
+  filteredSections: any[] = [];
+
+  ngOnInit(): void {
+    this.filteredSections = this.menuSections
+      .map(section => ({
+        ...section,
+        items: section.items
+          .map(item => this.filterItem(item))
+          .filter((item): item is MenuItem => item !== null)
+      }))
+      .filter(section => section.items.length > 0);
   }
+
+  // 🔥 CORE LOGIC
+  private filterItem(item: MenuItem): MenuItem | null {
+
+    // check role
+    if (item.roles && !item.roles.some(r => this.auth.hasRole(r))) {
+      return null;
+    }
+
+    // check permission
+    if (item.permissions && !item.permissions.every(p => this.auth.hasPermission(p))) {
+      return null;
+    }
+
+    // filter children
+    if (item.children) {
+      const children = item.children
+        .map(child => this.filterItem(child))
+        .filter(Boolean) as MenuItem[];
+
+      if (children.length === 0) return null;
+
+      return { ...item, children };
+    }
+
+    return item;
+  }
+
+  toggleSubmenu(item: MenuItem) {
+    item.expanded = !item.expanded;
+  }
+  
 }

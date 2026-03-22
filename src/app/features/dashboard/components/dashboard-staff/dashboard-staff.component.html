@@ -1,0 +1,126 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 border-l-4 border-emerald-500 pl-4">Staff Dashboard</h1>
+    <p class="text-gray-500 mt-2 pl-4">Your daily overview of orders and inventory alerts.</p>
+  </div>
+
+  <!-- ORDER SUMMARY STRIP -->
+  <div class="mb-10">
+    <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+      <lucide-angular [img]="ShoppingBag" class="w-6 h-6 mr-2 text-emerald-600"></lucide-angular>
+      Today's Orders Summary
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Total Orders -->
+      <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-md">
+        <div class="absolute top-0 right-0 p-4 opacity-10">
+          <lucide-angular [img]="ShoppingBag" class="w-16 h-16 text-emerald-500"></lucide-angular>
+        </div>
+        <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-4 text-emerald-600">
+          <lucide-angular [img]="ShoppingBag" class="w-6 h-6"></lucide-angular>
+        </div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Total Orders</h3>
+        <p class="text-3xl font-bold text-gray-900">{{ dashboardData.orderSummary.totalOrdersToday }}</p>
+      </div>
+
+      <!-- Pending Orders -->
+      <div class="bg-white rounded-2xl shadow-sm border border-yellow-100 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-md">
+        <div class="absolute top-0 right-0 p-4 opacity-10">
+          <lucide-angular [img]="Clock" class="w-16 h-16 text-yellow-500"></lucide-angular>
+        </div>
+        <div class="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mb-4 text-yellow-600">
+          <lucide-angular [img]="Clock" class="w-6 h-6"></lucide-angular>
+        </div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Pending</h3>
+        <p class="text-3xl font-bold text-yellow-600">{{ dashboardData.orderSummary.pending }}</p>
+      </div>
+
+      <!-- Confirmed Orders -->
+      <div class="bg-white rounded-2xl shadow-sm border border-blue-100 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-md">
+        <div class="absolute top-0 right-0 p-4 opacity-10">
+          <lucide-angular [img]="CheckCircle" class="w-16 h-16 text-blue-500"></lucide-angular>
+        </div>
+        <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 text-blue-600">
+          <lucide-angular [img]="CheckCircle" class="w-6 h-6"></lucide-angular>
+        </div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Confirmed</h3>
+        <p class="text-3xl font-bold text-blue-600">{{ dashboardData.orderSummary.confirmed }}</p>
+      </div>
+
+      <!-- Cancelled Orders -->
+      <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-md">
+        <div class="absolute top-0 right-0 p-4 opacity-10">
+          <lucide-angular [img]="XCircle" class="w-16 h-16 text-red-500"></lucide-angular>
+        </div>
+        <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 text-red-600">
+          <lucide-angular [img]="XCircle" class="w-6 h-6"></lucide-angular>
+        </div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Cancelled</h3>
+        <p class="text-3xl font-bold text-red-600">{{ dashboardData.orderSummary.cancelled }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- AVERAGE ORDER VALUE -->
+    <div class="lg:col-span-1">
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg text-white p-8 flex flex-col justify-center items-center relative overflow-hidden h-full min-h-[200px]">
+        <lucide-angular [img]="DollarSign" class="w-40 h-40 absolute -right-8 -bottom-8 text-white opacity-10 transform rotate-12"></lucide-angular>
+        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6 backdrop-blur-sm z-10 border border-white/30">
+          <lucide-angular [img]="DollarSign" class="w-8 h-8 text-white"></lucide-angular>
+        </div>
+        <h3 class="font-medium text-emerald-100 uppercase tracking-widest text-sm mb-3 z-10 text-center">Avg Order Value</h3>
+        <p class="text-4xl font-bold z-10 tracking-tight text-center">{{ dashboardData.orderSummary.averageOrderValue | currency:'VND' }}</p>
+      </div>
+    </div>
+
+    <!-- LOW STOCK PRODUCTS LIST -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden h-full flex flex-col">
+        <div class="px-6 py-5 border-b border-gray-100 bg-red-50/40 flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-red-800 flex items-center">
+            <lucide-angular [img]="AlertTriangle" class="w-5 h-5 mr-2 text-red-600"></lucide-angular>
+            Attention: Low Stock
+          </h3>
+          <span class="bg-red-100 text-red-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-red-200 shadow-sm flex items-center">
+            <lucide-angular [img]="Package" class="w-3 h-3 mr-1"></lucide-angular>
+            {{ dashboardData.lowStockProducts.length }} items need restock
+          </span>
+        </div>
+        
+        <div class="overflow-x-auto flex-grow">
+          <table class="w-full text-left text-sm text-gray-600 whitespace-nowrap">
+            <thead class="bg-gray-50 text-gray-500 text-xs font-semibold uppercase tracking-wider">
+              <tr>
+                <th scope="col" class="px-6 py-4">Code</th>
+                <th scope="col" class="px-6 py-4">Product Name</th>
+                <th scope="col" class="px-6 py-4 text-right">Selling Price</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr *ngFor="let product of dashboardData.lowStockProducts" class="hover:bg-red-50/50 transition-colors group">
+                <td class="px-6 py-4 font-mono text-gray-500">
+                  <span class="bg-gray-100 px-2 py-1 rounded text-xs">{{ product.code }}</span>
+                </td>
+                <td class="px-6 py-4 font-medium text-gray-900">{{ product.name }}</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-700">{{ product.price | currency:'VND' }}</td>
+              </tr>
+              <tr *ngIf="dashboardData.lowStockProducts.length === 0">
+                <td colspan="3" class="px-6 py-12 text-center text-gray-500">
+                  <div class="flex flex-col items-center justify-center">
+                    <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-3">
+                      <lucide-angular [img]="CheckCircle" class="w-6 h-6 text-green-500"></lucide-angular>
+                    </div>
+                    <p class="font-medium text-gray-800">All Good!</p>
+                    <p class="text-sm">There are no products running low on stock right now.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
