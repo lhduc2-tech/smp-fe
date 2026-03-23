@@ -25,42 +25,28 @@ export class CustomerService {
 
   /* ================= GET ALL (FOR DROPDOWN) ================= */
 
-  getAll(): Observable<Customer[]> {
-
-    const request: SearchCustomerRequest = {
-      page: 0,
-      size: 1000,
-      sortBy: 'createdAt',
-      sortDir: 'desc'
-    };
-
-    return this.apiService
-      .post<PageResponse<CustomerResponse>>(
-        `${this.API_ENDPOINT}/search`,
-        request
-      )
-      .pipe(
-        map(res => res.content?.map((i: any) => this.transformCustomer(i)) || [])
-      );
-  }
-
-  getCustomersByCurrentShop(): Observable<Customer[]> {
+getAll(): Observable<Customer[]> {
 
   const shopId = this.authService.shopId;
 
-  if (!shopId) {
-    return new Observable(observer => {
-      observer.next([]);
-      observer.complete();
-    });
-  }
+  const request: SearchCustomerRequest = {
+    page: 0,
+    size: 1000,
+    sortBy: 'createdAt',
+    sortDir: 'desc',
+    shopId: shopId || undefined   // 🔥 thêm dòng này
+  };
 
   return this.apiService
-    .get<CustomerResponse[]>(`${this.API_ENDPOINT}/by-shop/${shopId}`)
+    .post<PageResponse<CustomerResponse>>(
+      `${this.API_ENDPOINT}/search`,
+      request
+    )
     .pipe(
-      map(res => res.map(i => this.transformCustomer(i)))
+      map(res => res.content?.map(i => this.transformCustomer(i)) || [])
     );
 }
+
   /* ================= SEARCH ================= */
 
   getCustomerPage(
