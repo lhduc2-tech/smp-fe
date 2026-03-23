@@ -324,6 +324,12 @@ export class SidebarComponent implements OnInit {
       title: 'Vận hành',
       items: [
         {
+          label: 'Quản lý kho',
+          icon: 'archive' as ZardIcon,
+          route: '/inventory/warehouse',
+          permissions: ['warehouse:read']
+        },
+        {
           label: 'Phiếu nhập',
           icon: 'package' as ZardIcon,
           route: '/inventory/purchase-orders',

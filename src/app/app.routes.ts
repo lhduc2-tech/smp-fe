@@ -124,6 +124,15 @@ export const routes: Routes = [
     },
 
     {
+      path: 'inventory/warehouse',
+      canActivate: [permissionGuard],
+      data: { permissions: ['warehouse:read'] },
+      loadComponent: () =>
+        import('./features/warehouse-management/components/warehouse-management/warehouse-management.component')
+          .then(m => m.WarehouseManagementComponent)
+    },
+
+    {
       path: 'inventory',
       canActivate: [permissionGuard],
       data: { permissions: ['inventory:read'] },
