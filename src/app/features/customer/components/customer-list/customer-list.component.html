@@ -131,72 +131,87 @@
 
     <!-- ================= PAGINATION ================= -->
     <div *ngIf="!isLoading && totalPages > 0"
-         class="pt-6 flex items-center justify-between">
+     class="pt-6 flex items-center justify-between">
 
-      <!-- Page size -->
-      <div class="page-size-selector">
-        <label for="pageSize">Số bản ghi:</label>
-        <select id="pageSize"
-                [ngModel]="pageSize"
-                (ngModelChange)="onPageSizeChange($event)">
-          <option *ngFor="let opt of pageSizeOptions"
-                  [ngValue]="opt">
-            {{ opt }}
-          </option>
-        </select>
-      </div>
+  <!-- ================= PAGE SIZE ================= -->
+  <div class="page-size-selector flex items-center gap-2">
+    <label for="pageSize" class="text-sm text-muted-foreground">
+      Số bản ghi:
+    </label>
 
-      <!-- Pagination -->
-      <div class="pagination-nav" *ngIf="totalPages > 1">
+    <select id="pageSize"
+            class="h-9 border rounded-md px-2 text-sm"
+            [ngModel]="pageSize"
+            (ngModelChange)="onPageSizeChange($event)">
+      <option *ngFor="let opt of pageSizeOptions"
+              [ngValue]="opt">
+        {{ opt }}
+      </option>
+    </select>
+  </div>
 
-        <button class="page-btn"
-                [disabled]="currentPage === 0"
-                (click)="onPageChange(0)">
-          &laquo;
-        </button>
+  <!-- ================= PAGINATION ================= -->
+  <div class="pagination-nav flex items-center gap-1"
+       *ngIf="totalPages > 1">
 
-        <button class="page-btn"
-                [disabled]="currentPage === 0"
-                (click)="onPageChange(currentPage - 1)">
-          &lsaquo;
-        </button>
+    <!-- First -->
+    <button class="page-btn"
+            [disabled]="currentPage === 0"
+            (click)="onPageChange(0)"
+            title="Trang đầu">
+      &laquo;
+    </button>
 
-        <ng-container *ngFor="let page of displayPages">
+    <!-- Prev -->
+    <button class="page-btn"
+            [disabled]="currentPage === 0"
+            (click)="onPageChange(currentPage - 1)"
+            title="Trang trước">
+      &lsaquo;
+    </button>
 
-          <button *ngIf="page !== '...'; else ellipsisTpl"
-                  class="page-btn"
-                  [class.active]="currentPage === page"
-                  (click)="onPageChange(page)">
-            {{ getPageLabel(page) }}
-          </button>
+    <!-- Pages -->
+    <ng-container *ngFor="let page of displayPages">
 
-          <ng-template #ellipsisTpl>
-            <span class="page-ellipsis">...</span>
-          </ng-template>
+      <button *ngIf="page !== '...'; else ellipsisTpl"
+              class="page-btn"
+              [class.active]="currentPage === page"
+              (click)="onPageChange(page)">
+        {{ getPageLabel(page) }}
+      </button>
 
-        </ng-container>
+      <ng-template #ellipsisTpl>
+        <span class="page-ellipsis px-2 text-muted-foreground">
+          ...
+        </span>
+      </ng-template>
 
-        <button class="page-btn"
-                [disabled]="currentPage === totalPages - 1"
-                (click)="onPageChange(currentPage + 1)">
-          &rsaquo;
-        </button>
+    </ng-container>
 
-        <button class="page-btn"
-                [disabled]="currentPage === totalPages - 1"
-                (click)="onPageChange(totalPages - 1)">
-          &raquo;
-        </button>
+    <!-- Next -->
+    <button class="page-btn"
+            [disabled]="currentPage === totalPages - 1"
+            (click)="onPageChange(currentPage + 1)"
+            title="Trang sau">
+      &rsaquo;
+    </button>
 
-      </div>
-
-      <!-- Info -->
-      <div class="page-info">
-        Trang {{ currentPage + 1 }} / {{ totalPages }}
-      </div>
-
-    </div>
+    <!-- Last -->
+    <button class="page-btn"
+            [disabled]="currentPage === totalPages - 1"
+            (click)="onPageChange(totalPages - 1)"
+            title="Trang cuối">
+      &raquo;
+    </button>
 
   </div>
 
+  <!-- ================= INFO ================= -->
+  <div class="page-info text-sm text-muted-foreground">
+    Trang <span class="font-medium">{{ currentPage + 1 }}</span>
+    / {{ totalPages }}
+  </div>
+
+</div>
+</div>
 </z-card>

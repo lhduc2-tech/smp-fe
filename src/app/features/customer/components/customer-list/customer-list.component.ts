@@ -53,7 +53,7 @@ export class CustomerListComponent implements OnInit {
   loadCustomers(): void {
   this.isLoading = true;
 
-  this.customerService.getCustomersByCurrentShop()
+  this.customerService.getAll()
     .pipe(retry({ count: 3, delay: 1000 }))
     .subscribe({
       next: (data: Customer[]) => {
