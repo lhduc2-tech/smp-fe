@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
-import { AdminDashboard, MOCK_ADMIN_DASHBOARD } from '../../models/dashboard.model';
-import { LucideAngularModule, TrendingUp, TrendingDown, DollarSign, Package, ShoppingCart, AlertTriangle, Star, AlertCircle, TrendingUp as TrendingUpIcon } from 'lucide-angular';
+import { AdminDashboard } from '../../models/dashboard.model';
+import { LucideAngularModule, TrendingUp, TrendingDown, DollarSign, Package, ShoppingCart, AlertTriangle, Star, AlertCircle, TrendingUp as TrendingUpIcon, Loader2 } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -12,7 +13,9 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./dashboard-admin.component.css']
 })
 export class OwnerDashboardComponent implements OnInit {
-  dashboardData: AdminDashboard = MOCK_ADMIN_DASHBOARD;
+  dashboardData: AdminDashboard | null = null;
+  loading = true;
+  error: string | null = null;
   
   // Icons
   readonly TrendingUp = TrendingUp;
@@ -24,11 +27,40 @@ export class OwnerDashboardComponent implements OnInit {
   readonly Star = Star;
   readonly AlertCircle = AlertCircle;
   readonly TrendingUpIcon = TrendingUpIcon;
+  readonly Loader2 = Loader2;
 
-  constructor() {}
+  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    // In a real application, we would fetch data from a service here
-    this.dashboardData = MOCK_ADMIN_DASHBOARD;
+    this.loadDashboardData('all');
+  }
+
+  onPeriodChange(event: any): void {
+    const period = event.target.value;
+    this.loadDashboardData(period);
+  }
+
+  private loadDashboardData(period: string): void {
+    this.loading = true;
+    this.error = null;
+    this.dashboardService.getAdminDashboard(period).subscribe({
+      next: (data) => {
+        if (!data || Object.keys(data).length === 0) {
+           this.error = 'Dữ liệu trả về bị rỗng';
+           this.loading = false;
+           this.cdr.detectChanges();
+           return;
+        }
+        this.dashboardData = data;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load dashboard data', err);
+        this.error = 'Không thể tải dữ liệu bảng điều khiển';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

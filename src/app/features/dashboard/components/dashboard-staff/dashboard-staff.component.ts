@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { StaffDashboard, MOCK_STAFF_DASHBOARD } from '../../models/dashboard.model';
-import { LucideAngularModule, ShoppingBag, Clock, CheckCircle, XCircle, DollarSign, AlertTriangle, Package } from 'lucide-angular';
+import { StaffDashboard } from '../../models/dashboard.model';
+import { LucideAngularModule, ShoppingBag, Clock, CheckCircle, XCircle, DollarSign, AlertTriangle, Package, Loader2, AlertCircle } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard-staff',
@@ -12,7 +13,9 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./dashboard-staff.component.css']
 })
 export class StaffDashboardComponent implements OnInit {
-  dashboardData: StaffDashboard = MOCK_STAFF_DASHBOARD;
+  dashboardData: StaffDashboard | null = null;
+  loading = true;
+  error: string | null = null;
 
   // Icons
   readonly ShoppingBag = ShoppingBag;
@@ -22,11 +25,30 @@ export class StaffDashboardComponent implements OnInit {
   readonly DollarSign = DollarSign;
   readonly AlertTriangle = AlertTriangle;
   readonly Package = Package;
+  readonly Loader2 = Loader2;
+  readonly AlertCircle = AlertCircle;
 
-  constructor() {}
+  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    // In a real application, we would fetch real data
-    this.dashboardData = MOCK_STAFF_DASHBOARD;
+    this.dashboardService.getStaffDashboard().subscribe({
+      next: (data) => {
+        if (!data || Object.keys(data).length === 0) {
+           this.error = 'Dữ liệu trả về bị rỗng';
+           this.loading = false;
+           this.cdr.detectChanges();
+           return;
+        }
+        this.dashboardData = data;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load dashboard data', err);
+        this.error = 'Không thể tải dữ liệu bảng điều khiển';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

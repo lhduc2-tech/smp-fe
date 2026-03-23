@@ -31,7 +31,8 @@ export class CustomerService {
       page: 0,
       size: 1000,
       sortBy: 'createdAt',
-      sortDir: 'desc'
+      sortDir: 'desc',
+      shopId: this.authService.shopId || undefined
     };
 
     return this.apiService
@@ -71,8 +72,13 @@ export class CustomerService {
       page: 0,
       size: 10,
       sortBy: 'createdAt',
-      sortDir: 'desc'
+      sortDir: 'desc',
+      shopId: this.authService.shopId || undefined
     };
+    
+    if (request && !request.shopId) {
+      searchRequest.shopId = this.authService.shopId || undefined;
+    }
 
     return this.apiService
       .post<PageResponse<CustomerResponse>>(

@@ -70,7 +70,7 @@ export const routes: Routes = [
     {
       path: 'dashboard/staff',
       canActivate: [roleGuard],
-      data: { roles: ['STAFF'] },
+      data: { roles: ['STAFF', 'CASHIER', 'WAREHOUSE'] },
       loadComponent: () =>
         import('./features/dashboard/dashboard.module')
           .then(m => m.StaffDashboardComponent)

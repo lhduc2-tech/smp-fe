@@ -1,4 +1,4 @@
-<div class="p-6 bg-gray-50 min-h-screen">
+<div class="p-6 bg-gray-50 min-h-screen" *ngIf="dashboardData; else loadingOrError">
   <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-900 border-l-4 border-emerald-500 pl-4">Bảng Điều Khiển Nhân Viên</h1>
     <p class="text-gray-500 mt-2 pl-4">Tổng quan hàng ngày về đơn hàng và cảnh báo kho.</p>
@@ -124,3 +124,16 @@
     </div>
   </div>
 </div>
+
+<ng-template #loadingOrError>
+  <div class="p-6 bg-gray-50 min-h-screen flex flex-col items-center justify-center">
+    <div *ngIf="loading" class="flex flex-col items-center">
+      <lucide-angular [img]="Loader2" class="w-10 h-10 text-emerald-500 animate-spin mb-4"></lucide-angular>
+      <p class="text-gray-500">Đang tải dữ liệu...</p>
+    </div>
+    <div *ngIf="error" class="flex flex-col items-center">
+      <lucide-angular [img]="AlertCircle" class="w-12 h-12 text-red-500 mb-4"></lucide-angular>
+      <p class="text-red-600 font-medium">{{ error }}</p>
+    </div>
+  </div>
+</ng-template>

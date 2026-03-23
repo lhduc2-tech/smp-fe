@@ -13,10 +13,10 @@ export class RedirectComponent implements OnInit {
   ngOnInit(): void {
     if (this.auth.hasRole('ADMIN')) {
       this.router.navigate(['/dashboard/owner']);
-    } else if (this.auth.hasRole('STAFF')) {
+    } else if (this.auth.hasRole('STAFF') || this.auth.hasRole('CASHIER') || this.auth.hasRole('WAREHOUSE')) {
       this.router.navigate(['/dashboard/staff']);
     } else {
       this.router.navigate(['/403']);
     }
   }
-}
+}

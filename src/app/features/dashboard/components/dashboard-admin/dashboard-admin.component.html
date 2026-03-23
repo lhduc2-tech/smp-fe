@@ -1,7 +1,19 @@
-<div class="p-6 bg-gray-50 min-h-screen">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900 border-l-4 border-indigo-500 pl-4">Bảng Điều Khiển Quản Trị</h1>
-    <p class="text-gray-500 mt-2 pl-4">Tổng quan về doanh thu, tài chính và kho hàng.</p>
+<div class="p-6 bg-gray-50 min-h-screen" *ngIf="dashboardData; else loadingOrError">
+  <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 border-l-4 border-indigo-500 pl-4">Bảng Điều Khiển Quản Trị</h1>
+      <p class="text-gray-500 mt-2 pl-4">Tổng quan về doanh thu, tài chính và kho hàng.</p>
+    </div>
+    
+    <div>
+      <select class="p-2 border border-gray-300 rounded-lg text-sm bg-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500" (change)="onPeriodChange($event)">
+        <option value="today">Hôm nay</option>
+        <option value="week">Tuần này</option>
+        <option value="month">Tháng này</option>
+        <option value="year">Năm nay</option>
+        <option value="all" selected>Tất cả thời gian</option>
+      </select>
+    </div>
   </div>
 
   <!-- REVENUE & FINANCIAL GROUP -->
@@ -199,3 +211,16 @@
     </div>
   </div>
 </div>
+
+<ng-template #loadingOrError>
+  <div class="p-6 bg-gray-50 min-h-screen flex flex-col items-center justify-center">
+    <div *ngIf="loading" class="flex flex-col items-center">
+      <lucide-angular [img]="Loader2" class="w-10 h-10 text-indigo-500 animate-spin mb-4"></lucide-angular>
+      <p class="text-gray-500">Đang tải dữ liệu...</p>
+    </div>
+    <div *ngIf="error" class="flex flex-col items-center">
+      <lucide-angular [img]="AlertCircle" class="w-12 h-12 text-red-500 mb-4"></lucide-angular>
+      <p class="text-red-600 font-medium">{{ error }}</p>
+    </div>
+  </div>
+</ng-template>

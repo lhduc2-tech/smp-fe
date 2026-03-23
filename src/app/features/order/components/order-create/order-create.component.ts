@@ -372,12 +372,8 @@ export class OrderCreateComponent implements OnInit {
     return 0;
   }
 
-  get shippingFee(): number {
-    return this.orderItems.length > 0 ? 30000 : 0;
-  }
-
   get grandTotal(): number {
-    return this.subtotal - this.discount + this.shippingFee;
+    return this.subtotal - this.discount;
   }
 
   /* ================= VOUCHER ================= */

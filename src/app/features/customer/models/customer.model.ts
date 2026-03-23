@@ -40,6 +40,7 @@ export interface SearchCustomerRequest {
   fullName?: string;
   phoneNumber?: string;
   email?: string;
+  shopId?: string;
 }
 export interface PageResponse<T> {
   content: T[];
