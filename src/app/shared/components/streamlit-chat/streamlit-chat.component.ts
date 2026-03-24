@@ -117,7 +117,7 @@ export class StreamlitChatComponent {
     isOpen = signal(false);
 
     streamlitUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        'http://localhost:8501'
+        'https://tinytqa-sale-chatbot.hf.space'
     );
 
     toggleChat() {
