@@ -30,3 +30,11 @@ export interface InventoryItemDto {
   quantity: number;
   updated_at: string;
 }
+
+export interface SearchInventoryItemRequest {
+  page?: number;
+  size?: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
+  searchQuery?: string;
+}

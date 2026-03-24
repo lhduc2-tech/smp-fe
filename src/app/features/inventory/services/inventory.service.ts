@@ -7,7 +7,8 @@ import {
   Inventory,
   SearchInventoryRequest,
   PageResponse,
-  InventoryItemDto
+  InventoryItemDto,
+  SearchInventoryItemRequest
 } from '../models/inventory.model';
 
 import { ApiService } from '../../../core/services/api.service';
@@ -66,15 +67,19 @@ export class InventoryService {
    * Lấy tồn kho cho kho (shop) hiện tại
    */
   getInventoryForShop(
-    page: number = 0,
-    size: number = 10,
-    sortBy: string = 'updatedAt',
-    sortDir: string = 'desc'
+    request: SearchInventoryItemRequest
   ): Observable<PageResponse<InventoryItemDto>> {
-    const params = { page, size, sortBy, sortDir };
-    return this.apiService.get<any>(
+    const body = {
+      page: request.page ?? 0,
+      size: request.size ?? 10,
+      sortBy: request.sortBy || 'updatedAt',
+      sortDir: request.sortDir || 'desc',
+      searchQuery: request.searchQuery || ''
+    };
+
+    return this.apiService.post<any>(
       `${this.API_ENDPOINT}/shop`,
-      params
+      body
     ).pipe(
       map(res => this.transformInventoryShopResponse(res))
     );

@@ -54,12 +54,13 @@ export class WarehouseManagementComponent implements OnInit {
 
   loadData() {
     this.isLoading = true;
-    this.inventoryService.getInventoryForShop(
-      this.currentPage,
-      this.pageSize,
-      'updatedAt',
-      'desc'
-    ).subscribe({
+    this.inventoryService.getInventoryForShop({
+      page: this.currentPage,
+      size: this.pageSize,
+      sortBy: 'updatedAt',
+      sortDir: 'desc',
+      searchQuery: this.searchTerm
+    }).subscribe({
       next: (res) => {
         this.isLoading = false;
         
@@ -98,7 +99,8 @@ export class WarehouseManagementComponent implements OnInit {
   }
 
   onSearch() {
-    this.applyLocalFilters();
+    this.currentPage = 0;
+    this.loadData();
   }
 
   onStatusFilterChange(event: Event) {
@@ -110,15 +112,7 @@ export class WarehouseManagementComponent implements OnInit {
   applyLocalFilters() {
     let result = [...this.inventoryItems];
 
-    if (this.searchTerm && this.searchTerm.trim() !== '') {
-      const term = this.searchTerm.toLowerCase().trim();
-      result = result.filter(item => 
-        (item.productName || '').toLowerCase().includes(term) || 
-        (item.productCode || '').toLowerCase().includes(term) ||
-        (item.categoryName || '').toLowerCase().includes(term)
-      );
-    }
-
+    // Local filtering now only for Status (Search handled by BE)
     if (this.statusFilter !== 'ALL') {
       result = result.filter(item => item.status === this.statusFilter);
     }
