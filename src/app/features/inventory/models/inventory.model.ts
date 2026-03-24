@@ -21,3 +21,12 @@ export interface PageResponse<T> {
   total: number;
   totalPages: number;
 }
+
+export interface InventoryItemDto {
+  product_id: string;
+  product_code: string;
+  product_name: string;
+  category_name: string;
+  quantity: number;
+  updated_at: string;
+}

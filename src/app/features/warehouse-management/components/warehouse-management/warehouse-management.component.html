@@ -1,18 +1,226 @@
-<div class="page-container">
-  <div class="page-header">
+<div class="page-container p-6 space-y-6">
+  <!-- Header -->
+  <div class="page-header flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
     <div class="header-content">
-      <h1 class="page-title">Quản lý kho</h1>
-      <p class="page-description">Quản lý và theo dõi thông tin kho hàng</p>
+      <h1 class="text-2xl font-bold text-slate-800">Tồn kho hiện tại</h1>
+      <p class="text-slate-500 mt-1">Quản lý và theo dõi thông tin hàng hóa trong kho</p>
     </div>
   </div>
 
-  <z-card
-    zTitle="Tổng quan kho hàng"
-    zDescription="Danh sách kho và các thông số hoạt động"
-  >
-    <div class="empty-state">
-      <z-icon zType="archive" class="w-12 h-12 text-slate-400 mb-4"></z-icon>
-      <p class="text-slate-500">Giao diện quản lý đang được phát triển...</p>
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- Card 1 -->
+    <z-card class="rounded-xl shadow-sm border-0 bg-white">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+          <z-icon zType="package" class="w-6 h-6"></z-icon>
+        </div>
+        <div>
+          <p class="text-sm text-slate-500 font-medium">Tổng mã sản phẩm</p>
+          <p class="text-2xl font-bold text-slate-800">{{ totalProducts | number }}</p>
+        </div>
+      </div>
+    </z-card>
+    
+    <!-- Card 2 -->
+    <z-card class="rounded-xl shadow-sm border-0 bg-white">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <z-icon zType="layers" class="w-6 h-6"></z-icon>
+        </div>
+        <div>
+          <p class="text-sm text-slate-500 font-medium">Tổng lượng tồn</p>
+          <p class="text-2xl font-bold text-slate-800">{{ totalQuantity | number }}</p>
+        </div>
+      </div>
+    </z-card>
+
+    <!-- Card 3 -->
+    <z-card class="rounded-xl shadow-sm border-0 bg-white">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+          <z-icon zType="triangle-alert" class="w-6 h-6"></z-icon>
+        </div>
+        <div>
+          <p class="text-sm text-slate-500 font-medium">Sắp hết hàng</p>
+          <p class="text-2xl font-bold text-slate-800">{{ lowStockCount }}</p>
+        </div>
+      </div>
+    </z-card>
+
+    <!-- Card 4 -->
+    <z-card class="rounded-xl shadow-sm border-0 bg-white">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+          <z-icon zType="circle-x" class="w-6 h-6"></z-icon>
+        </div>
+        <div>
+          <p class="text-sm text-slate-500 font-medium">Đã hết hàng</p>
+          <p class="text-2xl font-bold text-slate-800">{{ outOfStockCount }}</p>
+        </div>
+      </div>
+    </z-card>
+  </div>
+
+  <!-- Main Content -->
+  <z-card class="rounded-2xl shadow-sm p-8 bg-white border-0">
+    <div class="space-y-6">
+      
+      <!-- Toolbar -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3 w-full max-w-lg">
+          <input
+            type="text"
+            class="flex-1 h-10 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+            placeholder="Tìm mã SP, tên SP, danh mục..."
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+          />
+          <select 
+            class="h-10 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            (change)="onStatusFilterChange($event)">
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="IN_STOCK">Còn hàng</option>
+            <option value="LOW_STOCK">Sắp hết hàng</option>
+            <option value="OUT_OF_STOCK">Hết hàng</option>
+          </select>
+          <button z-button zType="default" class="h-10 px-3 shrink-0" (click)="onSearch()">
+            <z-icon zType="search" class="w-4 h-4"></z-icon>
+          </button>
+        </div>
+
+        <button z-button style="background-color: #0f172a; color: white;" class="h-10 px-4 flex items-center gap-2 hover:bg-slate-800 transition shrink-0">
+          <z-icon zType="plus" class="w-4 h-4 text-white"></z-icon>
+          <span class="text-white">Kiểm kê / Nhập kho</span>
+        </button>
+      </div>
+
+      <!-- Table Section -->
+      <div *ngIf="false" class="p-4 bg-slate-100 text-xs rounded mb-4 overflow-auto max-h-40">
+        <p>Debug Array:</p>
+        <pre>{{ inventoryItems | json }}</pre>
+      </div>
+
+      <div class="overflow-x-auto border border-slate-200 rounded-xl">
+        <table class="w-full text-sm text-left whitespace-nowrap">
+          <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+            <tr>
+              <th class="px-6 py-4">Mã Sản phẩm</th>
+              <th class="px-6 py-4">Sản phẩm / Phân loại</th>
+              <th class="px-6 py-4">Số lượng tồn</th>
+              <th class="px-6 py-4">Trạng thái</th>
+              <th class="px-6 py-4">Cập nhật lần cuối</th>
+              <th class="px-6 py-4 text-center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <!-- Loading state -->
+            <tr *ngIf="isLoading">
+              <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                <z-icon zType="loader-circle" class="w-12 h-12 mx-auto mb-3 text-primary animate-spin"></z-icon>
+                <p>Đang tải dữ liệu, vui lòng đợi...</p>
+              </td>
+            </tr>
+
+            <!-- Empty state -->
+            <tr *ngIf="!isLoading && filteredItems.length === 0">
+              <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                <z-icon zType="inbox" class="w-12 h-12 mx-auto mb-3 text-slate-300"></z-icon>
+                <p>Không tìm thấy sản phẩm nào phù hợp</p>
+              </td>
+            </tr>
+            
+            <!-- Data rows -->
+            <ng-container *ngIf="!isLoading">
+              <tr *ngFor="let item of filteredItems" class="hover:bg-slate-50/50 transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-900">{{ item.productCode }}</td>
+                <td class="px-6 py-4">
+                  <p class="font-medium text-slate-900">{{ item.productName }}</p>
+                  <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                    <z-icon zType="tag" class="w-3 h-3"></z-icon> {{ item.categoryName }}
+                  </p>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="font-medium text-slate-800">{{ item.quantity | number }}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <span 
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                    [ngClass]="{
+                      'bg-green-50 text-green-700 border-green-200': item.status === 'IN_STOCK',
+                      'bg-amber-50 text-amber-700 border-amber-200': item.status === 'LOW_STOCK',
+                      'bg-red-50 text-red-700 border-red-200': item.status === 'OUT_OF_STOCK'
+                    }">
+                    <span class="w-1.5 h-1.5 rounded-full mr-1.5" 
+                      [ngClass]="{
+                        'bg-green-500': item.status === 'IN_STOCK',
+                        'bg-amber-500': item.status === 'LOW_STOCK',
+                        'bg-red-500': item.status === 'OUT_OF_STOCK'
+                      }"></span>
+                    {{ item.status === 'IN_STOCK' ? 'Còn hàng' : (item.status === 'LOW_STOCK' ? 'Sắp hết' : 'Hết hàng') }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-slate-500">
+                  {{ item.updatedAt | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors" title="Xem chi tiết">
+                      <z-icon zType="eye" class="w-4 h-4"></z-icon>
+                    </button>
+                    <button class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition-colors" title="Điều chỉnh">
+                      <z-icon zType="edit" class="w-4 h-4"></z-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Mock Component -->
+      <div *ngIf="totalPages > 0" class="flex items-center justify-between pt-4">
+        <div class="flex items-center gap-2 text-sm text-slate-600">
+          Hiển thị
+          <select 
+            class="border border-slate-200 rounded px-2 py-1 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            [ngModel]="pageSize" 
+            (ngModelChange)="onPageSizeChange($event)">
+            <option *ngFor="let p of pageSizeOptions" [value]="p">{{ p }}</option>
+          </select>
+          trong tổng số {{ totalElements }}
+        </div>
+        
+        <div class="flex items-center gap-1">
+          <button 
+            [disabled]="currentPage === 0"
+            (click)="onPageChange(currentPage - 1)"
+            class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <z-icon zType="chevron-left" class="w-4 h-4"></z-icon>
+          </button>
+          
+          <ng-container *ngFor="let p of [].constructor(totalPages); let i = index">
+            <!-- Simple dots logic mock -->
+            <button 
+              *ngIf="i < 3 || i > totalPages - 2 || Math.abs(currentPage - i) <= 1"
+              (click)="onPageChange(i)"
+              class="w-8 h-8 flex items-center justify-center rounded text-sm font-medium transition-colors"
+              [ngClass]="currentPage === i ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'">
+              {{ i + 1 }}
+            </button>
+            <span *ngIf="i === 3 && totalPages > 5 && Math.abs(currentPage - i) > 1" class="px-1 text-slate-400">...</span>
+          </ng-container>
+
+          <button 
+            [disabled]="currentPage === totalPages - 1"
+            (click)="onPageChange(currentPage + 1)"
+            class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <z-icon zType="chevron-right" class="w-4 h-4"></z-icon>
+          </button>
+        </div>
+      </div>
+
     </div>
   </z-card>
 </div>

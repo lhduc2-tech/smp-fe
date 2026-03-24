@@ -6,7 +6,8 @@ import { AuthService } from '../../auth/services/auth.service';
 import {
   Inventory,
   SearchInventoryRequest,
-  PageResponse
+  PageResponse,
+  InventoryItemDto
 } from '../models/inventory.model';
 
 import { ApiService } from '../../../core/services/api.service';
@@ -61,6 +62,24 @@ export class InventoryService {
     );
   }
 
+  /**
+   * Lấy tồn kho cho kho (shop) hiện tại
+   */
+  getInventoryForShop(
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'updatedAt',
+    sortDir: string = 'desc'
+  ): Observable<PageResponse<InventoryItemDto>> {
+    const params = { page, size, sortBy, sortDir };
+    return this.apiService.get<any>(
+      `${this.API_ENDPOINT}/shop`,
+      params
+    ).pipe(
+      map(res => this.transformInventoryShopResponse(res))
+    );
+  }
+
   // ================= TRANSFORM =================
 
   private transformInventory(res: any): Inventory {
@@ -80,6 +99,28 @@ export class InventoryService {
       size: res.page_size || 10,
       total: res.total_elements || 0,
       totalPages: res.total_pages || 0
+    };
+  }
+
+  private transformInventoryShopItem(res: any): InventoryItemDto {
+    return {
+      product_id: res.product_id || res.productId,
+      product_code: res.product_code || res.productCode,
+      product_name: res.product_name || res.productName,
+      category_name: res.category_name || res.categoryName,
+      quantity: res.quantity,
+      updated_at: res.updated_at || res.updatedAt
+    };
+  }
+
+  private transformInventoryShopResponse(res: any): PageResponse<InventoryItemDto> {
+    const data = res.data || res;
+    return {
+      content: data.content?.map((i: any) => this.transformInventoryShopItem(i)) || [],
+      page: data.page_number ?? data.page ?? 0,
+      size: data.page_size ?? data.size ?? 10,
+      total: data.total_elements ?? data.totalElements ?? 0,
+      totalPages: data.total_pages ?? data.totalPages ?? 0
     };
   }
 }
