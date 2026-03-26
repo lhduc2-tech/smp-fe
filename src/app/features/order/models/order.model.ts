@@ -42,6 +42,8 @@ export interface Order {
     updatedBy?: string;
     orderName: string;
     description?: string;
+    shop?: any;
+    customer?: any;
 }
 
 export interface OrderResponse {

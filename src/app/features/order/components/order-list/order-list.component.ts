@@ -9,6 +9,9 @@ import { Order, SearchOrderRequest } from '../../models/order.model';
 import { IconComponent } from '../../../../shared/components/icon.component';
 import { ConfirmService } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { OrderPaymentService } from '../order-payment/order-payment-dialog.component';
+import { InvoiceExportService } from '../../../../core/services/invoice-export.service';
+import { CustomerService } from '../../../customer/services/customer.service';
+import { ProductService } from '../../../product/services/product.service';
 import { toast } from 'ngx-sonner';
 
 @Component({
@@ -41,7 +44,10 @@ export class OrderListComponent implements OnInit {
         private orderService: OrderService,
         private cd: ChangeDetectorRef,
         private confirmService: ConfirmService,
-        private paymentService: OrderPaymentService
+        private paymentService: OrderPaymentService,
+        private invoiceExportService: InvoiceExportService,
+        private customerService: CustomerService,
+        private productService: ProductService
     ) { }
 
     ngOnInit(): void {
@@ -131,6 +137,56 @@ export class OrderListComponent implements OnInit {
         if (success) {
             this.loadOrders();
         }
+    }
+
+    /* ================= EXPORT ================= */
+
+    exportOrder(order: Order): void {
+        toast.info('Đang xử lý xuất hóa đơn...');
+        
+        // Fetch full order details including all items, products & customer info
+        this.orderService.getOrderById(order.id).subscribe({
+            next: (fullOrder) => {
+                if (fullOrder.customerId) {
+                    this.customerService.getCustomerById(fullOrder.customerId).subscribe({
+                        next: (customer) => {
+                            this.productService.getAllProductByShopId().subscribe({
+                                next: (products) => {
+                                    this.invoiceExportService.exportInvoice(fullOrder, customer, products);
+                                },
+                                error: () => {
+                                    this.invoiceExportService.exportInvoice(fullOrder, customer, []);
+                                }
+                            });
+                        },
+                        error: () => {
+                            // Can still export without customer details 
+                            this.productService.getAllProductByShopId().subscribe({
+                                next: (products) => {
+                                    this.invoiceExportService.exportInvoice(fullOrder, null, products);
+                                },
+                                error: () => {
+                                    this.invoiceExportService.exportInvoice(fullOrder, null, []);
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    // Export directly without full customer entity (uses the names inside Order model)
+                    this.productService.getAllProductByShopId().subscribe({
+                        next: (products) => {
+                            this.invoiceExportService.exportInvoice(fullOrder, null, products);
+                        },
+                        error: () => {
+                            this.invoiceExportService.exportInvoice(fullOrder, null, []);
+                        }
+                    });
+                }
+            },
+            error: () => {
+                toast.error('Không thể lấy chi tiết đơn hàng để xuất hóa đơn');
+            }
+        });
     }
 
     private updateDisplayPages(): void {

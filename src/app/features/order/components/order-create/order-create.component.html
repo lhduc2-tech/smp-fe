@@ -334,6 +334,11 @@
                 </div>
             </div>
 
+            <button *ngIf="isViewMode" z-button zType="secondary" (click)="exportInvoice()">
+                <z-icon zType="file-text" />
+                Xuất hóa đơn Word
+            </button>
+
             <div class="summary-actions">
                 <button *ngIf="!isViewMode" z-button zType="default" class="w-full submit-btn" (click)="submit()" [zLoading]="isLoading"
                     [zDisabled]="isLoading">

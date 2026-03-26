@@ -23,6 +23,7 @@ import { Customer, CustomerRequest } from '../../../customer/models/customer.mod
 import { AuthService } from '../../../auth/services/auth.service';
 
 import { toast } from 'ngx-sonner';
+import { InvoiceExportService } from '../../../../core/services/invoice-export.service';
 
 import { forkJoin, of, switchMap } from 'rxjs';
 
@@ -135,7 +136,8 @@ export class OrderCreateComponent implements OnInit {
     private customerService: CustomerService,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private invoiceExportService: InvoiceExportService
   ) {}
 
   /* ================= INIT ================= */
@@ -616,6 +618,17 @@ export class OrderCreateComponent implements OnInit {
       }
     });
 
+  }
+
+  /* ================= EXPORT ================= */
+  exportInvoice(): void {
+    if (!this.currentOrder) return;
+    toast.info('Đang xử lý xuất hóa đơn...');
+    
+    // Khách hàng có thể được chọn từ list hoặc có sẵn trong order
+    const customer = this.customers.find(c => c.id === this.selectedCustomerValue) || null;
+    
+    this.invoiceExportService.exportInvoice(this.currentOrder, customer, this.products);
   }
 
   /* ================= CANCEL ================= */

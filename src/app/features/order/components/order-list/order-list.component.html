@@ -109,8 +109,13 @@
                                     <z-icon zType="credit-card" />
                                     </button>
 
+                                    <!-- Export -->
+                                    <button z-button zType="secondary" zSize="sm" (click)="exportOrder(o)" title="Xuất hóa đơn">
+                                        <z-icon zType="file-text" />
+                                    </button>
+
                                     <!-- Update -->
-                                    <button z-button zSize="sm" [routerLink]="['/orders', o.id]">
+                                    <button z-button zSize="sm" [routerLink]="['/orders', o.id]" title="Xem chi tiết">
                                         <z-icon zType="eye" />
                                     </button>
 

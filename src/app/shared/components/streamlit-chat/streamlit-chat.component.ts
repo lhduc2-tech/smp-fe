@@ -15,7 +15,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
     <!-- Iframe Container -->
     <div class="chat-container" [class.open]="isOpen()">
       <div class="chat-header">
-        <span>🤖 AI Assistant Chatbot</span>
+        <span>🤖 Chatbot Nhí Nhảnh</span>
         <button class="close-btn" (click)="toggleChat()">✕</button>
       </div>
       <iframe

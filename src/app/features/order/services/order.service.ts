@@ -117,7 +117,9 @@ export class OrderService {
             updatedAt: res.updated_at,
             updatedBy: res.updated_by,
             orderName: res.order_name ?? res.orderName,
-            description: res.description
+            description: res.description,
+            shop: res.shop,
+            customer: res.customer
         };
     }
 
