@@ -115,7 +115,19 @@ interface MenuItem {
     }
 
     :host ::ng-deep .sidebar-wrapper .flex-1.overflow-auto {
-      overflow: hidden !important;
+      overflow-y: auto !important;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+    :host ::ng-deep .sidebar-wrapper .flex-1.overflow-auto::-webkit-scrollbar {
+      display: none !important;
+    }
+    :host ::ng-deep .sidebar-wrapper * {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+    :host ::ng-deep .sidebar-wrapper *::-webkit-scrollbar {
+      display: none !important;
     }
 
     /* Logo */
@@ -161,7 +173,8 @@ interface MenuItem {
     .sidebar-nav {
       flex: 1;
       padding: 0 12px;
-      overflow: hidden;
+      /* Remove overflow to let the parent handle scrolling */
+      overflow: visible;
     }
 
     .section-divider {
@@ -269,11 +282,7 @@ interface MenuItem {
 
     /* Scrollbar */
     .sidebar-nav::-webkit-scrollbar {
-      width: 3px;
-    }
-    .sidebar-nav::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
+      display: none;
     }
   `]
 })
