@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -27,7 +27,7 @@ import { InvoiceExportService } from '../../../../core/services/invoice-export.s
 
 import { forkJoin, of, switchMap } from 'rxjs';
 
-import { type ZardComboboxOption } from '../../../../shared/components/combobox/combobox.component';
+import { ZardComboboxComponent, ZardComboboxOption } from '../../../../shared/components/combobox/combobox.component';
 
 import {
   LucideAngularModule,
@@ -68,6 +68,7 @@ export interface OrderProductItem {
 })
 export class OrderCreateComponent implements OnInit {
 
+  @ViewChild('productCombobox') productCombobox?: ZardComboboxComponent;
   form!: FormGroup;
 
   isLoading = false;
@@ -110,6 +111,7 @@ export class OrderCreateComponent implements OnInit {
   selectedOrderOrigin = 'ONLINE';
   selectedDeliveryService = 'GHN';
  selectedCustomerValue = '';
+  selectedProductValue: string | null = null;
   paymentMethods = [
     { value: 'BANK_TRANSFER', label: 'Chuyển khoản ngân hàng' },
     { value: 'CASH', label: 'Tiền mặt' },
@@ -323,6 +325,11 @@ export class OrderCreateComponent implements OnInit {
 
     }
 
+    // Reset combobox
+    if (this.productCombobox) {
+      this.productCombobox.writeValue(null);
+    }
+    this.selectedProductValue = null;
   }
 
   /* ================= ORDER ITEMS ================= */

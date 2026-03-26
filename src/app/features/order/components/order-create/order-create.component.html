@@ -155,9 +155,17 @@
 
                 <!-- Search Product (Zard Combobox) -->
                 <div class="product-search-wrapper" *ngIf="!isPaid">
-                    <z-combobox [options]="productOptions" placeholder="Thêm sản phẩm..."
-                        searchPlaceholder="Tìm tên hoặc mã sản phẩm..." emptyText="Không tìm thấy sản phẩm."
-                        (zComboSelected)="onProductSelected($event)" class="w-full" zWidth="full" />
+                    <z-combobox
+                        #productCombobox="zCombobox"
+                        [(ngModel)]="selectedProductValue"
+                        [options]="productOptions"
+                        placeholder="Thêm sản phẩm"
+                        searchPlaceholder="Tìm tên hoặc mã sản phẩm..."
+                        emptyText="Không tìm thấy sản phẩm."
+                        (zComboSelected)="onProductSelected($event)"
+                        class="w-full"
+                        zWidth="full"
+                    />
                 </div>
             </div>
 
