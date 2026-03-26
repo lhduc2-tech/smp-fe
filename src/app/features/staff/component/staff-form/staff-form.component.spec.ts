@@ -17,7 +17,7 @@ describe.skip('StaffFormComponent', () => {
     staffServiceSpy = {
       addStaff: vi.fn().mockReturnValue(of({})),
       updateStaff: vi.fn().mockReturnValue(of({})),
-      getStaffById: vi.fn().mockReturnValue(of({ fullName: 'Test', email: 'test@test.com', phoneNumber: '0123', status: 'ACTIVE', position: 'CASHIER' }))
+      getStaffById: vi.fn().mockReturnValue(of({ fullName: 'Test', email: 'test@test.com', phoneNumber: '0123', status: 'ACTIVE', position: 'STAFF' }))
     };
 
     await TestBed.configureTestingModule({
@@ -72,7 +72,7 @@ describe.skip('StaffFormComponent', () => {
   it('should call addStaff on valid submit', () => {
     component.staffForm.patchValue({
       fullName: 'Test', email: 'test@test.com', phoneNumber: '0123',
-      status: 'ACTIVE', position: 'CASHIER'
+      status: 'ACTIVE', position: 'STAFF'
     });
     component.submitForm();
     expect(staffServiceSpy.addStaff).toHaveBeenCalled();
@@ -81,7 +81,7 @@ describe.skip('StaffFormComponent', () => {
   it('should set loading on submit', () => {
     component.staffForm.patchValue({
       fullName: 'Test', email: 'test@test.com', phoneNumber: '0123',
-      status: 'ACTIVE', position: 'CASHIER'
+      status: 'ACTIVE', position: 'STAFF'
     });
     component.submitForm();
     expect(component.isLoading).toBe(true);

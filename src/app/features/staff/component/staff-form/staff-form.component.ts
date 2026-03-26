@@ -31,7 +31,7 @@ export class StaffFormComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', [Validators.required]],
       status: ['ACTIVE', [Validators.required]],
-      position: ['CASHIER', [Validators.required]]
+      position: ['STAFF', [Validators.required]]
     });
   }
 
@@ -53,7 +53,7 @@ export class StaffFormComponent implements OnInit {
           email: staff.email,
           phoneNumber: staff.phoneNumber,
           status: staff.status || 'ACTIVE',
-          position: staff.position || 'CASHIER'
+          position: staff.position || 'STAFF'
         });
       },
       error: (error) => {
