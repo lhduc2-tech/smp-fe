@@ -178,11 +178,12 @@
 
           <!-- ACTION -->
           <div class="flex items-center justify-end gap-2 w-80">
-            <!-- SELECT PRODUCT -->
             <z-combobox
+              #productCombobox="zCombobox"
               *ngIf="!isCreatingProduct"
               [options]="productOptions"
-              placeholder="Tìm & thêm sản phẩm..."
+              [(ngModel)]="selectedProductValue"
+              placeholder="Thêm sản phẩm"
               searchPlaceholder="Tên / mã sản phẩm"
               (zComboSelected)="onProductSelected($event)"
               zWidth="full"

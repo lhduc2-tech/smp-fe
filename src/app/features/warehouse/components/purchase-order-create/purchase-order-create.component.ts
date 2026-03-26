@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +17,7 @@ import { LucideAngularModule, Package, ArrowLeft } from 'lucide-angular';
 import { toast } from 'ngx-sonner';
 import { finalize, forkJoin } from 'rxjs';
 
-import { ZardComboboxOption } from '../../../../shared/components/combobox/combobox.component';
+import { ZardComboboxComponent, ZardComboboxOption } from '../../../../shared/components/combobox/combobox.component';
 
 @Component({
   selector: 'app-purchase-order-create',
@@ -32,6 +32,8 @@ import { ZardComboboxOption } from '../../../../shared/components/combobox/combo
   styleUrls: ['./purchase-order-create.component.css']
 })
 export class PurchaseOrderCreateComponent implements OnInit {
+
+  @ViewChild('productCombobox') productCombobox?: ZardComboboxComponent;
 
   /* ================= ICON ================= */
   readonly iconPackage = Package;
@@ -60,6 +62,7 @@ export class PurchaseOrderCreateComponent implements OnInit {
   /* ================= PRODUCT ================= */
   products: Product[] = [];
   productOptions: ZardComboboxOption[] = [];
+  selectedProductValue: string | null = null;
 
   /* ================= CREATE PRODUCT ================= */
   isCreatingProduct = false;
@@ -248,6 +251,13 @@ onProductSelected(option: ZardComboboxOption): void {
   if (!product) return;
 
   this.addProductToOrder(product);
+  
+  // Reset combobox after selection
+  if (this.productCombobox) {
+    this.productCombobox.writeValue(null);
+  }
+  this.selectedProductValue = null;
+  this.cd.detectChanges();
 }
   createProductInline(): void {
 
