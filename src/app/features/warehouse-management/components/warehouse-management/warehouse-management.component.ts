@@ -74,7 +74,7 @@ export class WarehouseManagementComponent implements OnInit {
             categoryName: dto.category_name || 'Khác',
             quantity: qty,
             updatedAt: dto.updated_at ? new Date(dto.updated_at) : new Date(),
-            status: qty === 0 ? 'OUT_OF_STOCK' : (qty < 10 ? 'LOW_STOCK' : 'IN_STOCK')
+            status: qty === 0 ? 'OUT_OF_STOCK' : (qty < 5 ? 'LOW_STOCK' : 'IN_STOCK')
           };
         });
         
