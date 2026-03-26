@@ -301,7 +301,7 @@ export class SidebarComponent implements OnInit {
           label: 'Tổng quan',
           icon: 'layout-dashboard' as ZardIcon,
           route: '/dashboard',
-          roles: ['ADMIN', 'STAFF']
+          roles: ['ADMIN', 'STAFF', 'WAREHOUSE']
         },
         {
           label: 'Đơn hàng',
