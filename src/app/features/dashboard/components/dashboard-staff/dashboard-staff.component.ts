@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { StaffDashboard } from '../../models/dashboard.model';
 import { LucideAngularModule, ShoppingBag, Clock, CheckCircle, XCircle, DollarSign, AlertTriangle, Package, Loader2, AlertCircle } from 'lucide-angular';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
@@ -28,7 +28,11 @@ export class StaffDashboardComponent implements OnInit {
   readonly Loader2 = Loader2;
   readonly AlertCircle = AlertCircle;
 
-  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.dashboardService.getStaffDashboard().subscribe({
@@ -49,6 +53,12 @@ export class StaffDashboardComponent implements OnInit {
         this.loading = false;
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  importProduct(productId: string): void {
+    this.router.navigate(['/inventory/purchase-orders/create'], {
+      queryParams: { productId }
     });
   }
 }

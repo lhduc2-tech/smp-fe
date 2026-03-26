@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { AdminDashboard } from '../../models/dashboard.model';
 import { LucideAngularModule, TrendingUp, TrendingDown, DollarSign, Package, ShoppingCart, AlertTriangle, Star, AlertCircle, TrendingUp as TrendingUpIcon, Loader2 } from 'lucide-angular';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
@@ -29,7 +29,11 @@ export class OwnerDashboardComponent implements OnInit {
   readonly TrendingUpIcon = TrendingUpIcon;
   readonly Loader2 = Loader2;
 
-  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboardData('all');
@@ -61,6 +65,12 @@ export class OwnerDashboardComponent implements OnInit {
         this.loading = false;
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  importProduct(productId: string): void {
+    this.router.navigate(['/inventory/purchase-orders/create'], {
+      queryParams: { productId }
     });
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 import { ChangeDetectorRef } from '@angular/core';
@@ -78,9 +78,11 @@ export class PurchaseOrderCreateComponent implements OnInit {
   }[] = [];
 
   note: string = '';
+  preSelectedProductId: string | null = null;
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private inventoryService: InventoryFlowService,
     private productService: ProductService,
     private supplierService: SupplierService,
@@ -93,6 +95,7 @@ export class PurchaseOrderCreateComponent implements OnInit {
     this.resolveMode();
     this.loadSuppliers();
     this.loadProducts();
+    this.checkQueryBatch();
 
     if (this.isViewMode) {
       this.loadOrderDetail();
@@ -105,6 +108,24 @@ export class PurchaseOrderCreateComponent implements OnInit {
     if (url.includes('/view/')) {
       this.isViewMode = true;
       this.orderId = this.router.url.split('/').pop();
+    }
+  }
+  private checkQueryBatch(): void {
+    this.route.queryParams.subscribe(params => {
+      this.preSelectedProductId = params['productId'] || null;
+      this.tryAutoAddProduct();
+    });
+  }
+
+  private tryAutoAddProduct(): void {
+    if (this.preSelectedProductId && this.products.length > 0) {
+      const product = this.products.find(p => p.id === this.preSelectedProductId);
+      if (product) {
+        this.addProductToOrder(product);
+        // Clear param after adding to avoid re-adding on manual interactions if any
+        this.preSelectedProductId = null;
+        this.cd.detectChanges();
+      }
     }
   }
   /* =======Load view ===========*/
@@ -169,6 +190,7 @@ export class PurchaseOrderCreateComponent implements OnInit {
           value: p.id,
           label: `${p.name} — ${p.code}`
         }));
+        this.tryAutoAddProduct();
       }
     });
   }

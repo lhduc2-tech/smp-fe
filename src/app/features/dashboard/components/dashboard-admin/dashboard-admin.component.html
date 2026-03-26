@@ -194,15 +194,19 @@
               <td class="px-6 py-4 font-medium text-gray-900">{{ product.name }}</td>
               <td class="px-6 py-4 text-right">{{ product.price | number }} đ</td>
               <td class="px-6 py-4 text-center">
-                <button class="text-indigo-600 hover:text-indigo-900 font-medium text-sm transition-colors opacity-0 group-hover:opacity-100">
+                <button 
+                  (click)="importProduct(product.id)"
+                  class="text-indigo-600 hover:text-indigo-900 font-medium text-sm transition-colors">
                   Nhập thêm
                 </button>
               </td>
             </tr>
             <tr *ngIf="dashboardData.inventory.lowStockProducts.length === 0">
-              <td colspan="4" class="px-6 py-8 text-center text-gray-500 flex flex-col items-center">
-                <lucide-angular [img]="AlertCircle" class="w-8 h-8 text-green-400 mb-2"></lucide-angular>
-                Tất cả sản phẩm đều đủ hàng.
+              <td colspan="4" class="px-6 py-8 text-gray-500">
+                <div class="flex flex-col items-center justify-center">
+                  <lucide-angular [img]="AlertCircle" class="w-8 h-8 text-green-400 mb-2"></lucide-angular>
+                  <span>Tất cả sản phẩm đều đủ hàng.</span>
+                </div>
               </td>
             </tr>
           </tbody>
