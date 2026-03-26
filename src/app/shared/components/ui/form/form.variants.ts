@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
-export const formFieldVariants = cva('grid gap-2');
+export const formFieldVariants = cva('grid gap-3');
 
 export const formLabelVariants = cva(
     'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
