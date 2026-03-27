@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
 
 import { RoleService } from '../../services/role.service';
 import { PermissionService } from '../../../permission/services/permission.service';
@@ -45,7 +46,8 @@ export class RoleFormComponent implements OnInit {
     private roleService: RoleService,
     private permissionService: PermissionService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   /* ================= INIT ================= */
@@ -54,9 +56,7 @@ export class RoleFormComponent implements OnInit {
 
     this.initForm();
     this.resolveRoute();
-
-    this.loadPermissions();
-    this.loadRoleIfEdit();
+    this.loadData();
 
   }
 
@@ -82,61 +82,55 @@ export class RoleFormComponent implements OnInit {
 
   }
 
-  /* ================= LOAD PERMISSIONS ================= */
+  /* ================= LOAD DATA ================= */
 
-  private loadPermissions(): void {
-
-    this.permissionService.getAllPermissions()
-      .subscribe({
-
-        next: res => {
-          this.permissions = res;
-        },
-
-        error: () => {
-          toast.error('Không tải được danh sách permission');
-        }
-
-      });
-
-  }
-
-  /* ================= LOAD ROLE ================= */
-
-  private loadRoleIfEdit(): void {
-
-    if (!this.isEdit || !this.roleId) return;
+  private loadData(): void {
 
     this.isLoading = true;
 
-    this.roleService.getRoleById(this.roleId)
-      .subscribe({
+    const permissions$ = this.permissionService.getAllPermissions();
+    const role$ = this.isEdit && this.roleId 
+      ? this.roleService.getRoleById(this.roleId)
+      : of(null);
 
-        next: res => {
+    forkJoin([permissions$, role$]).subscribe({
 
+      next: ([allPermissions, role]) => {
+
+        this.permissions = allPermissions;
+
+        if (role) {
           this.form.patchValue({
-            code: res.code,
-            name: res.name,
-            description: res.description,
-            status: res.status
+            code: role.code,
+            name: role.name,
+            description: role.description,
+            status: role.status
           });
 
-          this.selectedPermissions = res.permissions || [];
-
-        },
-
-        error: () => {
-
-          toast.error('Không tải được dữ liệu role');
-          this.router.navigate(['/settings/roles']);
-
-        },
-
-        complete: () => {
-          this.isLoading = false;
+          // Map codes to IDs for selection
+          if (role.permissions) {
+            this.selectedPermissions = allPermissions
+              .filter(p => role.permissions?.includes(p.code))
+              .map(p => p.id);
+          }
         }
 
-      });
+        this.isLoading = false;
+        this.cdr.detectChanges();
+
+      },
+
+      error: (err) => {
+        console.error('Error loading role data:', err);
+        toast.error('Không tải được dữ liệu');
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        if (this.isEdit) {
+          this.router.navigate(['/settings/roles']);
+        }
+      }
+
+    });
 
   }
 

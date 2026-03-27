@@ -49,10 +49,10 @@
     <z-form-field>
       <label z-form-label>Status</label>
       <z-form-control>
-        <select z-input formControlName="status">
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="INACTIVE">INACTIVE</option>
-        </select>
+        <z-select formControlName="status" zPlaceholder="Chọn trạng thái">
+          <z-select-item zValue="ACTIVE">ACTIVE</z-select-item>
+          <z-select-item zValue="INACTIVE">INACTIVE</z-select-item>
+        </z-select>
       </z-form-control>
     </z-form-field>
 
@@ -87,7 +87,7 @@
     <z-divider />
 
     <!-- Actions -->
-    <div class="form-actions">
+    <div class="flex justify-start gap-3 mt-6">
 
       <a z-button zType="outline" routerLink="/settings/roles">
         Hủy
