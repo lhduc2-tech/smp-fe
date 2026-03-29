@@ -24,6 +24,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 
 import { toast } from 'ngx-sonner';
 import { InvoiceExportService } from '../../../../core/services/invoice-export.service';
+import { VnpayPaymentService } from '../../services/vnpay-payment.service';
 
 import { forkJoin, of, switchMap } from 'rxjs';
 
@@ -107,13 +108,13 @@ export class OrderCreateComponent implements OnInit {
 
   /* ================= PAYMENT ================= */
 
-  selectedPaymentMethod = 'BANK_TRANSFER';
+  selectedPaymentMethod = 'VNPAY';
   selectedOrderOrigin = 'ONLINE';
   selectedDeliveryService = 'GHN';
  selectedCustomerValue = '';
   selectedProductValue: string | null = null;
   paymentMethods = [
-    { value: 'BANK_TRANSFER', label: 'Chuyển khoản ngân hàng' },
+    { value: 'VNPAY', label: 'VNPay (Thanh toán trực tuyến)' },
     { value: 'CASH', label: 'Tiền mặt' },
     { value: 'CARD', label: 'Thẻ tín dụng / ghi nợ' }
   ];
@@ -139,7 +140,8 @@ export class OrderCreateComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private invoiceExportService: InvoiceExportService
+    private invoiceExportService: InvoiceExportService,
+    private vnpayService: VnpayPaymentService
   ) {}
 
   /* ================= INIT ================= */
@@ -374,7 +376,7 @@ export class OrderCreateComponent implements OnInit {
 
   get discount(): number {
 
-    if (this.appliedVoucher === 'SALE_ADMIN_2024' && this.selectedPaymentMethod === 'BANK_TRANSFER') {
+    if (this.appliedVoucher === 'SALE_ADMIN_2024' && this.selectedPaymentMethod === 'VNPAY') {
       return this.subtotal * 0.05;
     }
 
@@ -398,8 +400,8 @@ export class OrderCreateComponent implements OnInit {
 
     if (code === 'SALE_ADMIN_2024') {
 
-      if (this.selectedPaymentMethod !== 'BANK_TRANSFER') {
-        toast.error('Mã SALE_ADMIN_2024 chỉ áp dụng cho chuyển khoản');
+      if (this.selectedPaymentMethod !== 'VNPAY') {
+        toast.error('Mã SALE_ADMIN_2024 chỉ áp dụng cho thanh toán VNPay');
         return;
       }
 
@@ -524,9 +526,22 @@ export class OrderCreateComponent implements OnInit {
           return this.orderService.createOrder(request);
         })
       ).subscribe({
-        next: () => {
-          toast.success('Tạo khách hàng và đơn hàng thành công');
-          this.router.navigate(['/orders']);
+        next: (order) => {
+          if (this.selectedPaymentMethod === 'VNPAY' && order.id) {
+            toast.info('Tạo đơn hàng thành công. Đang chuyển hướng sang VNPay...');
+            this.vnpayService.createPaymentUrl(order.id).subscribe({
+              next: (response) => {
+                this.vnpayService.redirectToVnPay(response.paymentUrl);
+              },
+              error: () => {
+                toast.error('Không thể tạo link thanh toán VNPay, vui lòng thanh toán sau trong chi tiết đơn hàng.');
+                this.router.navigate(['/orders']);
+              }
+            });
+          } else {
+            toast.success('Tạo khách hàng và đơn hàng thành công');
+            this.router.navigate(['/orders']);
+          }
         },
         error: () => {
           toast.error('Tạo đơn hàng thất bại');
@@ -562,9 +577,22 @@ export class OrderCreateComponent implements OnInit {
       };
 
       this.orderService.createOrder(request).subscribe({
-        next: () => {
-          toast.success('Tạo đơn hàng thành công');
-          this.router.navigate(['/orders']);
+        next: (order) => {
+          if (this.selectedPaymentMethod === 'VNPAY' && order.id) {
+            toast.info('Tạo đơn hàng thành công. Đang chuyển hướng sang VNPay...');
+            this.vnpayService.createPaymentUrl(order.id).subscribe({
+              next: (response) => {
+                this.vnpayService.redirectToVnPay(response.paymentUrl);
+              },
+              error: () => {
+                toast.error('Không thể tạo link thanh toán VNPay, vui lòng thanh toán sau trong chi tiết đơn hàng.');
+                this.router.navigate(['/orders']);
+              }
+            });
+          } else {
+            toast.success('Tạo đơn hàng thành công');
+            this.router.navigate(['/orders']);
+          }
         },
         error: () => {
           toast.error('Tạo đơn hàng thất bại');

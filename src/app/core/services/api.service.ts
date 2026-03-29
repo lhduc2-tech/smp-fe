@@ -32,6 +32,21 @@ export class ApiService {
   }
 
   /**
+   * Gửi POST request với query params (không có body)
+   */
+  postWithParams<T>(endpoint: string, params?: any): Observable<T> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, null, { params: httpParams });
+  }
+
+  /**
    * Gửi PUT request
    */
   put<T>(endpoint: string, body: any): Observable<T> {

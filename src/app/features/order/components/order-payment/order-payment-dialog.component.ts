@@ -5,17 +5,19 @@ import {
   LucideAngularModule,
   CreditCard,
   Banknote,
-  Building2,
   CheckCircle2,
   XCircle,
   Clock,
   Loader2,
-  Receipt
+  Receipt,
+  ExternalLink,
+  ShieldCheck
 } from 'lucide-angular';
 
 import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 import { Order, UpdateOrderRequest } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
+import { VnpayPaymentService } from '../../services/vnpay-payment.service';
 import { toast } from 'ngx-sonner';
 
 /* ================================================================
@@ -126,11 +128,13 @@ export class OrderPaymentService {
                   <span class="method-name">Tiền mặt</span>
                 </button>
                 <button
-                  class="method-card"
-                  [class.method-active]="selectedMethod === 'BANK_TRANSFER'"
-                  (click)="selectMethod('BANK_TRANSFER')">
-                  <lucide-icon [img]="iconBuilding" [size]="28"></lucide-icon>
-                  <span class="method-name">Chuyển khoản</span>
+                  class="method-card vnpay-card"
+                  [class.method-active]="selectedMethod === 'VNPAY'"
+                  (click)="selectMethod('VNPAY')">
+                  <div class="vnpay-logo-small">
+                    <span class="vnpay-text-vn">VN</span><span class="vnpay-text-pay">PAY</span>
+                  </div>
+                  <span class="method-name">VNPay</span>
                 </button>
                 <button
                   class="method-card"
@@ -208,17 +212,33 @@ export class OrderPaymentService {
               </div>
             }
 
-            <!-- BANK TRANSFER info -->
-            @if (selectedMethod === 'BANK_TRANSFER') {
-              <div class="bank-section">
-                <div class="bank-info-card">
-                  <div class="bank-icon-wrapper">
-                    <lucide-icon [img]="iconBuilding" [size]="32"></lucide-icon>
+            <!-- VNPAY info -->
+            @if (selectedMethod === 'VNPAY') {
+              <div class="vnpay-section">
+                <div class="vnpay-info-card">
+                  <div class="vnpay-icon-wrapper">
+                    <div class="vnpay-logo">
+                      <span class="vnpay-logo-vn">VN</span><span class="vnpay-logo-pay">PAY</span>
+                    </div>
                   </div>
-                  <div class="bank-details">
-                    <p class="bank-hint">Xác nhận đã nhận được chuyển khoản từ khách hàng</p>
-                    <p class="bank-amount">Số tiền: <strong>{{ order?.price | number:'1.0-0' }}đ</strong></p>
+                  <div class="vnpay-details">
+                    <p class="vnpay-hint">Thanh toán trực tuyến qua cổng <strong>VNPay</strong></p>
+                    <p class="vnpay-amount">Số tiền: <strong>{{ order?.price | number:'1.0-0' }}đ</strong></p>
+                    <div class="vnpay-features">
+                      <span class="vnpay-feature">
+                        <lucide-icon [img]="iconShieldCheck" [size]="13"></lucide-icon>
+                        Bảo mật SSL
+                      </span>
+                      <span class="vnpay-feature">
+                        <lucide-icon [img]="iconExternalLink" [size]="13"></lucide-icon>
+                        Chuyển hướng đến VNPay
+                      </span>
+                    </div>
                   </div>
+                </div>
+                <div class="vnpay-note">
+                  <lucide-icon [img]="iconShieldCheck" [size]="14"></lucide-icon>
+                  <span>Bạn sẽ được chuyển đến trang thanh toán VNPay. Sau khi hoàn tất, hệ thống sẽ tự động cập nhật trạng thái đơn hàng.</span>
                 </div>
               </div>
             }
@@ -245,11 +265,15 @@ export class OrderPaymentService {
             <button class="btn-cancel" (click)="cancel()">Hủy bỏ</button>
             <button
               class="btn-confirm-payment"
+              [class.btn-vnpay]="selectedMethod === 'VNPAY'"
               [disabled]="!canConfirm || isProcessing"
               (click)="confirmPayment()">
               @if (isProcessing) {
                 <lucide-icon [img]="iconLoader" [size]="16" class="spin"></lucide-icon>
                 Đang xử lý...
+              } @else if (selectedMethod === 'VNPAY') {
+                <lucide-icon [img]="iconExternalLink" [size]="16"></lucide-icon>
+                Thanh toán qua VNPay
               } @else {
                 <lucide-icon [img]="iconCheck" [size]="16"></lucide-icon>
                 Xác nhận thanh toán
@@ -600,31 +624,143 @@ export class OrderPaymentService {
       font-size: 18px;
     }
 
-    /* ===== Bank / Card Sections ===== */
-    .bank-section,
+    /* ===== VNPay Section ===== */
+    .vnpay-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .vnpay-info-card {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding: 16px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8f4f8 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+    }
+
+    .vnpay-icon-wrapper {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .vnpay-logo {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .vnpay-logo-vn {
+      color: #005baa;
+    }
+
+    .vnpay-logo-pay {
+      color: #e41e2e;
+    }
+
+    .vnpay-details {
+      flex: 1;
+    }
+
+    .vnpay-hint {
+      margin: 0;
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .vnpay-amount {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .vnpay-features {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .vnpay-feature {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #059669;
+      font-weight: 500;
+    }
+
+    .vnpay-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      font-size: 12px;
+      color: #92400e;
+      line-height: 1.5;
+    }
+
+    .vnpay-note lucide-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* VNPay logo in method grid */
+    .vnpay-logo-small {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .vnpay-text-vn {
+      color: #005baa;
+    }
+
+    .vnpay-text-pay {
+      color: #e41e2e;
+    }
+
+    .method-card.vnpay-card.method-active {
+      border-color: #005baa;
+      background: rgba(0, 91, 170, 0.06);
+      box-shadow: 0 0 0 3px rgba(0, 91, 170, 0.12);
+    }
+
+    .method-card.vnpay-card:hover {
+      border-color: #005baa;
+      background: rgba(0, 91, 170, 0.03);
+    }
+
+    /* ===== Card Section ===== */
     .card-section {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .bank-info-card,
     .card-info-card {
       display: flex;
       gap: 16px;
       align-items: center;
       padding: 16px;
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
+      background: #faf5ff;
+      border: 1px solid #e9d5ff;
       border-radius: 12px;
     }
 
-    .card-info-card {
-      background: #faf5ff;
-      border-color: #e9d5ff;
-    }
-
-    .bank-icon-wrapper,
     .card-icon-wrapper {
       flex-shrink: 0;
       width: 52px;
@@ -634,14 +770,9 @@ export class OrderPaymentService {
       justify-content: center;
       border-radius: 12px;
       background: white;
-      color: #0284c7;
-    }
-
-    .card-icon-wrapper {
       color: #7c3aed;
     }
 
-    .bank-hint,
     .card-hint {
       margin: 0;
       font-size: 14px;
@@ -649,7 +780,6 @@ export class OrderPaymentService {
       line-height: 1.5;
     }
 
-    .bank-amount,
     .card-amount {
       margin: 6px 0 0;
       font-size: 14px;
@@ -665,6 +795,14 @@ export class OrderPaymentService {
       gap: 12px;
       border-top: 1px solid #f0f0f0;
       border-radius: 0 0 16px 16px;
+    }
+
+    .btn-vnpay {
+      background: linear-gradient(135deg, #005baa 0%, #0074d4 100%) !important;
+    }
+
+    .btn-vnpay:hover:not(:disabled) {
+      background: linear-gradient(135deg, #004a8c 0%, #005fac 100%) !important;
     }
 
     .btn-cancel {
@@ -773,12 +911,13 @@ export class OrderPaymentDialogComponent {
   /* ===== Icons ===== */
   readonly iconCreditCard = CreditCard;
   readonly iconBanknote = Banknote;
-  readonly iconBuilding = Building2;
   readonly iconCheck = CheckCircle2;
   readonly iconXCircle = XCircle;
   readonly iconClock = Clock;
   readonly iconLoader = Loader2;
   readonly iconReceipt = Receipt;
+  readonly iconExternalLink = ExternalLink;
+  readonly iconShieldCheck = ShieldCheck;
 
   /* ===== State ===== */
   selectedMethod = 'CASH';
@@ -791,7 +930,8 @@ export class OrderPaymentDialogComponent {
 
   constructor(
     public paymentService: OrderPaymentService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private vnpayService: VnpayPaymentService
   ) {}
 
   /* ===== Computed ===== */
@@ -845,6 +985,44 @@ export class OrderPaymentDialogComponent {
 
   confirmPayment(): void {
     if (!this.order || !this.canConfirm || this.isProcessing) return;
+
+    // VNPay: gọi API tạo payment URL rồi redirect
+    if (this.selectedMethod === 'VNPAY') {
+      this.processVnPayPayment();
+      return;
+    }
+
+    // Các phương thức khác: cập nhật trạng thái đơn hàng
+    this.processDirectPayment();
+  }
+
+  /**
+   * Thanh toán qua VNPay: gọi API tạo URL thanh toán, sau đó redirect sang VNPay.
+   */
+  private processVnPayPayment(): void {
+    if (!this.order) return;
+
+    this.isProcessing = true;
+
+    this.vnpayService.createPaymentUrl(this.order.id).subscribe({
+      next: (response) => {
+        toast.info('Đang chuyển hướng đến VNPay...');
+        // Redirect sang cổng thanh toán VNPay
+        this.vnpayService.redirectToVnPay(response.paymentUrl);
+      },
+      error: (err) => {
+        console.error('VNPay create payment error:', err);
+        toast.error('Không thể tạo thanh toán VNPay. Vui lòng thử lại.');
+        this.isProcessing = false;
+      }
+    });
+  }
+
+  /**
+   * Thanh toán trực tiếp (tiền mặt, thẻ): cập nhật trạng thái đơn hàng thành PAID.
+   */
+  private processDirectPayment(): void {
+    if (!this.order) return;
 
     this.isProcessing = true;
 
