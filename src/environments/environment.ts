@@ -6,7 +6,7 @@
 export const environment = {
   // Backend API Configuration
   api: {
-    baseUrl: 'http://localhost:8082',
+    baseUrl: 'https://sales-management-platform-pqqx.onrender.com',
     contextPath: '/sales',
     version: 'api/v1'
   },
