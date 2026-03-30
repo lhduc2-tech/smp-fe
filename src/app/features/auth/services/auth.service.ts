@@ -18,7 +18,7 @@ import { JwtPayload } from '../../../core/models/jwt-payload.model';
 export class AuthService {
 
   private readonly API_URL =
-    'http://localhost:8082/sales/public/api/v1/auth';
+    'https://sales-management-platform-pqqx.onrender.com/sales/public/api/v1/auth';
 
   constructor(private http: HttpClient) { }
 
