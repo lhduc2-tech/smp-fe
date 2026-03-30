@@ -31,7 +31,7 @@ export interface SupplierResponse {
 // Request gửi lên BE (theo SupplierRequest.java)
 export interface SupplierRequest {
   supplierName: string;
-  code: string;
+  code?: string;
   phoneNumber: string;
   email?: string;
   website?: string;

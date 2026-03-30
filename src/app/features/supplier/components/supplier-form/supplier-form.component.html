@@ -21,13 +21,13 @@
 
     <!-- Mã nhà cung cấp -->
     <z-form-field>
-      <label z-form-label zRequired>Mã nhà cung cấp</label>
+      <label z-form-label>Mã nhà cung cấp</label>
       <z-form-control>
         <input
           z-input
           type="text"
           formControlName="code"
-          placeholder="Nhập mã nhà cung cấp" />
+          [placeholder]="isEdit ? 'Mã nhà cung cấp' : 'Để trống để tự động sinh mã'" />
       </z-form-control>
     </z-form-field>
 

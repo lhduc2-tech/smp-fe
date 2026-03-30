@@ -86,9 +86,9 @@ import { toast } from 'ngx-sonner';
                   <z-form-field class="md:col-span-2">
                     <label z-form-label zRequired>Họ và tên</label>
                     <z-form-control>
-                      <input z-input type="text" formControlName="full_name" placeholder="Nhập họ và tên" />
+                      <input z-input type="text" formControlName="fullName" placeholder="Nhập họ và tên" />
                     </z-form-control>
-                    <div class="text-[0.8rem] font-medium text-destructive mt-1" *ngIf="profileForm.get('full_name')?.touched && profileForm.get('full_name')?.invalid">
+                    <div class="text-[0.8rem] font-medium text-destructive mt-1" *ngIf="profileForm.get('fullName')?.touched && profileForm.get('fullName')?.invalid">
                       Vui lòng nhập họ tên
                     </div>
                   </z-form-field>
@@ -106,9 +106,9 @@ import { toast } from 'ngx-sonner';
                   <z-form-field>
                     <label z-form-label zRequired>Số điện thoại</label>
                     <z-form-control>
-                      <input z-input type="text" formControlName="phone_number" placeholder="09xx xxx xxx" />
+                      <input z-input type="text" formControlName="phoneNumber" placeholder="09xx xxx xxx" />
                     </z-form-control>
-                    <div class="text-[0.8rem] font-medium text-destructive mt-1" *ngIf="profileForm.get('phone_number')?.touched && profileForm.get('phone_number')?.invalid">
+                    <div class="text-[0.8rem] font-medium text-destructive mt-1" *ngIf="profileForm.get('phoneNumber')?.touched && profileForm.get('phoneNumber')?.invalid">
                       Số điện thoại không hợp lệ
                     </div>
                   </z-form-field>
@@ -137,13 +137,6 @@ import { toast } from 'ngx-sonner';
               <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
-                  <z-form-field class="md:col-span-2">
-                    <label z-form-label zRequired>Mật khẩu hiện tại</label>
-                    <z-form-control>
-                      <input z-input type="password" formControlName="oldPassword" placeholder="••••••••" />
-                    </z-form-control>
-                  </z-form-field>
-
                   <z-form-field>
                     <label z-form-label zRequired>Mật khẩu mới</label>
                     <z-form-control>
@@ -202,13 +195,12 @@ export class ProfileComponent implements OnInit {
     private profileService: ProfileService
   ) {
     this.profileForm = this.fb.group({
-      full_name: ['', Validators.required],
+      fullName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone_number: ['', Validators.required]
+      phoneNumber: ['', Validators.required]
     });
 
     this.passwordForm = this.fb.group({
-      oldPassword: ['', Validators.required],
       newPassword: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
@@ -223,9 +215,9 @@ export class ProfileComponent implements OnInit {
       next: (data) => {
         this.profile = data;
         this.profileForm.patchValue({
-          full_name: data.full_name,
+          fullName: data.full_name,
           email: data.email,
-          phone_number: data.phone_number
+          phoneNumber: data.phone_number
         });
       },
       error: (err) => {
@@ -272,7 +264,8 @@ export class ProfileComponent implements OnInit {
   onChangePassword(): void {
     if (this.passwordForm.invalid) return;
     this.loading = true;
-    this.profileService.changePassword(this.passwordForm.value).subscribe({
+    const request = { password: this.passwordForm.get('newPassword')?.value };
+    this.profileService.changePassword(request).subscribe({
       next: () => {
         this.loading = false;
         this.passwordForm.reset();
@@ -281,7 +274,7 @@ export class ProfileComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.loading = false;
-        toast.error(err.error?.message || 'Không thể đổi mật khẩu. Vui lòng kiểm tra lại mật khẩu cũ.');
+        toast.error(err.error?.message || 'Không thể đổi mật khẩu.');
       }
     });
   }

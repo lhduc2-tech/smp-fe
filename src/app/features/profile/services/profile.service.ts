@@ -14,15 +14,13 @@ export interface UserProfile {
 }
 
 export interface UpdateProfileRequest {
-    full_name: string;
+    fullName: string;
     email: string;
-    phone_number: string;
+    phoneNumber: string;
 }
 
 export interface ChangePasswordRequest {
-    oldPassword: string;
-    newPassword: string;
-    confirmPassword: string;
+    password: string;
 }
 
 @Injectable({
@@ -41,7 +39,7 @@ export class ProfileService {
         return this.http.put<UserProfile>(this.apiUrl, request);
     }
 
-    changePassword(request: ChangePasswordRequest): Observable<void> {
-        return this.http.put<void>(`${this.apiUrl}/password`, request);
+    changePassword(request: ChangePasswordRequest): Observable<UserProfile> {
+        return this.http.put<UserProfile>(this.apiUrl, request);
     }
 }

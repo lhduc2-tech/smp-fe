@@ -47,7 +47,7 @@ export class SupplierFormComponent implements OnInit {
   private initForm(): void {
     this.form = this.fb.group({
       supplierName: ['', [Validators.required, Validators.maxLength(255)]],
-      code: ['', [Validators.required, Validators.maxLength(50)]],
+      code: ['', [Validators.maxLength(50)]],
       phoneNumber: ['', [Validators.required, Validators.maxLength(15)]],
       email: ['', [Validators.email, Validators.maxLength(255)]],
       website: ['', [Validators.maxLength(255)]],
@@ -59,6 +59,12 @@ export class SupplierFormComponent implements OnInit {
   private resolveRoute(): void {
     this.supplierId = this.route.snapshot.paramMap.get('id') || undefined;
     this.isEdit = !!this.supplierId;
+    
+    // Nếu là chế độ chỉnh sửa, không cho phép sửa mã nhà cung cấp
+    if (this.isEdit) {
+      const codeControl = this.form.get('code');
+      codeControl?.disable();
+    }
   }
 
   // ================= LOAD EDIT =================
@@ -95,14 +101,19 @@ export class SupplierFormComponent implements OnInit {
       return;
     }
 
-    const payload = {
+    const codeValue = this.form.get('code')?.value?.trim();
+    const payload: any = {
       supplierName: this.form.get('supplierName')?.value,
-      code: this.form.get('code')?.value,
       phoneNumber: this.form.get('phoneNumber')?.value,
       email: this.form.get('email')?.value,
       website: this.form.get('website')?.value,
       taxCode: this.form.get('taxCode')?.value
     };
+
+    // Chỉ gửi code nếu người dùng nhập, nếu bỏ trống thì backend tự sinh
+    if (codeValue) {
+      payload.code = codeValue;
+    }
 
     this.isLoading = true;
 

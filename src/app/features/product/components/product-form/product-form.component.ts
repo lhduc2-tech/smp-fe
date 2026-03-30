@@ -51,6 +51,7 @@ export class ProductFormComponent implements OnInit {
     this.isEdit = !!this.productId;
 
     if (this.isEdit) {
+      this.form.get('code')?.disable();
       this.productService.getProductById(this.productId!)
         .subscribe(res => {
           this.form.patchValue(res);
@@ -75,7 +76,7 @@ export class ProductFormComponent implements OnInit {
     const action$ = this.isEdit
       ? this.productService.updateProduct({
         id: this.productId!,
-        ...this.form.value
+        ...this.form.getRawValue()
       })
       : this.productService.addProduct(this.form.value);
 

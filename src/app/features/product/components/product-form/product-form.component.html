@@ -4,9 +4,9 @@
 
     <!-- Mã sản phẩm -->
     <z-form-field>
-      <label z-form-label>Mã sản phẩm (Tự sinh nếu để trống)</label>
+      <label z-form-label>{{ isEdit ? 'Mã sản phẩm' : 'Mã sản phẩm (Tự sinh nếu để trống)' }}</label>
       <z-form-control>
-        <input z-input type="text" formControlName="code" placeholder="Nhập mã sản phẩm" />
+        <input z-input type="text" formControlName="code" [placeholder]="isEdit ? 'Mã sản phẩm' : 'Để trống để tự động sinh mã'" />
       </z-form-control>
     </z-form-field>
 

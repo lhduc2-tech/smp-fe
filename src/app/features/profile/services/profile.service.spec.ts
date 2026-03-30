@@ -34,8 +34,8 @@ describe('ProfileService', () => {
   });
 
   it('should update profile', () => {
-    const updateReq = { full_name: 'Updated', email: 'u@test.com', phone_number: '0456' };
-    const mockRes = { id: '1', username: 'admin', ...updateReq, status: 'ACTIVE', roles: ['ADMIN'] };
+    const updateReq = { fullName: 'Updated', email: 'u@test.com', phoneNumber: '0456' };
+    const mockRes = { id: '1', username: 'admin', full_name: 'Updated', email: 'u@test.com', phone_number: '0456', status: 'ACTIVE', roles: ['ADMIN'] };
 
     service.updateProfile(updateReq).subscribe(profile => {
       expect(profile.full_name).toBe('Updated');
@@ -47,12 +47,13 @@ describe('ProfileService', () => {
   });
 
   it('should change password', () => {
-    const pwReq = { oldPassword: 'old', newPassword: 'new123', confirmPassword: 'new123' };
+    const pwReq = { password: 'newPassword123' };
 
     service.changePassword(pwReq).subscribe();
 
-    const req = httpMock.expectOne(r => r.url.includes('/password'));
+    const req = httpMock.expectOne(r => r.url.includes('/me'));
     expect(req.request.method).toBe('PUT');
-    req.flush(null);
+    expect(req.request.body).toEqual({ password: 'newPassword123' });
+    req.flush({ id: '1', username: 'admin', email: 'a@test.com', phone_number: '0123', status: 'ACTIVE', full_name: 'Admin', roles: ['ADMIN'] });
   });
 });
