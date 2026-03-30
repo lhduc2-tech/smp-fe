@@ -11,14 +11,14 @@ import {
 } from '../models/auth.model';
 
 import { JwtPayload } from '../../../core/models/jwt-payload.model';
+import { getApiUrl } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private readonly API_URL =
-    'https://sales-management-platform-pqqx.onrender.com/sales/public/api/v1/auth';
+  private readonly API_URL = getApiUrl('/public/api/v1/auth');
 
   constructor(private http: HttpClient) { }
 
