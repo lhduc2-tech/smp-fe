@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: sales-management-platform
+    runtime: node
+    plan: free
+    # Change BUILD_ENV to 'staging' or 'production' to use different .env files
+    # For staging: set BUILD_ENV=staging (will use .env.staging)
+    # For production: set BUILD_ENV=production (will use .env)
+    buildCommand: |
+      if [ "$BUILD_ENV" = "staging" ]; then
+        npm install && npm run build:staging
+      else
+        npm install && npm run build
+      fi
+    startCommand: npm install -g serve && serve -s dist/sales-fe/browser -l 3000
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20
+      - key: BUILD_ENV
+        value: production  # Change to 'staging' for staging environment
+
