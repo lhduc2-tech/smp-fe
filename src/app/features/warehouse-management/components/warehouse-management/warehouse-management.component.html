@@ -164,10 +164,7 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                   <div class="flex items-center justify-center gap-1">
-                    <button class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors" title="Xem chi tiết">
-                      <z-icon zType="eye" class="w-4 h-4"></z-icon>
-                    </button>
-                    <button class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition-colors" title="Điều chỉnh">
+                    <button class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition-colors" title="Điều chỉnh" (click)="openAdjustDialog(item)">
                       <z-icon zType="edit" class="w-4 h-4"></z-icon>
                     </button>
                   </div>
@@ -222,4 +219,71 @@
 
     </div>
   </z-card>
+
+  <!-- Adjust Inventory Dialog (Tailwind Custom Modal) -->
+  <div *ngIf="isAdjustDialogOpen" class="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-slate-900/50 backdrop-blur-sm transition-all">
+    <div class="relative w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl border border-slate-100 m-4 animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+        <div>
+          <h3 class="text-[1.1rem] font-bold text-slate-800">Điều chỉnh Tồn Kho</h3>
+          <p class="text-sm text-slate-500 mt-1">Cập nhật số liệu tồn kho thực tế.</p>
+        </div>
+        <button (click)="closeAdjustDialog()" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-red-50">
+          <z-icon zType="x" class="w-5 h-5"></z-icon>
+        </button>
+      </div>
+
+      <div class="space-y-4" *ngIf="selectedProduct">
+        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 mb-5">
+          <p class="text-sm font-semibold text-slate-800">{{ selectedProduct.productName }}</p>
+          <p class="text-[0.8rem] text-slate-500 mt-1.5">Mã SP: <span class="text-slate-700 font-medium">{{ selectedProduct.productCode }}</span> • Phân loại: {{ selectedProduct.categoryName }}</p>
+          <div class="mt-3 pt-3 border-t border-blue-100 flex justify-between items-center">
+             <span class="text-sm text-slate-600">Tồn kho hiện tại:</span>
+             <span class="text-lg font-bold text-blue-600">{{ selectedProduct.quantity }}</span>
+          </div>
+        </div>
+
+        <form [formGroup]="adjustForm" (ngSubmit)="submitAdjustment()" class="space-y-5">
+          <z-form-field>
+            <label z-form-label zRequired>Số lượng thực tế (mới)</label>
+            <z-form-control>
+              <input z-input type="number" formControlName="newQuantity" min="0" class="text-lg font-medium" />
+              <z-form-message *ngIf="adjustForm.get('newQuantity')?.touched && adjustForm.get('newQuantity')?.invalid">
+                Vui lòng nhập số hợp lệ (từ 0 trở lên)
+              </z-form-message>
+            </z-form-control>
+          </z-form-field>
+
+          <z-form-field>
+            <label z-form-label>Nguyên nhân / Lý do</label>
+            <z-form-control>
+              <select formControlName="reason" class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+                <option value="Kiểm kê">Kiểm kê định kỳ</option>
+                <option value="Hàng hỏng/lỗi">Hàng hỏng/lỗi</option>
+                <option value="Hàng mất mát">Hàng thất thoát/mất mát</option>
+                <option value="Khác">Lý do khác</option>
+              </select>
+            </z-form-control>
+          </z-form-field>
+
+          <z-form-field>
+            <label z-form-label>Ghi chú chi tiết</label>
+            <z-form-control>
+              <textarea z-input formControlName="note" placeholder="Nhập ghi chú chi tiết cho thay đổi này..." rows="2" class="resize-none"></textarea>
+            </z-form-control>
+          </z-form-field>
+
+          <div class="flex justify-end gap-3 pt-2">
+            <button type="button" z-button zType="outline" (click)="closeAdjustDialog()" [zDisabled]="isAdjusting">Hủy</button>
+            <button type="submit" z-button zType="default" [zDisabled]="adjustForm.invalid || isAdjusting" class="min-w-[120px]">
+              <z-icon *ngIf="isAdjusting" zType="loader-circle" class="w-4 h-4 mr-2 animate-spin"></z-icon>
+              {{ isAdjusting ? 'Đang lưu...' : 'Lưu điều chỉnh' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

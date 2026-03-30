@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -21,6 +21,7 @@ import { CustomerService } from '../../../customer/services/customer.service';
 import { Customer, CustomerRequest } from '../../../customer/models/customer.model';
 
 import { AuthService } from '../../../auth/services/auth.service';
+import { InventoryService } from '../../../inventory/services/inventory.service';
 
 import { toast } from 'ngx-sonner';
 import { InvoiceExportService } from '../../../../core/services/invoice-export.service';
@@ -48,6 +49,7 @@ import {
 export interface OrderProductItem {
   product: Product;
   quantity: number;
+  maxQuantity?: number;
   unitPrice: number;
   totalPrice: number;
 }
@@ -141,7 +143,9 @@ export class OrderCreateComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private invoiceExportService: InvoiceExportService,
-    private vnpayService: VnpayPaymentService
+    private vnpayService: VnpayPaymentService,
+    private inventoryService: InventoryService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   /* ================= INIT ================= */
@@ -260,12 +264,23 @@ export class OrderCreateComponent implements OnInit {
 
     if (!product) return null;
 
-    return {
+    const orderObj: OrderProductItem = {
       product,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
-      totalPrice: item.totalPrice
+      totalPrice: item.totalPrice,
+      maxQuantity: item.quantity // Dự phòng
     };
+
+    // Lấy tồn kho thực tế hiện hành + số lượng đã giữ trong đơn này (để được ra max Limit của việc Update)
+    this.inventoryService.getByProductAndShop(product.id).subscribe({
+      next: (inv) => {
+         orderObj.maxQuantity = (inv.quantity || 0) + item.quantity;
+      },
+      error: () => console.error('Lỗi khi lấy tồn kho của sản phẩm trong đơn', product.id)
+    });
+
+    return orderObj;
 
   }).filter(Boolean) as OrderProductItem[];
 
@@ -309,25 +324,54 @@ export class OrderCreateComponent implements OnInit {
     const product = this.products.find(p => p.id === option.value);
     if (!product) return;
 
-    const existing = this.orderItems.find(i => i.product.id === product.id);
+    this.isLoading = true;
 
-    if (existing) {
+    this.inventoryService.getByProductAndShop(product.id).subscribe({
+      next: (inv) => {
+        this.isLoading = false;
+        const remainingStock = inv.quantity || 0;
 
-      existing.quantity += 1;
-      existing.totalPrice = existing.quantity * existing.unitPrice;
+        // Nếu mới chọn mà kho đã cạn
+        if (remainingStock <= 0) {
+          toast.error(`Sản phẩm ${product.name} đã hết hàng trong kho!`);
+          this.resetProductCombobox();
+          return;
+        }
 
-    } else {
+        const existing = this.orderItems.find(i => i.product.id === product.id);
 
-      this.orderItems.push({
-        product,
-        quantity: 1,
-        unitPrice: product.price,
-        totalPrice: product.price
-      });
+        if (existing) {
+          const limit = existing.maxQuantity ?? remainingStock;
+          if (existing.quantity + 1 > limit) {
+             toast.error(`Chỉ còn tối đa ${limit} sản phẩm trong kho!`);
+          } else {
+             existing.quantity += 1;
+             existing.totalPrice = existing.quantity * existing.unitPrice;
+          }
+        } else {
+          this.orderItems.push({
+            product,
+            quantity: 1,
+            maxQuantity: remainingStock, // Gán limit ngay khi mới thêm
+            unitPrice: product.price,
+            totalPrice: product.price
+          });
+        }
+        
+        this.resetProductCombobox();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoading = false;
+        toast.error('Lỗi khi kiểm tra số lượng tồn kho!');
+        this.resetProductCombobox();
+        this.cdr.detectChanges();
+      }
+    });
 
-    }
+  }
 
-    // Reset combobox
+  private resetProductCombobox() {
     if (this.productCombobox) {
       this.productCombobox.writeValue(null);
     }
@@ -337,6 +381,12 @@ export class OrderCreateComponent implements OnInit {
   /* ================= ORDER ITEMS ================= */
 
   increaseQty(item: OrderProductItem): void {
+
+    const limit = item.maxQuantity ?? 999999;
+    if (item.quantity + 1 > limit) {
+      toast.error(`Đã đạt giới hạn tồn kho (${limit})!`);
+      return;
+    }
 
     item.quantity += 1;
     item.totalPrice = item.quantity * item.unitPrice;
@@ -355,12 +405,20 @@ export class OrderCreateComponent implements OnInit {
   updateQty(item: OrderProductItem, event: Event): void {
 
     const input = event.target as HTMLInputElement;
-    const val = parseInt(input.value, 10);
+    let val = parseInt(input.value, 10);
+    const limit = item.maxQuantity ?? 999999;
 
-    if (val > 0) {
-      item.quantity = val;
-      item.totalPrice = item.quantity * item.unitPrice;
+    if (val > limit) {
+      toast.error(`Số lượng vượt quá tồn kho cho phép (${limit})!`);
+      val = limit;
+      input.value = limit.toString();
+    } else if (isNaN(val) || val <= 0) {
+      val = 1;
+      input.value = '1';
     }
+
+    item.quantity = val;
+    item.totalPrice = item.quantity * item.unitPrice;
 
   }
 

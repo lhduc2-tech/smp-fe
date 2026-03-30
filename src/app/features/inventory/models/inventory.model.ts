@@ -38,3 +38,9 @@ export interface SearchInventoryItemRequest {
   sortDir?: 'asc' | 'desc';
   searchQuery?: string;
 }
+
+export interface AdjustInventoryRequest {
+  newQuantity: number;
+  reason?: string;
+  note?: string;
+}

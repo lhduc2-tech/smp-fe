@@ -338,12 +338,7 @@ export class SidebarComponent implements OnInit {
           route: '/inventory/warehouse',
           permissions: ['warehouse:read']
         },
-        {
-          label: 'Phiếu nhập',
-          icon: 'package' as ZardIcon,
-          route: '/inventory/purchase-orders',
-          permissions: ['purchase_order:read']
-        },
+
         {
           label: 'Lịch sử kho',
           icon: 'layers' as ZardIcon,

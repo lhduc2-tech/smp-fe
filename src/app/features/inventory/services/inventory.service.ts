@@ -8,7 +8,8 @@ import {
   SearchInventoryRequest,
   PageResponse,
   InventoryItemDto,
-  SearchInventoryItemRequest
+  SearchInventoryItemRequest,
+  AdjustInventoryRequest
 } from '../models/inventory.model';
 
 import { ApiService } from '../../../core/services/api.service';
@@ -82,6 +83,16 @@ export class InventoryService {
       body
     ).pipe(
       map(res => this.transformInventoryShopResponse(res))
+    );
+  }
+
+  /**
+   * Điều chỉnh số lượng tồn kho theo sản phẩm
+   */
+  adjustStock(productId: string, request: AdjustInventoryRequest): Observable<any> {
+    return this.apiService.put<any>(
+      `${this.API_ENDPOINT}/${productId}/adjust`,
+      request
     );
   }
 

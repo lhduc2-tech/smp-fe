@@ -185,7 +185,12 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let item of orderItems; let i = index">
-                                <td class="font-medium">{{ item.product.name }}</td>
+                                <td>
+                                    <div class="font-medium">{{ item.product.name }}</div>
+                                    <div class="text-[0.7rem] text-slate-400 mt-1" *ngIf="item.maxQuantity !== undefined">
+                                        Kho còn: {{ item.maxQuantity || 0 }}
+                                    </div>
+                                </td>
                                 <td>
                                     <z-badge>{{ item.product.code }}</z-badge>
                                 </td>
@@ -196,7 +201,7 @@
                                         <input class="qty-input" type="number" [value]="item.quantity"
                                             (change)="updateQty(item, $event)" min="1" [readonly]="isPaid" />
                                         <button z-button zType="outline" zSize="sm"
-                                            (click)="increaseQty(item)" [zDisabled]="isPaid">+</button>
+                                            (click)="increaseQty(item)" [zDisabled]="isPaid || (item.maxQuantity !== undefined && item.quantity >= item.maxQuantity)">+</button>
                                     </div>
                                 </td>
                                 <td class="text-right">{{ item.unitPrice | number:'1.0-0' }}đ</td>

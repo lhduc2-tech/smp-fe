@@ -1,9 +1,10 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SHARED_UI_IMPORTS } from '../../../../shared/components/ui';
 import { InventoryService } from '../../../inventory/services/inventory.service';
+import { toast } from 'ngx-sonner';
 
 interface InventoryItem {
   productId: string;
@@ -18,13 +19,20 @@ interface InventoryItem {
 @Component({
   selector: 'app-warehouse-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ...SHARED_UI_IMPORTS],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, ...SHARED_UI_IMPORTS],
   templateUrl: './warehouse-management.component.html',
   styleUrls: ['./warehouse-management.component.css']
 })
 export class WarehouseManagementComponent implements OnInit {
   private inventoryService = inject(InventoryService);
   private cdr = inject(ChangeDetectorRef);
+  private fb = inject(FormBuilder);
+
+  // Dialog State
+  isAdjustDialogOpen = false;
+  selectedProduct: InventoryItem | null = null;
+  adjustForm!: FormGroup;
+  isAdjusting = false;
 
   inventoryItems: InventoryItem[] = [];
   filteredItems: InventoryItem[] = [];
@@ -49,7 +57,71 @@ export class WarehouseManagementComponent implements OnInit {
   outOfStockCount = 0;
 
   ngOnInit() {
+    this.initAdjustForm();
     this.loadData();
+  }
+
+  initAdjustForm() {
+    this.adjustForm = this.fb.group({
+      newQuantity: [0, [Validators.required, Validators.min(0)]],
+      reason: [''],
+      note: ['']
+    });
+  }
+
+  openAdjustDialog(item: InventoryItem) {
+    console.log('Opening dialog for item:', item);
+    this.selectedProduct = item;
+    this.adjustForm.patchValue({
+      newQuantity: item.quantity,
+      reason: 'Kiểm kê',
+      note: ''
+    });
+    this.isAdjustDialogOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeAdjustDialog() {
+    this.isAdjustDialogOpen = false;
+    this.selectedProduct = null;
+    this.adjustForm.reset();
+    this.cdr.detectChanges();
+  }
+
+  submitAdjustment() {
+    if (this.adjustForm.invalid || !this.selectedProduct) {
+      this.adjustForm.markAllAsTouched();
+      return;
+    }
+
+    const { newQuantity, reason, note } = this.adjustForm.value;
+    
+    // Nếu số thay đổi không khác số cũ, bỏ qua
+    if (newQuantity === this.selectedProduct.quantity) {
+      toast.info('Số lượng tồn không có thay đổi.');
+      this.closeAdjustDialog();
+      return;
+    }
+
+    this.isAdjusting = true;
+    this.inventoryService.adjustStock(this.selectedProduct.productId, {
+      newQuantity,
+      reason,
+      note
+    }).subscribe({
+      next: () => {
+        toast.success(`Đã cập nhật tồn kho cho ${this.selectedProduct?.productCode}`);
+        this.isAdjusting = false;
+        this.closeAdjustDialog();
+        this.loadData(); // Tải lại bảng để cập nhật số liệu mới nhất
+      },
+      error: (err) => {
+        console.error('Lỗi khi điều chỉnh tồn kho', err);
+        toast.error('Có lỗi xảy ra khi cập nhật tồn kho!');
+        this.isAdjusting = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   loadData() {
