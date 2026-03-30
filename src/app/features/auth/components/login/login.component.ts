@@ -10,6 +10,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
 import { GoogleAuthService } from '../../services/google-auth.service';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-login',
@@ -49,8 +50,14 @@ export class LoginComponent implements AfterViewInit {
     // ✅ ĐỢI GOOGLE SDK LOAD + INIT
     await this.googleAuth.initialize((idToken: string) => {
       this.authService.loginWithGoogle(idToken).subscribe({
-        next: () => this.router.navigate(['/dashboard']),
-        error: err => console.error('Google login failed', err)
+        next: () => {
+          toast.success('Đăng nhập Google thành công');
+          this.router.navigate(['/dashboard']);
+        },
+        error: err => {
+          console.error('Google login failed', err);
+          toast.error('Đăng nhập Google thất bại');
+        }
       });
     });
 
@@ -65,9 +72,13 @@ export class LoginComponent implements AfterViewInit {
     const { username, password } = this.form.value;
 
     this.authService.login({ username, password }).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => {
+        toast.success('Đăng nhập thành công');
+        this.router.navigate(['/dashboard']);
+      },
       error: err => {
         console.error(err);
+        toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
         this.loading = false;
       }
     });

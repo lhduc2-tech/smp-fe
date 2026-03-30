@@ -187,12 +187,17 @@ export class RoleFormComponent implements OnInit {
                 : 'Tạo role thành công'
             );
 
-            this.router.navigate(['/settings/roles']);
+            this.isLoading = false;
+
+            if (!this.isEdit) {
+              this.router.navigate(['/settings/roles']);
+            }
 
           },
 
           error: () => {
             toast.error('Phân quyền thất bại');
+            this.isLoading = false;
           }
 
         });
