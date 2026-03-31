@@ -4,6 +4,7 @@ import { StaffDashboard } from '../../models/dashboard.model';
 import { LucideAngularModule, ShoppingBag, Clock, CheckCircle, XCircle, DollarSign, AlertTriangle, Package, Loader2, AlertCircle } from 'lucide-angular';
 import { RouterModule, Router } from '@angular/router';
 import { DashboardService } from '../../services/dashboard.service';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-dashboard-staff',
@@ -16,6 +17,7 @@ export class StaffDashboardComponent implements OnInit {
   dashboardData: StaffDashboard | null = null;
   loading = true;
   error: string | null = null;
+  isWarehouse = false;
 
   // Icons
   readonly ShoppingBag = ShoppingBag;
@@ -30,9 +32,12 @@ export class StaffDashboardComponent implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private router: Router
-  ) {}
+  ) {
+    this.isWarehouse = this.authService.hasRole('WAREHOUSE');
+  }
 
   ngOnInit(): void {
     this.dashboardService.getStaffDashboard().subscribe({
